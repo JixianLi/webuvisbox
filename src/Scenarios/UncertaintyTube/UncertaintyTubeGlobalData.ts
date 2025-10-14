@@ -249,32 +249,27 @@ export class UncertaintyTubeGlobalData implements GlobalContext {
         return null;
     }
 
-    loadFromObject(obj: any): void {
-        this.data_server_address = obj.data_server_address || this.data_server_address;
-        this.seeds = obj.seeds || this.seeds;
-        this.seed_placement = obj.seed_placement || this.seed_placement;
-        this.seedbox = obj.seedbox || this.seedbox;
-        this.sb_bounds = obj.bounds || this.sb_bounds;
-        this.query_config = obj.query_config || this.query_config;
-        this.colormap_config = obj.colormap_config || this.colormap_config;
+    initialize(global_data: any): void {
+        this.data_server_address = global_data.data_server_address || this.data_server_address;
+        this.seeds = global_data.seeds || this.seeds;
+        this.seed_placement = global_data.seed_placement || this.seed_placement;
+        this.seedbox = global_data.seedbox || this.seedbox;
+        this.sb_bounds = global_data.bounds || this.sb_bounds;
+        this.query_config = global_data.query_config || this.query_config;
+        this.colormap_config = global_data.colormap_config || this.colormap_config;
         this.colormap = this.buildColormap(this.colormap_config) || this.colormap;
         this.texture_manager.registerColormap("uncertainty_tube_colormap", this.colormap);
-        this.trajectory_visualization = obj.trajectory_visualization || this.trajectory_visualization;
-        this.primary_trajectories = obj.primary_trajectories ? [decode64(obj.primary_trajectories) as Float32Array] : this.primary_trajectories;
-        this.secondary_trajectories = obj.secondary_trajectories ? [decode64(obj.secondary_trajectories) as Float32Array] : this.secondary_trajectories;
-        this.render_config = obj.render_config || this.render_config;
+        this.trajectory_visualization = global_data.trajectory_visualization || this.trajectory_visualization;
+        this.primary_trajectories = global_data.primary_trajectories ? [decode64(global_data.primary_trajectories) as Float32Array] : this.primary_trajectories;
+        this.secondary_trajectories = global_data.secondary_trajectories ? [decode64(global_data.secondary_trajectories) as Float32Array] : this.secondary_trajectories;
+        this.render_config = global_data.render_config || this.render_config;
 
-        if (obj.uncertainty_tubes) {
-            this.uncertainty_tubes.loaded = obj.uncertainty_tubes.loaded || this.uncertainty_tubes.loaded;
-            this.uncertainty_tubes.vertices = obj.uncertainty_tubes.vertices ? decode64(obj.uncertainty_tubes.vertices) as Float32Array : this.uncertainty_tubes.vertices;
-            this.uncertainty_tubes.faces = obj.uncertainty_tubes.faces ? decode64(obj.uncertainty_tubes.faces, 'uint32') as Uint32Array : this.uncertainty_tubes.faces;
-            this.uncertainty_tubes.uv = obj.uncertainty_tubes.uv ? decode64(obj.uncertainty_tubes.uv) as Float32Array : this.uncertainty_tubes.uv;
+        if (global_data.uncertainty_tubes) {
+            this.uncertainty_tubes.loaded = global_data.uncertainty_tubes.loaded || this.uncertainty_tubes.loaded;
+            this.uncertainty_tubes.vertices = global_data.uncertainty_tubes.vertices ? decode64(global_data.uncertainty_tubes.vertices) as Float32Array : this.uncertainty_tubes.vertices;
+            this.uncertainty_tubes.faces = global_data.uncertainty_tubes.faces ? decode64(global_data.uncertainty_tubes.faces, 'uint32') as Uint32Array : this.uncertainty_tubes.faces;
+            this.uncertainty_tubes.uv = global_data.uncertainty_tubes.uv ? decode64(global_data.uncertainty_tubes.uv) as Float32Array : this.uncertainty_tubes.uv;
         }
-    }
-
-    initialize(input: string | object): void {
-        let obj = typeof input === "object" ? input : JSON.parse(input);
-        this.loadFromObject(obj.global_data);
     }
 
     async asyncInitialize(): Promise<void> {

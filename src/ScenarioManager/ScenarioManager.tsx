@@ -7,19 +7,16 @@ import { createContext, useContext, useEffect, useState } from "react";
 import UncertaintyTubeGlobalData from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
 import WildfireGlobalData from "@/Scenarios/Wildfire/WildfireGlobalData";
 
-function createGlobalContext(config: any): GlobalContext {
-    console.log('config', config);
+function createGlobalContext(scenario_name: string): GlobalContext {
     let global_context: GlobalContext;
 
-    if (config.name === "Uncertainty Tube") {
+    if (scenario_name === "Uncertainty Tube") {
         global_context = new UncertaintyTubeGlobalData();
-    } else if (config.name === "Wildfire") {
+    } else if (scenario_name === "Wildfire") {
         global_context = new WildfireGlobalData();
     } else {
-        throw new Error(`Unknown GlobalData type: ${config.name}`);
+        throw new Error(`Unknown GlobalData type: ${scenario_name}`);
     }
-
-    global_context.initialize(config);
     return global_context as GlobalContext;
 }
 
@@ -70,7 +67,8 @@ class ScenarioManager implements Scenario {
             this.views = config.views || this.views || [];
             const panel_layouts = config.panel_layouts
             this.panel_layouts = new PanelLayoutManager(panel_layouts.default_layouts, panel_layouts.breakpoints, panel_layouts.cols);
-            this.global_context = createGlobalContext(config || {});
+            this.global_context = createGlobalContext(this.name);
+            this.global_context.initialize(config.global_data);
         });
     }
 

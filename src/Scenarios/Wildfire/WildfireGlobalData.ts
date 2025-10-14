@@ -156,29 +156,37 @@ export class WildfireGlobalData implements GlobalContext {
         this._play = null;
     }
 
-    initialize(input: string | object): void {
-        console.log("WildfireGlobalData initialize called with input:", input);
-        let obj = typeof input === "object" ? input : JSON.parse(input);
-        this.loadFromObject(obj.global_data);
-    }
-
-    loadFromObject(obj: any): void {
-        this.name = obj.name || this.name;
-        this.description = obj.description || this.description;
-        this.data_server_address = obj.data_server_address || this.data_server_address;
-        this.ensemble_names = obj.ensemble_names || this.ensemble_names;
-        this.time_in_seconds = obj.time_index_to_seconds || this.time_in_seconds;
-        this.current_time_index = obj.current_time_index || this.current_time_index;
-        this.current_ensemble_index = obj.current_ensemble_index || this.current_ensemble_index;
-        this.ensemble_colors = obj.ensemble_colors || this.ensemble_colors;
-        this.ui_configs = obj.ui_configs || this.ui_configs;
-        this.contour_configs = obj.contour_configs || this.contour_configs;
-        this.time_diff_data = obj.time_diff_data || this.time_diff_data;
-        this.time_diff_configs = obj.time_diff_configs || this.time_diff_configs;
+    initialize(global_data_object: any): void {
+        this.name = global_data_object.name || this.name;
+        this.description = global_data_object.description || this.description;
+        this.data_server_address = global_data_object.data_server_address || this.data_server_address;
+        this.ensemble_names = global_data_object.ensemble_names || this.ensemble_names;
+        this.time_in_seconds = global_data_object.time_index_to_seconds || this.time_in_seconds;
+        this.current_time_index = global_data_object.current_time_index || this.current_time_index;
+        this.current_ensemble_index = global_data_object.current_ensemble_index || this.current_ensemble_index;
+        this.ensemble_colors = global_data_object.ensemble_colors || this.ensemble_colors;
+        this.ui_configs = global_data_object.ui_configs || this.ui_configs;
+        this.contour_configs = global_data_object.contour_configs || this.contour_configs;
+        this.time_diff_data = global_data_object.time_diff_data || this.time_diff_data;
+        this.time_diff_configs = global_data_object.time_diff_configs || this.time_diff_configs;
 
         this.data_fetcher.setDataServerAddress(this.data_server_address!);
-        this.terrain.loadFromObject(obj.terrain || {});
-        this.wind_glyphs_config.loadFromObject(obj.wind_glyphs_config || {});
+        this.terrain.loadFromObject(global_data_object.terrain || {});
+        this.wind_glyphs_config.loadFromObject(global_data_object.wind_glyphs_config || {});
+    }
+
+    async asyncInitialize(): Promise<void> {
+        runInAction(async () => {
+            await trackPromise(this.queryTerrainData());
+            await trackPromise(this.queryTimeMap());
+            await trackPromise(this.queryScalarData(this.current_ensemble_index, this.current_time_index));
+            await trackPromise(this.queryContourData());
+            await trackPromise(this.queryTimeDiffData());
+
+            this.updateTerrainViewConfig();
+            this.windGlyphsUpdateInstances();
+        });
+        return Promise.resolve();
     }
 
     toObject() {
@@ -217,21 +225,6 @@ export class WildfireGlobalData implements GlobalContext {
             this.terrain_view_config.current_otf_name = "FUEL_FRAC";
             this.terrain_view_config.current_otf = this.scalars.tfs["FUEL_FRAC"].otf;
         }
-    }
-
-    async asyncInitialize(): Promise<void> {
-        console.log("WildfireGlobalData asyncInitialize called");
-        runInAction(async () => {
-            await trackPromise(this.queryTerrainData());
-            await trackPromise(this.queryTimeMap());
-            await trackPromise(this.queryScalarData(this.current_ensemble_index, this.current_time_index));
-            await trackPromise(this.queryContourData());
-            await trackPromise(this.queryTimeDiffData());
-
-            this.updateTerrainViewConfig();
-            this.windGlyphsUpdateInstances();
-        });
-        return Promise.resolve();
     }
 
     private async queryScalarData(ensembleIndex: number, timeIndex: number): Promise<void> {

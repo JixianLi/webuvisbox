@@ -1,7 +1,6 @@
 
 export interface GlobalContext {
-    initialize(input: string | object): void;
+    initialize(global_data_object: any): void;
     asyncInitialize(): Promise<void>;
-
     toObject(): any;
 }
