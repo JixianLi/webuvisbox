@@ -2,7 +2,7 @@ import Panel from "@/Panels/Panel";
 import TimeCharts from "./TimeCharts";
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type { WildfireGlobalData } from "@/Scenarios/Wildfire/WildfireGlobalData";
+import type { WildfireGlobalContext } from "@/Scenarios/Wildfire/WildfireGlobalData";
 import { useState } from "react";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from '@mui/icons-material/Menu';
@@ -20,7 +20,7 @@ import { LazyTextField } from "@/Panels/Lazyfields";
 
 const TimeNavigationPanel = observer(() => {
 
-    const global_data = useScenario().global_context as WildfireGlobalData;
+    const global_data = useScenario().global_context as WildfireGlobalContext;
     const config = global_data.time_diff_configs;
 
     const [anchor, setAnchor] = useState(null);

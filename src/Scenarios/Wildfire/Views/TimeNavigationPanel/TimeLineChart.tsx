@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type WildfireGlobalData from "../../WildfireGlobalData";
+import type WildfireGlobalContext from "../../WildfireGlobalData";
 import { useRef, useState } from "react";
 import { toJS } from "mobx";
 
@@ -52,7 +52,7 @@ function create_y_scale_options(name: string, data: any, configs: any, edx: numb
 const TimeLineChart = observer((props: TimeLineChartProps) => {
     const chartRef = useRef<Chart<'line'>>(null);
     const scenario = useScenario();
-    const global_data = scenario.global_context as WildfireGlobalData;
+    const global_data = scenario.global_context as WildfireGlobalContext;
     const time_diff_data = global_data.time_diff_data;
     const configs = global_data.time_diff_configs;
     const time_in_seconds = global_data.time_in_seconds;

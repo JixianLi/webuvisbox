@@ -8,7 +8,7 @@ import { decode64, encode64 } from "@/Helpers/DataHelper";
 import PresetLinearColormap from "@/Renderers/Colormaps/PresetLinearColormap";
 import { getTextureManager } from "@/Renderers/Colormaps/TextureManager";
 
-export class UncertaintyTubeGlobalData implements GlobalContext {
+export class UncertaintyTubeGlobalContext implements GlobalContext {
     data_server_address: string;
     seeds: Point3D[];
 
@@ -349,4 +349,4 @@ export class UncertaintyTubeGlobalData implements GlobalContext {
 
 }
 
-export default UncertaintyTubeGlobalData;
+export default UncertaintyTubeGlobalContext;

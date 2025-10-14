@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import { WildfireGlobalData } from "@/Scenarios/Wildfire/WildfireGlobalData";
+import { WildfireGlobalContext } from "@/Scenarios/Wildfire/WildfireGlobalData";
 
 import Panel from "@/Panels/Panel";
 import Grid from "@mui/material/Grid";
@@ -10,7 +10,7 @@ import GridLayoutContainer from "@/Panels/GridLayoutContainer";
 import { LazyTextField } from "@/Panels/Lazyfields";
 
 export const WindGlyphConfigPanel = observer(() => {
-    const global_data = useScenario().global_context as WildfireGlobalData;
+    const global_data = useScenario().global_context as WildfireGlobalContext;
     const config = global_data.wind_glyphs_config;
 
     const content = (<>

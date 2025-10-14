@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalData from "../../UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalData";
 import { LinearTubeMesh } from "@/Renderers/Mesh/LinearTubeMesh";
 
 const UncertaintyPathMesh = observer(() => {
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalData;
+    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
     const primary_paths = global_context.primary_trajectories;
     const diag = global_context.diag;
 

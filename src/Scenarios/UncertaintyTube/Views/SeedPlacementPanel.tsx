@@ -5,7 +5,7 @@ import Grid from "@mui/material/Grid";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalData from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
 import { LazyTextField } from "@/Panels/Lazyfields";
 import Stack from "@mui/material/Stack";
 import { runInAction } from "mobx";
@@ -16,7 +16,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 const SeedPlacementPanel = observer(() => {
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalData;
+    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
 
     const seed_placement_config = global_context.seed_placement;
     const [min_x, max_x, min_y, max_y, min_z, max_z] = global_context.sb_bounds;

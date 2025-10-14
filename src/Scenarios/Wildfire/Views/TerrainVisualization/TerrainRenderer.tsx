@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import WildfireGlobalData from "@/Scenarios/Wildfire/WildfireGlobalData";
+import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalData";
 import { Canvas } from "@react-three/fiber";
 import { PerspectiveCamera, GizmoHelper, GizmoViewport } from "@react-three/drei";
 import * as THREE from "three";
@@ -20,7 +20,7 @@ export const TerrainRenderer = observer((props: TerrainRendererProps) => {
     const canvas_ref = useRef(null);
 
     const scenario = useScenario();
-    const global_data = scenario.global_context as WildfireGlobalData;
+    const global_data = scenario.global_context as WildfireGlobalContext;
     const terrain_view_config = global_data.terrain_view_config;
     if (!terrain_view_config) {
         return <div>No terrain view configuration available</div>;

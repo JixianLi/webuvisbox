@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import WildfireGlobalData from "../../WildfireGlobalData";
+import WildfireGlobalContext from "../../WildfireGlobalData";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
 import { ScalarFieldMesh } from "@/Renderers/Mesh/ScalarFieldMesh";
 import { ContourMesh } from "./ContourMesh";
@@ -13,7 +13,7 @@ interface TerrainSceneProps {
 }
 
 export const TerrainScene = observer((props: TerrainSceneProps) => {
-    const global_data = useScenario().global_context as WildfireGlobalData;
+    const global_data = useScenario().global_context as WildfireGlobalContext;
     const terrain_view_config = global_data.terrain_view_config;
 
     // Terrain data

@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalData from "../../UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalData";
 import InstancedSphereMesh from "@/Renderers/Mesh/InstancedSphereMesh";
 
 const SeedsMesh = observer(() => {
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalData;
+    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
     const seeds = global_context.seeds;
     const render_config = global_context.render_config;
 

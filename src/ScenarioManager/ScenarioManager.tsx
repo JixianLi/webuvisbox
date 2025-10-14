@@ -4,16 +4,16 @@ import type { PanelLayouts } from "@/Types/PanelLayouts";
 import type { Scenario } from "@/Types/Scenario";
 import PanelLayoutManager from "@/LayoutManager/PanelLayoutManager";
 import { createContext, useContext, useEffect, useState } from "react";
-import UncertaintyTubeGlobalData from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
-import WildfireGlobalData from "@/Scenarios/Wildfire/WildfireGlobalData";
+import UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
+import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalData";
 
 function createGlobalContext(scenario_name: string): GlobalContext {
     let global_context: GlobalContext;
 
     if (scenario_name === "Uncertainty Tube") {
-        global_context = new UncertaintyTubeGlobalData();
+        global_context = new UncertaintyTubeGlobalContext();
     } else if (scenario_name === "Wildfire") {
-        global_context = new WildfireGlobalData();
+        global_context = new WildfireGlobalContext();
     } else {
         throw new Error(`Unknown GlobalData type: ${scenario_name}`);
     }

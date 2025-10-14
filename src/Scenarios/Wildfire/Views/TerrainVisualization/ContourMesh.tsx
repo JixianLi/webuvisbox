@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import LinearTubeMesh from "@/Renderers/Mesh/LinearTubeMesh";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import WildfireGlobalData from "@/Scenarios/Wildfire/WildfireGlobalData";
+import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalData";
 // @ts-expect-error unused import
 import { Canvas } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
@@ -9,7 +9,7 @@ import { Html } from "@react-three/drei";
 
 export const ContourMesh = observer(() => {
     const scenario = useScenario();
-    const global_data = scenario.global_context as WildfireGlobalData;
+    const global_data = scenario.global_context as WildfireGlobalContext;
     const ensemble_index = global_data.current_ensemble_index;
     const contour_configs = global_data.contour_configs;
     const base_scale = global_data.terrain.base_scale;  

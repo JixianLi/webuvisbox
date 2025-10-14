@@ -4,7 +4,7 @@ import { PerspectiveCamera, TrackballControls, GizmoHelper, GizmoViewport, Stats
 import { useRef } from "react";
 import UncertaintyPathMesh from "./UncertaintyPathMesh";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalData from "../../UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalData";
 import { Vector3 } from "three";
 import SeedsMesh from "./SeedsMesh";
 import UncertaintyTubeMesh from "./UncertaintyTubeMesh";
@@ -15,7 +15,7 @@ const TrajectoriesRenderer = observer(() => {
     const canvas_ref = useRef(null);
     const control_ref = useRef(null);
     const scenario = useScenario();
-    const global_data = scenario.global_context as UncertaintyTubeGlobalData;
+    const global_data = scenario.global_context as UncertaintyTubeGlobalContext;
 
     const center = global_data.center;
     const diag = global_data.diag;

@@ -14,7 +14,7 @@ import { SharedTrackballPerspectiveCamera } from "@/Renderers/SharedCameraContro
 import { ScalarFields } from "./GlobalDataContainers/ScalarFields";
 
 
-export class WildfireGlobalData implements GlobalContext {
+export class WildfireGlobalContext implements GlobalContext {
     name: string;
     description?: string
     data_server_address?: string
@@ -537,4 +537,4 @@ export class WildfireGlobalData implements GlobalContext {
     }
 }
 
-export default WildfireGlobalData;
+export default WildfireGlobalContext;

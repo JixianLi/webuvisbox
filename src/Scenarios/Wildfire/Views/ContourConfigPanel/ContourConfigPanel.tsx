@@ -5,13 +5,13 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type WildfireGlobalData from "@/Scenarios/Wildfire/WildfireGlobalData";
+import type WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalData";
 import { LazyTextField } from "@/Panels/Lazyfields";
 import { GridLayoutContainer } from "@/Panels/GridLayoutContainer";
 
 const ContourConfigPanel = observer(() => {
     const scenario = useScenario();
-    const global_data = scenario.global_context as WildfireGlobalData;
+    const global_data = scenario.global_context as WildfireGlobalContext;
     const contour_configs = global_data.contour_configs;
     if (!scenario.initialized) {
         return <Panel panel_name={"Contour Configuration"}>

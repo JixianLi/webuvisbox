@@ -13,14 +13,14 @@ import { observer } from "mobx-react-lite";
 import { LazyTextField } from "@/Panels/Lazyfields";
 import Panel from "@/Panels/Panel";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalData from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
 import { trackPromise } from "react-promise-tracker";
 
 
 const QueryConfigPanel = observer(() => {
 
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalData;
+    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
 
     if (!scenario.initialized) {
         return <Panel panel_name={"Query Config"}>

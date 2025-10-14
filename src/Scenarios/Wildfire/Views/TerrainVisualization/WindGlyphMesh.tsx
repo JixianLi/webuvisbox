@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
-import WildfireGlobalData from "../../WildfireGlobalData";
+import WildfireGlobalContext from "../../WildfireGlobalData";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
 import InstancedConeMesh from "@/Renderers/Mesh/InstancedConeMesh";
 
 export const WindGlyphMesh = observer(() => {
     const scenario = useScenario();
-    const global_data = scenario.global_context as WildfireGlobalData;
+    const global_data = scenario.global_context as WildfireGlobalContext;
     const wind_glyphs_config = global_data.wind_glyphs_config;
 
     if (!global_data || !wind_glyphs_config.display || wind_glyphs_config.instances.length === 0) {

@@ -8,11 +8,11 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Panel from "@/Panels/Panel";
 import { LazyTextField } from "@/Panels/Lazyfields";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalData from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
 
 const SeedboxConfigPanel = observer(() => {
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalData;
+    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
     const seedbox_config = global_context.seedbox;
 
     // Number of steps for sliders (higher value = finer control)

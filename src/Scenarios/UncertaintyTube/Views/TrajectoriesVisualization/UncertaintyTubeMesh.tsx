@@ -1,12 +1,12 @@
 import { observer } from "mobx-react-lite";
 import { toJS } from "mobx";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalData from "../../UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalData";
 import TexturedBufferedMesh from "@/Renderers/Mesh/TexturedBufferedMesh";
 
 const UncertaintyTubeMesh = observer(() => {
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalData;
+    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
     const texture_height = global_context.colormap_config.texture_height;
     const texuter_width = global_context.colormap_config.texture_width;
     const texture = global_context.texture_manager.getTexture("uncertainty_tube_colormap", undefined, texuter_width, texture_height);

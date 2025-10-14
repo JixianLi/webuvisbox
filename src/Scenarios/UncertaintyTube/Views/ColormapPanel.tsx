@@ -10,7 +10,7 @@ import Grid from "@mui/material/Grid";
 
 import Panel from "@/Panels/Panel";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalData from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
 import { range } from "@/Helpers/MathHelper";
 import PresetLinearColormap  from "@/Renderers/Colormaps/PresetLinearColormap";
 import VSUP from "@/Renderers/Colormaps/VSUP";
@@ -18,7 +18,7 @@ import VSUP from "@/Renderers/Colormaps/VSUP";
 const ColormapRenderer = observer(() => {
     const scenario = useScenario();
     const planeRef = useRef(null);
-    const global_context = scenario.global_context as UncertaintyTubeGlobalData;
+    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
     const texture_height = global_context.colormap_config.texture_height;
     const texture_width = global_context.colormap_config.texture_width;
     const texture = global_context.texture_manager.getTexture("uncertainty_tube_colormap", undefined, texture_width, texture_height);
@@ -50,7 +50,7 @@ const ColormapPanel = observer(() => {
         </Panel>;
     }
 
-    const global_data = scenario.global_context as UncertaintyTubeGlobalData;
+    const global_data = scenario.global_context as UncertaintyTubeGlobalContext;
     const type = global_data.colormap.type;
     let colormap;
     switch (type) {

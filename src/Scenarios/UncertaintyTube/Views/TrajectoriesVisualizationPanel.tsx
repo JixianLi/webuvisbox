@@ -6,7 +6,7 @@ import Menu from "@mui/material/Menu";
 import MenuList from "@mui/material/MenuList";
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalData from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
 import { runInAction } from "mobx";
 import MenuToggleItem from "@/Panels/MenuToggleItem";
 import TrajectoriesRenderer from "./TrajectoriesVisualization/TrajectoriesRenderer";
@@ -28,7 +28,7 @@ const TrajectoriesVisualizationPanel = observer(() => {
             <div>Loading...</div>
         </Panel>;
     }
-    const global_data = scenario.global_context as UncertaintyTubeGlobalData;
+    const global_data = scenario.global_context as UncertaintyTubeGlobalContext;
 
     const trajectory_visualization_config = global_data.trajectory_visualization;
 

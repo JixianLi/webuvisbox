@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import WildfireGlobalData from "@/Scenarios/Wildfire/WildfireGlobalData";
+import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalData";
 import { useState, useRef } from "react";
 import { Bubble } from "react-chartjs-2";
 import 'chart.js/auto';
@@ -17,7 +17,7 @@ export const ContourBanddepthPlot = observer(() => {
     const chart_ref = useRef(null);
 
     const scenario = useScenario();
-    const global_data = scenario?.global_context as WildfireGlobalData;
+    const global_data = scenario?.global_context as WildfireGlobalContext;
     const ensemble_names = global_data?.ensemble_names;
     const depths = global_data?.scalars?.depths;
     const ordering = global_data?.scalars?.ordering;

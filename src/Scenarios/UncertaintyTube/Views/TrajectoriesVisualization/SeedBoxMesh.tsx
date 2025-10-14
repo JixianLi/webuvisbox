@@ -1,12 +1,12 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalData from "../../UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalData";
 import { BoxOutlineMesh } from "@/Renderers/Mesh/BoxOutlineMesh";
 
 
 const SeedBoxMesh = observer(() => {
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalData;
+    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
 
     if (!global_context.seedbox.visible) {
         return null;
