@@ -1,6 +1,7 @@
-export interface GlobalContext{
-    loadFromJson(json: string): void;
-    loadFromObject(obj: any): void;
+
+export interface GlobalContext {
+    initialize(input: string | object): void;
+    asyncInitialize(): Promise<void>;
+
     toObject(): any;
-    toJson(): string;
 }

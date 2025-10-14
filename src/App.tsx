@@ -29,6 +29,10 @@ function App() {
                 main: '#f50057',
             },
         },
+        typography: {
+            fontFamily: 'Roboto, Arial, sans-serif',
+            fontSize: 20,
+        },
     });
 
     useEffect(() => {

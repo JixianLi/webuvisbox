@@ -156,16 +156,16 @@ export class WildfireGlobalData implements GlobalContext {
         this._play = null;
     }
 
-    loadFromJson(json: string): void {
-        const obj = JSON.parse(json);
-        this.loadFromObject(obj);
+    initialize(input: string | object): void {
+        console.log("WildfireGlobalData initialize called with input:", input);
+        let obj = typeof input === "object" ? input : JSON.parse(input);
+        this.loadFromObject(obj.global_data);
     }
 
     loadFromObject(obj: any): void {
         this.name = obj.name || this.name;
         this.description = obj.description || this.description;
         this.data_server_address = obj.data_server_address || this.data_server_address;
-
         this.ensemble_names = obj.ensemble_names || this.ensemble_names;
         this.time_in_seconds = obj.time_index_to_seconds || this.time_in_seconds;
         this.current_time_index = obj.current_time_index || this.current_time_index;
@@ -200,10 +200,6 @@ export class WildfireGlobalData implements GlobalContext {
         };
     }
 
-    toJson(): string {
-        return JSON.stringify(this.toObject(), null, 2);
-    }
-
     updateTerrainViewConfig() {
         if (this.terrain_view_config === undefined) {
             this.terrain_view_config = {
@@ -223,7 +219,8 @@ export class WildfireGlobalData implements GlobalContext {
         }
     }
 
-    async initialize(): Promise<void> {
+    async asyncInitialize(): Promise<void> {
+        console.log("WildfireGlobalData asyncInitialize called");
         runInAction(async () => {
             await trackPromise(this.queryTerrainData());
             await trackPromise(this.queryTimeMap());

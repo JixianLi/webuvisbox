@@ -272,9 +272,17 @@ export class UncertaintyTubeGlobalData implements GlobalContext {
         }
     }
 
-    loadFromJson(json: string): void {
-        const data = JSON.parse(json);
-        this.loadFromObject(data);
+    initialize(input: string | object): void {
+        let obj = typeof input === "object" ? input : JSON.parse(input);
+        this.loadFromObject(obj.global_data);
+    }
+
+    async asyncInitialize(): Promise<void> {
+        console.log("UncertaintyTubeGlobalData asyncInitialize called");
+        await this.fetch_bounds();
+        if (this.seeds.length > 0) {
+            await this.fetch_trajectories();
+        }
     }
 
     toObject(): any {
@@ -298,10 +306,6 @@ export class UncertaintyTubeGlobalData implements GlobalContext {
             primary_trajectories: this.primary_trajectories.map(arr => encode64(arr)),
             secondary_trajectories: this.secondary_trajectories.map(arr => encode64(arr))
         };
-    }
-
-    toJson(): string {
-        return JSON.stringify(this.toObject(), null, 2);
     }
 
     get_active_bounds(): [number, number, number, number, number, number] {

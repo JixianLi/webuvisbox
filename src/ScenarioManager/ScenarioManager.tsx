@@ -1,11 +1,27 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import type { GlobalContext } from "@/Types/GlobalContext";
+import type { GlobalContext} from "@/Types/GlobalContext";
 import type { PanelLayouts } from "@/Types/PanelLayouts";
 import type { Scenario } from "@/Types/Scenario";
 import PanelLayoutManager from "@/LayoutManager/PanelLayoutManager";
 import { createContext, useContext, useEffect, useState } from "react";
 import UncertaintyTubeGlobalData from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
 import WildfireGlobalData from "@/Scenarios/Wildfire/WildfireGlobalData";
+
+function createGlobalContext(config: any): GlobalContext {
+    console.log('config', config);
+    let global_context: GlobalContext;
+
+    if (config.name === "Uncertainty Tube") {
+        global_context = new UncertaintyTubeGlobalData();
+    } else if (config.name === "Wildfire") {
+        global_context = new WildfireGlobalData();
+    } else {
+        throw new Error(`Unknown GlobalData type: ${config.name}`);
+    }
+
+    global_context.initialize(config);
+    return global_context as GlobalContext;
+}
 
 class ScenarioManager implements Scenario {
     name: string;
@@ -27,33 +43,24 @@ class ScenarioManager implements Scenario {
         makeAutoObservable(this);
     }
 
-    initializeScenario(scenario_name: string, global_data_config: any): void {
-        switch (scenario_name) {
-            case "Uncertainty Tube":
-                this.global_context = new UncertaintyTubeGlobalData();
-                this.global_context.loadFromObject(global_data_config);
-                break;
-            case "Wildfire":
-                this.global_context = new WildfireGlobalData();
-                this.global_context.loadFromObject(global_data_config);
-                break;
-            default:
-                this.global_context = {} as GlobalContext;
-                throw new Error(`Unknown GlobalData type: ${scenario_name}`);
-        }
-    }
+    // createGlobalContext(scenario_name: string): void {
+    //     runInAction((() => {
+    //         switch (scenario_name) {
+    //             case "Uncertainty Tube":
+    //                 this.global_context = new UncertaintyTubeGlobalData();
+    //                 break;
+    //             case "Wildfire":
+    //                 this.global_context = new WildfireGlobalData();
+    //                 break;
+    //             default:
+    //                 this.global_context = {} as GlobalContext;
+    //                 throw new Error(`Unknown GlobalData type: ${scenario_name}`);
+    //         }
+    //     }))
+    // }
 
     async asyncInitialization(): Promise<void> {
-        switch (this.name) {
-            case "Uncertainty Tube":
-                await (this.global_context as UncertaintyTubeGlobalData).fetch_bounds();
-                break;
-            case "Wildfire":
-                await (this.global_context as WildfireGlobalData).initialize();
-                break;
-            default:
-                return Promise.resolve();
-        }
+        return this.global_context.asyncInitialize();
     }
 
     loadFromObject(config: any): void {
@@ -63,7 +70,7 @@ class ScenarioManager implements Scenario {
             this.views = config.views || this.views || [];
             const panel_layouts = config.panel_layouts
             this.panel_layouts = new PanelLayoutManager(panel_layouts.default_layouts, panel_layouts.breakpoints, panel_layouts.cols);
-            this.initializeScenario(this.name, config.global_data || {});
+            this.global_context = createGlobalContext(config || {});
         });
     }
 

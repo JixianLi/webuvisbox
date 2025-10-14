@@ -1,5 +1,6 @@
 import { Instances, Instance } from "@react-three/drei"
 import * as THREE from 'three';
+import { useRef } from "react";
 // @ts-ignore
 import { useFrame } from '@react-three/fiber';
 
@@ -61,8 +62,16 @@ export function InstancedSphereMesh(props: SphereMeshProps) {
         shininess = 30                       // Default moderate shininess
     } = props;
 
+    const limitRef = useRef(points.length > 0 ? points.length : 1000);
+
+    if (points.length > limitRef.current) {
+        limitRef.current = points.length;
+    }
+
+    const limit = limitRef.current;
+
     return (
-        <Instances limit={points.length} frustumCulled={false}>
+        <Instances key={limit} limit={limit} frustumCulled={false}>
             {/* Shared geometry - created once and reused for all instances */}
             <sphereGeometry args={[radius, widthSegments, heightSegments]} />
             
