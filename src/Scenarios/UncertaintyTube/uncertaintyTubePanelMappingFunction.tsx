@@ -5,7 +5,7 @@ import QueryConfigPanel from "./Views/QueryConfigPanel";
 import ColormapPanel from "./Views/ColormapPanel";
 import type React from "react";
 
-export function getUncertaintyTubeView(viewname:string): React.ReactNode {
+export function uncertaintyTubePanelMappingFunction(viewname:string): React.ReactNode {
     switch(viewname){
         case "Trajectories Visualization":
             return <TrajectoriesVisualizationPanel />;
@@ -23,4 +23,4 @@ export function getUncertaintyTubeView(viewname:string): React.ReactNode {
     }
 }
 
-export default getUncertaintyTubeView;
+export default uncertaintyTubePanelMappingFunction;

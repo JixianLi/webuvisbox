@@ -4,21 +4,7 @@ import type { PanelLayouts } from "@/Types/PanelLayouts";
 import type { Scenario } from "@/Types/Scenario";
 import PanelLayoutManager from "@/LayoutManager/PanelLayoutManager";
 import { createContext, useContext, useEffect, useState } from "react";
-import UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
-import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalData";
-
-function createGlobalContext(scenario_name: string): GlobalContext {
-    let global_context: GlobalContext;
-
-    if (scenario_name === "Uncertainty Tube") {
-        global_context = new UncertaintyTubeGlobalContext();
-    } else if (scenario_name === "Wildfire") {
-        global_context = new WildfireGlobalContext();
-    } else {
-        throw new Error(`Unknown GlobalData type: ${scenario_name}`);
-    }
-    return global_context as GlobalContext;
-}
+import { getGlobalContext } from "@/Scenarios/ScenarioExtension";
 
 class ScenarioManager implements Scenario {
     name: string;
@@ -67,7 +53,7 @@ class ScenarioManager implements Scenario {
             this.views = config.views || this.views || [];
             const panel_layouts = config.panel_layouts
             this.panel_layouts = new PanelLayoutManager(panel_layouts.default_layouts, panel_layouts.breakpoints, panel_layouts.cols);
-            this.global_context = createGlobalContext(this.name);
+            this.global_context = getGlobalContext(this.name);
             this.global_context.initialize(config.global_data);
         });
     }

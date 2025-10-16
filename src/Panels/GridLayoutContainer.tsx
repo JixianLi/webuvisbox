@@ -9,8 +9,8 @@ interface ConfigContentContainerProps {
 }
 
 export const GridLayoutContainer = (props: ConfigContentContainerProps) => {
-    return <Box sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex', width: '100%', height: '100%', p: "10px" }}>
-        <Grid container spacing={props.spacing || 2} sx={{ p: props.padding || "10px", width: '100%', height: '100%', ...props.sx }}>
+    return <Box sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex', p: "10px" }}>
+        <Grid container spacing={props.spacing || 2} sx={{ p: props.padding || "10px", ...props.sx }}>
             {props.children}
         </Grid>
     </Box>

@@ -5,7 +5,7 @@ import ContourBoxplotPanel from "./Views/TerrainVisualization/ContourBoxplotPane
 import TimeNavigationPanel from "./Views/TimeNavigationPanel/TimeNavigationPanel";
 import WindGlyphConfigPanel from "./Views/WindGlyphConfigPanel/WindGlyphConfigPanel";
 
-export function getWildfireView(viewname:string): React.ReactNode {
+export function wildFirePanelMappingFunction(viewname:string): React.ReactNode {
     switch(viewname){
         case "Terrain Visualization":
             return <TerrainVisualizationPanel />;

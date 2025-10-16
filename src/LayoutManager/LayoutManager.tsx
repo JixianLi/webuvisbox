@@ -6,8 +6,8 @@ import type { AppLayout, AppLayouts, PanelLayouts } from "@/Types/PanelLayouts";
 import type { Theme } from "@mui/material/styles";
 import HeaderBar from "./HeaderBar/HeaderBar";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import { getUncertaintyTubeView } from "@/Scenarios/UncertaintyTube/getUncertaintyTubeView";
-import { getWildfireView } from "@/Scenarios/Wildfire/getWildfireView";
+import { uncertaintyTubePanelMappingFunction } from "@/Scenarios/UncertaintyTube/uncertaintyTubePanelMappingFunction";
+import { wildFirePanelMappingFunction } from "@/Scenarios/Wildfire/wildFirePanelMappingFunction";
 import { usePromiseTracker } from "react-promise-tracker";
 import PacmanLoader from "react-spinners/PacmanLoader";
 // @ts-ignore
@@ -61,9 +61,9 @@ const LayoutManager: React.FC<LayoutManagerProps> = observer((props: LayoutManag
     const layoutPanels = () => {
         const getPanel = () => {
             if (scenario.name === "Uncertainty Tube") {
-                return getUncertaintyTubeView;
+                return uncertaintyTubePanelMappingFunction;
             } else if (scenario.name === "Wildfire") {
-                return getWildfireView;
+                return wildFirePanelMappingFunction;
             } else {
                 throw new Error(`Unknown scenario name: ${scenario.name}`);
             }
