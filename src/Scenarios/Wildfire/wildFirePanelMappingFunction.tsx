@@ -4,6 +4,8 @@ import TerrainVisualizationPanel from "./Views/TerrainVisualization/TerrainVisua
 import ContourBoxplotPanel from "./Views/TerrainVisualization/ContourBoxplotPanel";
 import TimeNavigationPanel from "./Views/TimeNavigationPanel/TimeNavigationPanel";
 import WindGlyphConfigPanel from "./Views/WindGlyphConfigPanel/WindGlyphConfigPanel";
+import ColorEditorPanel from "./Views/ColorEditorPanel/ColorEditorPanel";
+import OpacityEditorPanel from "./Views/OpacityEditorPanel/OpacityEditorPanel";
 
 export function wildFirePanelMappingFunction(viewname:string): React.ReactNode {
     switch(viewname){
@@ -19,6 +21,10 @@ export function wildFirePanelMappingFunction(viewname:string): React.ReactNode {
             return <TimeNavigationPanel />;
         case "Wind Glyph Configuration":
             return <WindGlyphConfigPanel />;
+        case "Color Editor":
+            return <ColorEditorPanel />;
+        case "Opacity Editor":
+            return <OpacityEditorPanel />;
         default:
             throw new Error(`Unknown view name: ${viewname}`);
             return <div>Unknown view: {viewname}</div>;

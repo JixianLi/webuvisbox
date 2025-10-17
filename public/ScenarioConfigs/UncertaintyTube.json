@@ -36,7 +36,7 @@
     "cols": {"xl": 22, "lg": 12, "sm": 6}
   },
   "global_data": {
-    "data_server_address": "http://10.0.0.13:10000",
+    "data_server_address": "http://localhost:10000",
     "seed_placement": {
       "use_random_seeding": false,
       "random_seed_count": 100,
