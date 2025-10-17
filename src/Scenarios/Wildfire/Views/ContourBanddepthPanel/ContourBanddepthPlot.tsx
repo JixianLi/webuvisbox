@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalData";
+import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalContext";
 import { useState, useRef } from "react";
 import { Bubble } from "react-chartjs-2";
 import 'chart.js/auto';

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import WildfireGlobalContext from "../../WildfireGlobalData";
+import WildfireGlobalContext from "../../WildfireGlobalContext";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
 import { ScalarFieldMesh } from "@/Renderers/Mesh/ScalarFieldMesh";
 import { ContourMesh } from "./ContourMesh";

@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type WildfireGlobalContext from "../../WildfireGlobalData";
+import type WildfireGlobalContext from "../../WildfireGlobalContext";
 import { useRef, useState } from "react";
 import { toJS } from "mobx";
 

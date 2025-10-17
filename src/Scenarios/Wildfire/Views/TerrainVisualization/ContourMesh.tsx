@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import LinearTubeMesh from "@/Renderers/Mesh/LinearTubeMesh";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalData";
+import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalContext";
 // @ts-expect-error unused import
 import { Canvas } from "@react-three/fiber";
 import { Html } from "@react-three/drei";

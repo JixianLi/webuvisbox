@@ -2,7 +2,7 @@ import Panel from "@/Panels/Panel";
 import TimeCharts from "./TimeCharts";
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type { WildfireGlobalContext } from "@/Scenarios/Wildfire/WildfireGlobalData";
+import type { WildfireGlobalContext } from "@/Scenarios/Wildfire/WildfireGlobalContext";
 import { useState } from "react";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from '@mui/icons-material/Menu';

@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalData";
+import type WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalContext";
 import { LazyTextField } from "@/Panels/Lazyfields";
 import { GridLayoutContainer } from "@/Panels/GridLayoutContainer";
 

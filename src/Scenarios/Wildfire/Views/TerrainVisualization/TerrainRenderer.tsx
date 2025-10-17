@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalData";
+import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalContext";
 import { Canvas } from "@react-three/fiber";
 import { PerspectiveCamera, GizmoHelper, GizmoViewport } from "@react-three/drei";
 import * as THREE from "three";

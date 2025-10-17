@@ -1,6 +1,6 @@
 import type { GlobalContext } from "@/Types/GlobalContext";
 import { UncertaintyTubeGlobalContext } from "./UncertaintyTube/UncertaintyTubeGlobalData";
-import { WildfireGlobalContext } from "./Wildfire/WildfireGlobalData";
+import { WildfireGlobalContext } from "./Wildfire/WildfireGlobalContext";
 import { uncertaintyTubePanelMappingFunction } from "@/Scenarios/UncertaintyTube/uncertaintyTubePanelMappingFunction";
 import { wildFirePanelMappingFunction } from "@/Scenarios/Wildfire/wildFirePanelMappingFunction";
 import type { ReactNode } from "react";
