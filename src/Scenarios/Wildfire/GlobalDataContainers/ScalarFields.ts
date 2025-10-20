@@ -66,8 +66,13 @@ export class ScalarFields {
             this._scalar_names.forEach(name => {
                 if (this._tfs[name] === undefined || this._tfs[name] === null) {
                     if (name === "NFUEL_CAT") {
+                        const colormap = new PresetLinearColormap("Greens");
+                        colormap.setControlPoints([0.0,0.076,0.7692],
+                            [[0.9,1.0,0.9],
+                            [0.5,1.0,0.5],
+                            [0.3,0.6,0.3]]);
                         this._tfs[name] = {
-                            ctf: new PresetLinearColormap("Greens"),
+                            ctf: colormap,
                             otf: new OpacityMap([0, 1], [0, 1])
                         };
                     } else if (name === "boxplot") {

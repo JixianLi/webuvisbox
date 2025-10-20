@@ -68,7 +68,7 @@ export class VSUP extends PresetLinearColormap {
                     const uncertainty = 1 - d / (this.depth - 1);
                     const ratio = i / (2 ** d - 1);
 
-                    const color1 = this.getColorFromControlPoints(ratio);
+                    const color1 = this.getColorByValue(ratio);
                     const color = d3.rgb(d3.interpolateLab(color1, this.fading_color)(uncertainty));
 
                     this.nodes[idx] = color;
@@ -121,7 +121,7 @@ export class VSUP extends PresetLinearColormap {
         let result: d3.RGBColor;
 
         if (continuous || this.depth === 1) {
-            const color1 = this.getColorFromControlPoints(value);
+            const color1 = this.getColorByValue(value);
             result = d3.rgb(d3.interpolateLab(color1, this.fading_color)(1 - uncertainty));
         } else {
             let depth = Math.floor(this.depth * uncertainty);

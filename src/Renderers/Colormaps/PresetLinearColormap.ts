@@ -12,7 +12,7 @@ export class PresetLinearColormap {
     color_points: number[][] = [];
 
     constructor(
-        preset_name: string = "Cool to Warm"
+        preset_name: string = "Cool to Warm",
     ) {
         this.setPreset(preset_name);
 
@@ -39,7 +39,7 @@ export class PresetLinearColormap {
             console.warn("New color control point must be within the existing range.");
             return;
         }
-        const newColor = this.getColorFromControlPoints(value);
+        const newColor = this.getColorByValue(value);
         let idx = findSmallerIndex(this.color_control_points, value) + 1;
         if (idx === this.color_control_points.length) idx = this.color_control_points.length - 1;
         runInAction(() => {
@@ -49,11 +49,11 @@ export class PresetLinearColormap {
     }
 
     getRGBColors(values: number[]): d3.RGBColor[] {
-        return values.map(v => this.getColorFromControlPoints(v));
+        return values.map(v => this.getColorByValue(v));
     }
 
     getColor(value: number): d3.RGBColor {
-        return this.getColorFromControlPoints(value);
+        return this.getColorByValue(value);
     }
 
     invert() {
@@ -69,7 +69,7 @@ export class PresetLinearColormap {
         }
     }
 
-    getColorFromControlPoints(value: number): d3.RGBColor {
+    getColorByValue(value: number): d3.RGBColor {
         value = Math.max(0, Math.min(value, 1));
         const color_control_points = this.color_control_points;
         const color_points = this.color_points;
@@ -96,13 +96,25 @@ export class PresetLinearColormap {
         });
     }
 
+    setControlPoints(control_points: number[], color_points: number[][]): void {
+        if (control_points.length !== color_points.length) {
+            console.warn("control_points and color_points must have the same length.");
+            return;
+        }
+        runInAction(() => {
+            this.color_control_points = control_points;
+            this.color_points = color_points;
+            this._colorCache.clear();
+        });
+    }
+
     setCacheSize(size: number): void {
         this._cache_size = Math.max(0, size);
         if (this._colorCache.size > this._cache_size) this._colorCache.clear();
     }
 
     getColorForTexture(x: number, _y: number): d3.RGBColor {
-        return this.getColorFromControlPoints(x);
+        return this.getColorByValue(x);
     }
 
     toObject() {
