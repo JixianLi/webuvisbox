@@ -11,7 +11,7 @@ export function wildFirePanelMappingFunction(viewname:string): React.ReactNode {
     switch(viewname){
         case "Terrain Visualization":
             return <TerrainVisualizationPanel />;
-            case "Contour Boxplot":
+        case "Contour Boxplot":
             return <ContourBoxplotPanel />;
         case "Contour Banddepths":
             return <ContourBanddepthPanel />;
@@ -25,6 +25,7 @@ export function wildFirePanelMappingFunction(viewname:string): React.ReactNode {
             return <ColorEditorPanel />;
         case "Opacity Editor":
             return <OpacityEditorPanel />;
+
         default:
             throw new Error(`Unknown view name: ${viewname}`);
             return <div>Unknown view: {viewname}</div>;
