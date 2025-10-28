@@ -42,6 +42,12 @@ If you are developing a production application, we recommend updating the config
 - Node.js 18+ 
 - npm or yarn
 
+### Data Server
+
+**Note**: The data server backend is not provided by default with this repository. If you plan to use WebUVisBox with your own data, please email the author with details about your planned usage for inquiry. Example server code will be provided in future releases.
+
+For development and testing, you can modify the `data_server_address` in scenario configuration files to point to your own data source.
+
 ### Installation
 
 ```bash
