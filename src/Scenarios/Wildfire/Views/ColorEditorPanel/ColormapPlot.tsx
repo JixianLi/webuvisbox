@@ -2,17 +2,17 @@ import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
 import type WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalContext";
 import type PresetLinearColormap from "@/Renderers/Colormaps/PresetLinearColormap";
-import { useMemo, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { Bar } from "react-chartjs-2";
 import { Chart, type ChartEvent } from "chart.js";
 import { getDataPosition } from "@/Renderers/Chartjs/ChartHelpers";
+import { useTheme } from "@mui/material";
 import annotationPlugin from 'chartjs-plugin-annotation';
 import 'chart.js/auto';
 import {
     computeHistogram,
     generateBarColors,
-    createControlPointAnnotations,
-    findNearestControlPoint
+    createControlPointAnnotations
 } from "./HistogramHelpers";
 
 // Register Chart.js annotation plugin
@@ -26,6 +26,9 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
     const global_context = useScenario().global_context as WildfireGlobalContext;
     const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
     const chartRef = useRef<any>(null);
+
+    const ui_configs = global_context.ui_configs;
+    const theme = useTheme();
 
     // Get scalar data
     const scalar_data = global_context.scalars.scalar_data[props.scalar_name];
@@ -45,26 +48,22 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
         </div>;
     }
 
-    // Compute histogram
-    const { binEdges, binCounts, binCenters } = useMemo(() => 
-        computeHistogram(scalar_data, 50, min, max),
-        [scalar_data, min, max]
-    );
+    // Access observable properties directly to ensure MobX tracking
+    const controlPoints = colormap.color_control_points;
+    // Also access color_points to ensure MobX tracks it
+    colormap.color_points;
 
-    // Generate colored bars
-    const barColors = useMemo(() => 
-        generateBarColors(binCenters, colormap, min, max),
-        [binCenters, colormap.color_control_points, colormap.color_points, min, max]
-    );
+    // Compute histogram
+    const { binEdges, binCounts, binCenters } = computeHistogram(scalar_data, 50, min, max);
+
+    // Generate colored bars - MobX will track changes to controlPoints/colorPoints
+    const barColors = generateBarColors(binCenters, colormap, min, max);
 
     // Get max count for annotation positioning
-    const maxCount = useMemo(() => Math.max(...binCounts, 1), [binCounts]);
+    const maxCount = Math.max(...binCounts, 1);
 
-    // Create control point annotations
-    const annotations = useMemo(() => 
-        createControlPointAnnotations(colormap, min, max, maxCount),
-        [colormap.color_control_points, colormap.color_points, min, max, maxCount]
-    );
+    // Create control point annotations - MobX will track changes
+    const annotations = createControlPointAnnotations(colormap, maxCount, binCenters.length);
 
     // Chart data
     const chartData = {
@@ -82,32 +81,47 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
 
     // Handle chart click
     const handleChartClick = (event: ChartEvent, _elements: any[], _chart: Chart) => {
+        console.log('Single click event triggered');
         const position = getDataPosition(chartRef, event);
         if (!position) return;
 
         const [dataX] = position;
         if (dataX === undefined || dataX === null) return;
 
-        // Convert label index to actual value
+        // dataX is the bin index (0 to numBins-1)
         const binIndex = Math.floor(dataX);
         if (binIndex < 0 || binIndex >= binCenters.length) return;
         
-        const clickValue = binCenters[binIndex];
+        // Convert bin index to normalized value [0, 1]
+        const normalizedValue = binIndex / (binCenters.length - 1);
 
-        // Check if clicking near a control point
-        const nearestPoint = findNearestControlPoint(
-            clickValue,
-            colormap.color_control_points,
-            min,
-            max
-        );
+        console.log('Single click - binIndex:', binIndex, 'normalized:', normalizedValue, 
+            'control points in bins:', controlPoints.map(cp => cp * (binCenters.length - 1)));
+
+        // Check if clicking near a control point (compare in bin index space)
+        // Find nearest control point manually
+        let nearestPoint = -1;
+        let nearestDistance = Infinity;
+        const tolerance = 2.0;
+        
+        controlPoints.forEach((cp, index) => {
+            const cpBinIndex = cp * (binCenters.length - 1);
+            const distance = Math.abs(binIndex - cpBinIndex);
+            if (distance < tolerance && distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestPoint = index;
+            }
+        });
+
+        console.log('Found nearest point:', nearestPoint, 'distance:', nearestDistance);
 
         if (nearestPoint >= 0) {
             // Select the control point
+            console.log('Selecting control point', nearestPoint);
             setSelectedPointIndex(nearestPoint);
         } else {
-            // Add new control point
-            const normalizedValue = (clickValue - min) / (max - min);
+            // Add new control point with normalized value
+            console.log('Adding new control point at', normalizedValue);
             colormap.addColorConntrolPoint(normalizedValue);
             setSelectedPointIndex(null);
         }
@@ -121,18 +135,28 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
         const [dataX] = position;
         if (dataX === undefined || dataX === null) return;
 
+        // dataX is the bin index (0 to numBins-1)
         const binIndex = Math.floor(dataX);
         if (binIndex < 0 || binIndex >= binCenters.length) return;
-        
-        const clickValue = binCenters[binIndex];
 
-        // Find control point to remove
-        const pointIndex = findNearestControlPoint(
-            clickValue,
-            colormap.color_control_points,
-            min,
-            max
-        );
+        console.log('Double click - binIndex:', binIndex, 'control points in bins:', 
+            controlPoints.map(cp => cp * (binCenters.length - 1)));
+
+        // Find control point to remove manually
+        let pointIndex = -1;
+        let nearestDistance = Infinity;
+        const tolerance = 2.0;
+        
+        controlPoints.forEach((cp, index) => {
+            const cpBinIndex = cp * (binCenters.length - 1);
+            const distance = Math.abs(binIndex - cpBinIndex);
+            if (distance < tolerance && distance < nearestDistance) {
+                nearestDistance = distance;
+                pointIndex = index;
+            }
+        });
+
+        console.log('Found point index:', pointIndex, 'distance:', nearestDistance);
 
         if (pointIndex >= 0) {
             colormap.removeColorControlPoint(pointIndex);
@@ -148,28 +172,27 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
             x: {
                 title: {
                     display: true,
-                    text: `${props.scalar_name} (${scalar_tag.units || ''})`
+                    text: `${props.scalar_name} (${scalar_tag.units || ''})`,
+                    font: { size: ui_configs.plot_label_size },
+                    color: theme.palette.text.primary
                 },
                 ticks: {
                     maxRotation: 45,
                     minRotation: 0,
                     autoSkip: true,
-                    maxTicksLimit: 10
+                    maxTicksLimit: 5
                 }
             },
             y: {
                 type: 'logarithmic' as const,
                 title: {
                     display: true,
-                    text: 'Count (log scale)'
+                    text: 'Count (log scale)',
+                    font: { size: ui_configs.plot_label_size },
+                    color: theme.palette.text.primary
                 },
                 ticks: {
-                    callback: function(value: any) {
-                        // Display actual count (subtract the +1 we added)
-                        const actualValue = Number(value) - 1;
-                        if (actualValue <= 0) return '0';
-                        return actualValue.toLocaleString();
-                    }
+                    display: false
                 }
             }
         },
@@ -200,12 +223,14 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
     };
 
     return (
-        <div style={{ height: '400px', width: '100%', padding: '10px' }}>
+        <div style={{ width: '100%', padding: '10px', boxSizing: 'border-box' }}>
             <div style={{ marginBottom: '10px', fontSize: '12px', color: '#666' }}>
                 <strong>Instructions:</strong> Click to add control point • Double-click control point to remove
-                {selectedPointIndex !== null && ` • Selected point ${selectedPointIndex + 1} of ${colormap.color_control_points.length}`}
+                {selectedPointIndex !== null && ` • Selected point ${selectedPointIndex + 1} of ${controlPoints.length}`}
             </div>
-            <Bar ref={chartRef} data={chartData} options={chartOptions} />
+            <div style={{ height: '400px', width: '100%', position: 'relative' }}>
+                <Bar ref={chartRef} data={chartData} options={chartOptions} />
+            </div>
         </div>
     );
 });

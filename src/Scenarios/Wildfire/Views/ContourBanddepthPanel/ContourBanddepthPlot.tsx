@@ -17,19 +17,19 @@ export const ContourBanddepthPlot = observer(() => {
     const chart_ref = useRef(null);
 
     const scenario = useScenario();
-    const global_data = scenario?.global_context as WildfireGlobalContext;
-    const ensemble_names = global_data?.ensemble_names;
-    const depths = global_data?.scalars?.depths;
-    const ordering = global_data?.scalars?.ordering;
+    const global_context = scenario?.global_context as WildfireGlobalContext;
+    const ensemble_names = global_context?.ensemble_names;
+    const depths = global_context?.scalars?.depths;
+    const ordering = global_context?.scalars?.ordering;
     const [point_size, setPointSize] = useState(4);
     const theme = useTheme();
 
-    if (!global_data || !global_data.scalars || !depths || !ensemble_names || !ordering) {
+    if (!global_context || !global_context.scalars || !depths || !ensemble_names || !ordering) {
         return <div>Loading...</div>;
     }
 
-    const current_ensemble_index = global_data.current_ensemble_index;
-    const ui_configs = global_data.ui_configs;
+    const current_ensemble_index = global_context.current_ensemble_index;
+    const ui_configs = global_context.ui_configs;
 
 
     const point_location = new Array(depths.length);
@@ -40,10 +40,10 @@ export const ContourBanddepthPlot = observer(() => {
         point_location[i] = { x: i, y: depths[i] };
         if (i === current_ensemble_index) {
             point_radius[i] = point_size * 1.25;
-            point_colors[i] = global_data!.ensemble_colors["primary"];
+            point_colors[i] = global_context!.ensemble_colors["primary"];
         } else {
             point_radius[i] = point_size;
-            point_colors[i] = global_data!.ensemble_colors["secondary"];
+            point_colors[i] = global_context!.ensemble_colors["secondary"];
         }
     }
 
@@ -112,7 +112,7 @@ export const ContourBanddepthPlot = observer(() => {
         events: ['click', 'mousemove'],
         onClick: (e) => {
             const [data_x] = getDataPosition(chart_ref, e);
-            global_data.setEnsembleIndex(Math.round(data_x));
+            global_context.setEnsembleIndex(Math.round(data_x));
         },
         onResize: onChartResize,
         plugins: {
@@ -124,7 +124,7 @@ export const ContourBanddepthPlot = observer(() => {
                         return ensemble_names[datapoint.x] + " order:" + ordering[context.dataIndex]
                     }
                 },
-                bodyFont: { size: 22 }
+                bodyFont: { size: ui_configs.plot_label_size }
             },
             legend: { display: false }
         }

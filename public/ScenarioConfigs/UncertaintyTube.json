@@ -11,75 +11,50 @@
   "panel_layouts": {
     "default_layouts": {
       "xl": [
-        {"i":"Uncertainty Tubes","x":7,"y":0,"w":7,"h":14,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Predicted Trajectories","x":0,"y":0,"w":7,"h":14,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Uncertainty Samples","x":14,"y":0,"w":8,"h":14,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Seed Placement","x":5,"y":14,"w":6,"h":6,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Seedbox Config","x":0,"y":14,"w":5,"h":6,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Query Config","x":15,"y":14,"w":7,"h":6,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Colormap Config","x":11,"y":14,"w":4,"h":6,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false}
+        {"i": "Trajectories Visualization", "x": 0, "y": 0, "w": 10, "h": 16, "minW": 3, "minH": 3, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false},
+        {"i": "Seed Placement", "x": 10, "y": 0, "w": 6, "h": 6, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false},
+        {"i": "Seedbox Config", "x": 10, "y": 6, "w": 6, "h": 10, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false},
+        {"i": "Query Config", "x": 16, "y": 0, "w": 6, "h": 5, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false},
+        {"i": "Colormap Config", "x": 16, "y": 5, "w": 6, "h": 11, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false}
       ],
       "lg": [
-        {"i":"Uncertainty Tubes","x":0,"y":0,"w":8,"h":8,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Predicted Trajectories","x":0,"y":8,"w":8,"h":8,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Uncertainty Samples","x":0,"y":16,"w":8,"h":8,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Seed Placement","x":8,"y":0,"w":4,"h":7,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Seedbox Config","x":8,"y":7,"w":4,"h":8,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Query Config","x":4,"y":9,"w":4,"h":6,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Colormap Config","x":0,"y":9,"w":4,"h":6,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false}
+        {"i": "Trajectories Visualization", "x": 0, "y": 0, "w": 8, "h": 9, "minW": 3, "minH": 6, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false},
+        {"i": "Seed Placement", "x": 8, "y": 0, "w": 4, "h": 7, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false},
+        {"i": "Seedbox Config", "x": 8, "y": 7, "w": 4, "h": 8, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false},
+        {"i": "Query Config", "x": 4, "y": 9, "w": 4, "h": 6, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false},
+        {"i": "Colormap Config", "x": 0, "y": 9, "w": 4, "h": 6, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false}
       ],
       "sm": [
-        {"i":"Uncertainty Tubes","x":0,"y":0,"w":6,"h":6,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Predicted Trajectories","x":0,"y":6,"w":6,"h":6,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Uncertainty Samples","x":0,"y":12,"w":6,"h":6,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Seed Placement","x":0,"y":16,"w":6,"h":5,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Seedbox Config","x":0,"y":6,"w":6,"h":5,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Query Config","x":0,"y":21,"w":6,"h":4,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
-        {"i":"Colormap Config","x":0,"y":11,"w":6,"h":5,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false}
+        {"i": "Trajectories Visualization", "x": 0, "y": 0, "w": 6, "h": 6, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false},
+        {"i": "Seed Placement", "x": 0, "y": 16, "w": 6, "h": 5, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false},
+        {"i": "Seedbox Config", "x": 0, "y": 6, "w": 6, "h": 5, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false},
+        {"i": "Query Config", "x": 0, "y": 21, "w": 6, "h": 4, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false},
+        {"i": "Colormap Config", "x": 0, "y": 11, "w": 6, "h": 5, "minW": 2, "minH": 2, "resizeHandles": ["sw", "se"], "visible": true, "moved": false, "static": false}
       ]
     },
-    "breakpoints": {"xl":1440,"lg":800,"sm":400},
-    "cols": {"xl":22,"lg":12,"sm":6}
+    "breakpoints": {"xl": 1440, "lg": 800, "sm": 400},
+    "cols": {"xl": 22, "lg": 12, "sm": 6}
   },
   "global_data": {
-    "data_server_address": "http://localhost:10000",
+    "data_server_address": "http://10.0.0.13:10000",
     "seed_placement": {
-      "use_random_seeding": true,
-      "random_seed_count": 300,
-      "use_uniform_seeding": false,
-      "num_uniform_seeds": [
-        5,
-        5,
-        5
-      ],
+      "use_random_seeding": false,
+      "random_seed_count": 100,
+      "use_uniform_seeding": true,
+      "num_uniform_seeds": [5, 5, 5],
       "use_manual_seeding": false,
-      "manual_seed_location": [
-        0,
-        0,
-        0
-      ]
+      "manual_seed_location": [0, 0, 0]
     },
     "seedbox": {
-      "position": [
-        -9.999967575073242,
-        -9.999946594238281,
-        -9.999959945678711
-      ],
-      "size": [
-        1.9999895095825195,
-        1.999988842010498,
-        1.9999881744384767
-      ],
+      "position": [1.1995899740213645e-7, 0.00002465309989929665, 0.000010527200174692553],
+      "size": [6.2831799968984114, 6.283130930616608, 6.283149168835735],
       "visible": false,
       "active": false
     },
     "bounds": [
-      -9.999967575073242,
-      9.999927520751953,
-      -9.999946594238281,
-      9.9999418258667,
-      -9.999959945678711,
-      9.999921798706055
+      1.1995899740213645e-7, 6.283180236816406,
+      0.00002465309989929665, 6.283180236816406,
+      0.000010527200174692553, 6.283170223236084
     ],
     "trajectory_visualization": {
       "show_path": true,
@@ -89,26 +64,12 @@
       "show_stats": false
     },
     "render_config": {
-      "camera": {
-        "near": 0.01,
-        "farMultiplier": 10
-      },
+      "camera": {"near": 0.01, "farMultiplier": 10},
       "paths": {
-        "primary": {
-          "color": "orange",
-          "radius_divisor": 500,
-          "radial_segments": 8
-        },
-        "secondary": {
-          "color": "lightgray",
-          "radius_divisor": 700,
-          "radial_segments": 3
-        }
+        "primary": {"color": "orange", "radius_divisor": 500, "radial_segments": 8},
+        "secondary": {"color": "lightgray", "radius_divisor": 700, "radial_segments": 3}
       },
-      "seeds": {
-        "color": "red",
-        "radius_divisor": 200
-      }
+      "seeds": {"color": "red", "radius_divisor": 200}
     },
     "query_config": {
       "uncertainty_tube": true,
@@ -125,6 +86,10 @@
       "texture_width": 256,
       "fading_color": "rgb(233, 233, 233)",
       "continuous": false
-    }
+    },
+    "seeds": [],
+    "uncertainty_tubes": {"loaded": false, "vertices": null, "faces": null, "uv": null},
+    "primary_trajectories": [],
+    "secondary_trajectories": []
   }
 }

@@ -67,10 +67,8 @@ export class ScalarFields {
                 if (this._tfs[name] === undefined || this._tfs[name] === null) {
                     if (name === "NFUEL_CAT") {
                         const colormap = new PresetLinearColormap("Greens");
-                        colormap.setControlPoints([0.0,0.076,0.7692],
-                            [[0.9,1.0,0.9],
-                            [0.5,1.0,0.5],
-                            [0.3,0.6,0.3]]);
+                        colormap.setControlPoints([0.0,0.076,1.0],
+                            [[0.2,0.4,0.2],[0.4,0.7,0.4],[0.95,1.0,0.95]]);
                         this._tfs[name] = {
                             ctf: colormap,
                             otf: new OpacityMap([0, 1], [0, 1])

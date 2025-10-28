@@ -102,19 +102,21 @@ export function generateBarColors(
  * @param min - Minimum value for denormalization
  * @param max - Maximum value for denormalization
  * @param maxCount - Maximum bin count for positioning
+ * @param numBins - Number of bins in the histogram
  * @returns Array of annotation configurations
  */
 export function createControlPointAnnotations(
     colormap: PresetLinearColormap,
-    min: number,
-    max: number,
-    maxCount: number
+    maxCount: number,
+    numBins: number
 ): any[] {
-    const yPosition = maxCount * 1.15; // Position above histogram
+    // Position in the middle of histogram height, accounting for the +1 offset for log scale
+    const yPosition = Math.log10(maxCount + 1 * 0.5);
 
     return colormap.color_control_points.map((cp, index) => {
-        // Denormalize control point to data range
-        const xValue = cp * (max - min) + min;
+        // Convert normalized control point [0,1] to bin index
+        // cp is in [0, 1], we need to map to bin index [0, numBins-1]
+        const xValue = cp * (numBins - 1);
         
         // Get color for this control point
         const [r, g, b] = colormap.color_points[index];

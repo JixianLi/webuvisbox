@@ -49,7 +49,7 @@
   "global_data": {
     "name": "Wildfire",
     "description": "A scenario for visualizing wildfire spread data.",
-    "data_server_address": "http://localhost:10001",
+    "data_server_address": "http://10.0.0.13:10001",
     "ensemble_names": [
       "zack_1.nc",
       "zack_2.nc",

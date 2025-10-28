@@ -63,7 +63,7 @@ export const TerrainRenderer = observer((props: TerrainRendererProps) => {
             <TerrainScene {...props} />
             <ambientLight intensity={2} />
             <PerspectiveCamera makeDefault
-                position={camera_pos} near={near} far={far} fov={50}>
+                position={camera_pos} near={near} far={far} fov={35}>
                 <directionalLight position={[0, 0, 0]} intensity={1} />
             </PerspectiveCamera>
             <SharedTrackballControl

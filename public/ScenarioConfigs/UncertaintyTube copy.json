@@ -1,0 +1,130 @@
+{
+  "name": "Uncertainty Tube",
+  "description": "Visualizing model uncertainty in NN flow map",
+  "views": [
+    "Trajectories Visualization",
+    "Seed Placement",
+    "Seedbox Config",
+    "Query Config",
+    "Colormap Config"
+  ],
+  "panel_layouts": {
+    "default_layouts": {
+      "xl": [
+        {"i":"Uncertainty Tubes","x":7,"y":0,"w":7,"h":14,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Predicted Trajectories","x":0,"y":0,"w":7,"h":14,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Uncertainty Samples","x":14,"y":0,"w":8,"h":14,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Seed Placement","x":5,"y":14,"w":6,"h":6,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Seedbox Config","x":0,"y":14,"w":5,"h":6,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Query Config","x":15,"y":14,"w":7,"h":6,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Colormap Config","x":11,"y":14,"w":4,"h":6,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false}
+      ],
+      "lg": [
+        {"i":"Uncertainty Tubes","x":0,"y":0,"w":8,"h":8,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Predicted Trajectories","x":0,"y":8,"w":8,"h":8,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Uncertainty Samples","x":0,"y":16,"w":8,"h":8,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Seed Placement","x":8,"y":0,"w":4,"h":7,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Seedbox Config","x":8,"y":7,"w":4,"h":8,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Query Config","x":4,"y":9,"w":4,"h":6,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Colormap Config","x":0,"y":9,"w":4,"h":6,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false}
+      ],
+      "sm": [
+        {"i":"Uncertainty Tubes","x":0,"y":0,"w":6,"h":6,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Predicted Trajectories","x":0,"y":6,"w":6,"h":6,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Uncertainty Samples","x":0,"y":12,"w":6,"h":6,"minW":3,"minH":3,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Seed Placement","x":0,"y":16,"w":6,"h":5,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Seedbox Config","x":0,"y":6,"w":6,"h":5,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Query Config","x":0,"y":21,"w":6,"h":4,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false},
+        {"i":"Colormap Config","x":0,"y":11,"w":6,"h":5,"minW":2,"minH":2,"resizeHandles":["sw","se"],"visible":true,"moved":false,"static":false}
+      ]
+    },
+    "breakpoints": {"xl":1440,"lg":800,"sm":400},
+    "cols": {"xl":22,"lg":12,"sm":6}
+  },
+  "global_data": {
+    "data_server_address": "http://localhost:10000",
+    "seed_placement": {
+      "use_random_seeding": true,
+      "random_seed_count": 300,
+      "use_uniform_seeding": false,
+      "num_uniform_seeds": [
+        5,
+        5,
+        5
+      ],
+      "use_manual_seeding": false,
+      "manual_seed_location": [
+        0,
+        0,
+        0
+      ]
+    },
+    "seedbox": {
+      "position": [
+        -9.999967575073242,
+        -9.999946594238281,
+        -9.999959945678711
+      ],
+      "size": [
+        1.9999895095825195,
+        1.999988842010498,
+        1.9999881744384767
+      ],
+      "visible": false,
+      "active": false
+    },
+    "bounds": [
+      -9.999967575073242,
+      9.999927520751953,
+      -9.999946594238281,
+      9.9999418258667,
+      -9.999959945678711,
+      9.999921798706055
+    ],
+    "trajectory_visualization": {
+      "show_path": true,
+      "show_uncertainty_path": true,
+      "show_uncertainty_tube": true,
+      "show_seeds": true,
+      "show_stats": false
+    },
+    "render_config": {
+      "camera": {
+        "near": 0.01,
+        "farMultiplier": 10
+      },
+      "paths": {
+        "primary": {
+          "color": "orange",
+          "radius_divisor": 500,
+          "radial_segments": 8
+        },
+        "secondary": {
+          "color": "lightgray",
+          "radius_divisor": 700,
+          "radial_segments": 3
+        }
+      },
+      "seeds": {
+        "color": "red",
+        "radius_divisor": 200
+      }
+    },
+    "query_config": {
+      "uncertainty_tube": true,
+      "method": "swag",
+      "eproj": 0.5,
+      "sym": false
+    },
+    "colormap_config": {
+      "type": "vsup",
+      "preset_name": "Cool to Warm",
+      "depth": 1,
+      "flip_y": false,
+      "texture_height": 128,
+      "texture_width": 256,
+      "fading_color": "rgb(233, 233, 233)",
+      "continuous": false
+    }
+  }
+}
