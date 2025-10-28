@@ -22,6 +22,34 @@ export class PanelLayoutManager implements PanelLayouts {
         this.cache_layouts = _.cloneDeep(default_layouts);
         this.breakpoints = _.cloneDeep(breakpoints);
         this.cols = _.cloneDeep(cols);
+        
+        // Initialize panels with visible: false
+        // Move their full layout to cache and set them to zero-size in current_layouts
+        Object.keys(this.current_layouts).forEach(breakpoint => {
+            this.current_layouts[breakpoint].forEach((panel, index) => {
+                if (panel.visible === false) {
+                    // Store the full layout in cache
+                    this.cache_layouts[breakpoint][index] = _.cloneDeep(panel);
+                    // Set to zero-size in current_layouts
+                    this.current_layouts[breakpoint][index] = { 
+                        i: panel.i, 
+                        x: 0, 
+                        y: 0, 
+                        w: 0, 
+                        h: 0, 
+                        minH: 0, 
+                        minW: 0, 
+                        maxH: 0, 
+                        maxW: 0, 
+                        visible: false, 
+                        isResizable: false, 
+                        isDraggable: false, 
+                        static: true 
+                    };
+                }
+            });
+        });
+        
         makeAutoObservable(this);
     }
 
