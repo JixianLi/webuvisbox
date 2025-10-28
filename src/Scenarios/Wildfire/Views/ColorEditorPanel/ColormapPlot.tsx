@@ -6,7 +6,7 @@ import { useState, useRef } from "react";
 import { Bar } from "react-chartjs-2";
 import { Chart, type ChartEvent } from "chart.js";
 import { getDataPosition } from "@/Renderers/Chartjs/ChartHelpers";
-import { useTheme } from "@mui/material";
+import { useTheme, Stack, Typography, Box } from "@mui/material";
 import annotationPlugin from 'chartjs-plugin-annotation';
 import 'chart.js/auto';
 import {
@@ -54,7 +54,7 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
     colormap.color_points;
 
     // Compute histogram
-    const { binEdges, binCounts, binCenters } = computeHistogram(scalar_data, 50, min, max);
+    const { binEdges, binCounts, binCenters } = computeHistogram(scalar_data, 14, min, max);
 
     // Generate colored bars - MobX will track changes to controlPoints/colorPoints
     const barColors = generateBarColors(binCenters, colormap, min, max);
@@ -185,6 +185,7 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
             },
             y: {
                 type: 'logarithmic' as const,
+                min: 1,
                 title: {
                     display: true,
                     text: 'Count (log scale)',
@@ -223,15 +224,15 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
     };
 
     return (
-        <div style={{ width: '100%', padding: '10px', boxSizing: 'border-box' }}>
-            <div style={{ marginBottom: '10px', fontSize: '12px', color: '#666' }}>
+        <Stack spacing={1}>
+            <Typography variant="caption" color="text.secondary">
                 <strong>Instructions:</strong> Click to add control point • Double-click control point to remove
                 {selectedPointIndex !== null && ` • Selected point ${selectedPointIndex + 1} of ${controlPoints.length}`}
-            </div>
-            <div style={{ height: '400px', width: '100%', position: 'relative' }}>
+            </Typography>
+            <Box sx={{minHeight:'300px'}}>
                 <Bar ref={chartRef} data={chartData} options={chartOptions} />
-            </div>
-        </div>
+            </Box>
+        </Stack>
     );
 });
 
