@@ -1,28 +1,24 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
 import type WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalContext";
-import type PresetLinearColormap from "@/Renderers/Colormaps/PresetLinearColormap";
+import type OpacityMap from "@/Renderers/Colormaps/OpacityMap";
 import { useState, useRef } from "react";
-import { Bar } from "react-chartjs-2";
+import { Chart as ChartJS } from "react-chartjs-2";
 import { Chart, type ChartEvent } from "chart.js";
 import { getDataPosition } from "@/Renderers/Chartjs/ChartHelpers";
 import { useTheme, Stack, Typography, Box } from "@mui/material";
 import annotationPlugin from 'chartjs-plugin-annotation';
 import 'chart.js/auto';
-import {
-    computeHistogram,
-    generateBarColors,
-    createControlPointAnnotations
-} from "./HistogramHelpers";
+import { computeHistogram } from "../ColorEditorPanel/HistogramHelpers";
 
 // Register Chart.js annotation plugin
 Chart.register(annotationPlugin);
 
-interface ColormapPlotProps {
+interface OpacityPlotProps {
     scalar_name: string;
 }
 
-export const ColormapPlot = observer((props: ColormapPlotProps) => {
+export const OpacityPlot = observer((props: OpacityPlotProps) => {
     const global_context = useScenario().global_context as WildfireGlobalContext;
     const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
     const chartRef = useRef<any>(null);
@@ -41,52 +37,95 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
     }
 
     const { min, max } = scalar_tag;
-    const colormap = global_context.texture_manager.getColormap(props.scalar_name) as PresetLinearColormap;
-    if (!colormap) {
+    const opacityMap = global_context.texture_manager.getOpacityMap(props.scalar_name) as OpacityMap;
+    if (!opacityMap) {
         return <div style={{ padding: '20px', color: 'red' }}>
-            No colormap available for {props.scalar_name}
+            No opacity map available for {props.scalar_name}
         </div>;
     }
 
     // Access observable properties directly to ensure MobX tracking
-    const controlPoints = colormap.color_control_points;
-    // Also access color_points to ensure MobX tracks it
-    colormap.color_points;
+    const controlPoints = opacityMap.opacity_control_points;
+    const opacityValues = opacityMap.opacity_values;
 
     // Compute histogram
     const { binEdges, binCounts, binCenters } = computeHistogram(scalar_data, 14, min, max);
 
-    // Generate colored bars - MobX will track changes to controlPoints/colorPoints
-    const barColors = generateBarColors(binCenters, colormap, min, max);
+    // Generate light gray bars
+    const barColors = binCenters.map(() => 'rgba(200, 200, 200, 0.7)');
 
     // Get max count for annotation positioning
     const maxCount = Math.max(...binCounts, 1);
 
-    // Create control point annotations - MobX will track changes
-    const annotations = createControlPointAnnotations(colormap, maxCount, binCenters.length);
+    // Create control point annotations with y-position representing opacity (0 to 1)
+    const annotations: any = {};
+    controlPoints.forEach((cp, index) => {
+        const binIndex = cp * (binCenters.length - 1);
+        const opacity = opacityValues[index];
+        
+        // Map opacity (0-1) to y-axis value (log scale, 1 to maxCount+1)
+        const yValue = 1 + opacity * maxCount;
+        
+        annotations[`point-${index}`] = {
+            type: 'point',
+            xValue: binIndex,
+            yValue: yValue,
+            backgroundColor: selectedPointIndex === index ? 'rgba(255, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.8)',
+            borderColor: selectedPointIndex === index ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 0, 0, 1)',
+            borderWidth: 2,
+            radius: 6,
+            pointStyle: 'circle'
+        };
+    });
+
+    // Create line plot data for control points
+    // Create a dense array with nulls where there are no control points
+    const lineDataArray = new Array(binCenters.length).fill(null);
+    controlPoints.forEach((cp, index) => {
+        const binIndex = Math.round(cp * (binCenters.length - 1));
+        const opacity = opacityValues[index];
+        const yValue = 1 + opacity * maxCount;
+        lineDataArray[binIndex] = yValue;
+    });
 
     // Chart data
     const chartData = {
         labels: binEdges.slice(0, -1).map(edge => edge.toFixed(3)),
-        datasets: [{
-            label: 'Count',
-            data: binCounts.map(count => count + 1), // Add 1 for log scale
-            backgroundColor: barColors,
-            borderColor: 'rgba(0,0,0,0.1)',
-            borderWidth: 1,
-            barPercentage: 1.0,
-            categoryPercentage: 1.0
-        }]
+        datasets: [
+            {
+                label: 'Count',
+                type: 'bar' as const,
+                data: binCounts.map(count => count + 1), // Add 1 for log scale
+                backgroundColor: barColors,
+                borderColor: 'rgba(0,0,0,0.1)',
+                borderWidth: 1,
+                barPercentage: 1.0,
+                categoryPercentage: 1.0,
+                order: 2
+            },
+            {
+                label: 'Opacity Function',
+                type: 'line' as const,
+                data: lineDataArray,
+                borderColor: 'rgba(0, 0, 255, 0.8)',
+                backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: false,
+                tension: 0,
+                spanGaps: true,
+                order: 1
+            }
+        ]
     };
 
     // Handle chart click
     const handleChartClick = (event: ChartEvent, _elements: any[], _chart: Chart) => {
-        console.log('Single click event triggered');
         const position = getDataPosition(chartRef, event);
         if (!position) return;
 
-        const [dataX] = position;
-        if (dataX === undefined || dataX === null) return;
+        const [dataX, dataY] = position;
+        if (dataX === undefined || dataX === null || dataY === undefined || dataY === null) return;
 
         // dataX is the bin index (0 to numBins-1)
         const binIndex = Math.floor(dataX);
@@ -95,11 +134,11 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
         // Convert bin index to normalized value [0, 1]
         const normalizedValue = binIndex / (binCenters.length - 1);
 
-        console.log('Single click - binIndex:', binIndex, 'normalized:', normalizedValue, 
-            'control points in bins:', controlPoints.map(cp => cp * (binCenters.length - 1)));
+        // Convert y-position to opacity (0 to 1)
+        // dataY is in log scale (1 to maxCount+1)
+        const opacity = Math.max(0, Math.min(1, (dataY - 1) / maxCount));
 
         // Check if clicking near a control point (compare in bin index space)
-        // Find nearest control point manually
         let nearestPoint = -1;
         let nearestDistance = Infinity;
         const tolerance = 2.0;
@@ -113,16 +152,14 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
             }
         });
 
-        console.log('Found nearest point:', nearestPoint, 'distance:', nearestDistance);
-
         if (nearestPoint >= 0) {
-            // Select the control point
-            console.log('Selecting control point', nearestPoint);
+            // Select the control point and update its opacity
             setSelectedPointIndex(nearestPoint);
+            // Update opacity value of existing control point
+            opacityMap.opacity_values[nearestPoint] = opacity;
         } else {
-            // Add new control point with normalized value
-            console.log('Adding new control point at', normalizedValue);
-            colormap.addColorConntrolPoint(normalizedValue);
+            // Add new control point with normalized value and opacity
+            opacityMap.addOpacityControlPoint(normalizedValue, opacity);
             setSelectedPointIndex(null);
         }
     };
@@ -139,9 +176,6 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
         const binIndex = Math.floor(dataX);
         if (binIndex < 0 || binIndex >= binCenters.length) return;
 
-        console.log('Right-click - binIndex:', binIndex, 'control points in bins:', 
-            controlPoints.map(cp => cp * (binCenters.length - 1)));
-
         // Find control point to remove manually
         let pointIndex = -1;
         let nearestDistance = Infinity;
@@ -156,10 +190,8 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
             }
         });
 
-        console.log('Found point index:', pointIndex, 'distance:', nearestDistance);
-
         if (pointIndex >= 0) {
-            colormap.removeColorControlPoint(pointIndex);
+            opacityMap.removeOpacityControlPoint(pointIndex);
             setSelectedPointIndex(null);
             // Prevent default context menu
             event.native?.preventDefault();
@@ -170,7 +202,7 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
-        animation: false as const,
+        animation: false as const, // Disable animations
         scales: {
             x: {
                 title: {
@@ -247,14 +279,14 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
     return (
         <Stack spacing={1}>
             <Typography variant="caption" color="text.secondary">
-                <strong>Instructions:</strong> Click to add control point • Right-click control point to remove
-                {selectedPointIndex !== null && ` • Selected point ${selectedPointIndex + 1} of ${controlPoints.length}`}
+                <strong>Instructions:</strong> Click to add/adjust control point (y-position = opacity) • Right-click control point to remove
+                {selectedPointIndex !== null && ` • Selected point ${selectedPointIndex + 1} of ${controlPoints.length} • Opacity: ${opacityValues[selectedPointIndex].toFixed(2)}`}
             </Typography>
-            <Box sx={{minHeight:'300px'}} onContextMenu={handleContainerContextMenu}>
-                <Bar ref={chartRef} data={chartData} options={chartOptions} />
+            <Box sx={{ minHeight: '300px' }} onContextMenu={handleContainerContextMenu}>
+                <ChartJS ref={chartRef} type='bar' data={chartData} options={chartOptions} />
             </Box>
         </Stack>
     );
 });
 
-export default ColormapPlot;
+export default OpacityPlot;
