@@ -106,9 +106,12 @@ class ScenarioManager implements Scenario {
         await this.asyncInitialization();
 
         // Ensure layouts are properly initialized
-        if (this.panel_layouts && config.panel_layouts) {
-            this.panel_layouts.reinitializeLayouts(config.panel_layouts.default_layouts);
-        }
+        // NOTE: Commented out to fix visible:false panel initialization
+        // This was originally added to solve a race condition in built mode
+        // Needs additional testing before re-enabling
+        // if (this.panel_layouts && config.panel_layouts) {
+        //     this.panel_layouts.reinitializeLayouts(config.panel_layouts.default_layouts);
+        // }
 
         runInAction(() => {
             this.initialized = true;

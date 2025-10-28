@@ -173,6 +173,9 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
         animation: false as const,
         scales: {
             x: {
+                grid: {
+                    display: false
+                },
                 title: {
                     display: true,
                     text: `${props.scalar_name} (${scalar_tag.units || ''})`,
@@ -189,6 +192,9 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
             y: {
                 type: 'logarithmic' as const,
                 min: 1,
+                grid: {
+                    display: false
+                },
                 title: {
                     display: true,
                     text: 'Count (log scale)',

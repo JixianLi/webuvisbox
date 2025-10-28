@@ -49,7 +49,7 @@ export class PanelLayoutManager implements PanelLayouts {
                 }
             });
         });
-        
+        console.log('Initialized PanelLayoutManager:', toJS(this.current_layouts), toJS(this.cache_layouts));
         makeAutoObservable(this);
     }
 

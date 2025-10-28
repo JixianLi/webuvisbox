@@ -205,6 +205,9 @@ export const OpacityPlot = observer((props: OpacityPlotProps) => {
         animation: false as const, // Disable animations
         scales: {
             x: {
+                grid: {
+                    display: false
+                },
                 title: {
                     display: true,
                     text: `${props.scalar_name} (${scalar_tag.units || ''})`,
@@ -221,6 +224,9 @@ export const OpacityPlot = observer((props: OpacityPlotProps) => {
             y: {
                 type: 'logarithmic' as const,
                 min: 1,
+                grid: {
+                    display: false
+                },
                 title: {
                     display: true,
                     text: 'Count (log scale)',
