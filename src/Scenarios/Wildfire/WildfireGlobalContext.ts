@@ -1,17 +1,20 @@
+import * as d3 from "d3";
+import * as THREE from "three";
 import { makeAutoObservable, runInAction } from "mobx";
-import type { GlobalContext } from "@/Types/GlobalContext";
 import { trackPromise } from "react-promise-tracker";
+
+import type { GlobalContext } from "@/Types/GlobalContext";
+import { clip } from "@/Helpers/MathHelper";
 import { PresetLinearColormap } from "@/Renderers/Colormaps/PresetLinearColormap";
 import { getTextureManager } from "@/Renderers/Colormaps/TextureManager";
 import OpacityMap from "@/Renderers/Colormaps/OpacityMap";
-import { WildfireDataFetcher } from "./DataFetcher";
-import { clip } from "@/Helpers/MathHelper";
-import { SingleInstanceWindGlyphsConfig } from "./GlobalDataContainers/SingleInstanceWindGlyphsConfig";
-import * as d3 from "d3";
-import * as THREE from "three";
-import TerrainData from "./GlobalDataContainers/TerrainData";
 import { SharedTrackballPerspectiveCamera } from "@/Renderers/SharedCameraControl/SharedPerspectiveCamera";
+import { WildfireDataFetcher } from "./DataFetcher";
 import { ScalarFields } from "./GlobalDataContainers/ScalarFields";
+import { SingleInstanceWindGlyphsConfig } from "./GlobalDataContainers/SingleInstanceWindGlyphsConfig";
+import { SquidsGlyphs } from "./GlobalDataContainers/SquidsGlyphs";
+import TerrainData from "./GlobalDataContainers/TerrainData";
+import { color_equals, parseColor } from "@/Helpers/ColorParser";
 
 
 export class WildfireGlobalContext implements GlobalContext {
@@ -30,6 +33,7 @@ export class WildfireGlobalContext implements GlobalContext {
     scalars: ScalarFields;
     terrain: TerrainData;
     wind_glyphs_config: SingleInstanceWindGlyphsConfig;
+    squid_glyphs: SquidsGlyphs;
 
     ensemble_colors: {
         "primary": string;
@@ -102,6 +106,7 @@ export class WildfireGlobalContext implements GlobalContext {
         this.terrain = new TerrainData();
         this.scalars = new ScalarFields();
 
+
         this.ensemble_colors = {
             primary: "#EA0000",
             secondary: "#CDCDCD"
@@ -133,6 +138,7 @@ export class WildfireGlobalContext implements GlobalContext {
         };
 
         this.wind_glyphs_config = new SingleInstanceWindGlyphsConfig();
+        this.squid_glyphs = new SquidsGlyphs();
 
         makeAutoObservable(this);
     }
@@ -170,9 +176,11 @@ export class WildfireGlobalContext implements GlobalContext {
         this.time_diff_data = global_data_object.time_diff_data || this.time_diff_data;
         this.time_diff_configs = global_data_object.time_diff_configs || this.time_diff_configs;
 
+
         this.data_fetcher.setDataServerAddress(this.data_server_address!);
         this.terrain.loadFromObject(global_data_object.terrain || {});
         this.wind_glyphs_config.loadFromObject(global_data_object.wind_glyphs_config || {});
+        this.squid_glyphs.loadFromObject(global_data_object.squid_glyphs || {});
     }
 
     async asyncInitialize(): Promise<void> {
@@ -182,9 +190,13 @@ export class WildfireGlobalContext implements GlobalContext {
             await trackPromise(this.queryScalarData(this.current_ensemble_index, this.current_time_index));
             await trackPromise(this.queryContourData());
             await trackPromise(this.queryTimeDiffData());
+            if (this.squid_glyphs.display) {
+                await trackPromise(this.querySquidGlyphs());
+            }
 
             this.updateTerrainViewConfig();
             this.windGlyphsUpdateInstances();
+
         });
         return Promise.resolve();
     }
@@ -204,7 +216,8 @@ export class WildfireGlobalContext implements GlobalContext {
             time_diff_configs: this.time_diff_configs,
 
             terrain: this.terrain.toObject(),
-            wind_glyphs_config: this.wind_glyphs_config.toObject()
+            wind_glyphs_config: this.wind_glyphs_config.toObject(),
+            squid_glyphs: this.squid_glyphs.toObject()
         };
     }
 
@@ -303,6 +316,20 @@ export class WildfireGlobalContext implements GlobalContext {
         return Promise.resolve();
     }
 
+    public async querySquidGlyphs() {
+        const squidResult = await this.data_fetcher.fetchSquidData({
+            time: this.current_time_index,
+            scale: this.squid_glyphs.scale,
+            sampling_stride: this.wind_glyphs_config.sampling_stride
+        });
+        runInAction(() => {
+            console.log("Fetched squid glyph data:", squidResult);
+            this.squid_glyphs.setVertices(squidResult.vertices);
+            this.squid_glyphs.setFaces(squidResult.faces);
+        });
+        return Promise.resolve();
+    }
+
     private async queryContourData() {
         const contourResults = await this.data_fetcher.fetchContourData({ time: this.current_time_index });
         runInAction(() => {
@@ -336,9 +363,11 @@ export class WildfireGlobalContext implements GlobalContext {
             this.queryScalarData(this.current_ensemble_index, clipped_index);
             this.queryContourData();
             this.windGlyphsUpdateInstances();
+            this.querySquidGlyphs();
         });
         return Promise.resolve();
     }
+    
 
     contourConfigSetDisplayPrimary(display: boolean) {
         runInAction(() => {
@@ -535,6 +564,35 @@ export class WildfireGlobalContext implements GlobalContext {
             }
         });
     }
+
+    squidGlyphsSetDisplay(display: boolean): void {
+        runInAction(() => {
+            this.squid_glyphs.setDisplay(display);
+            if (this.squid_glyphs.display) {
+                this.querySquidGlyphs();
+            }
+        });
+    }
+
+    squidGlyphsSetScale(scale: number): void {
+        if (scale === this.squid_glyphs.scale) return;
+        runInAction(() => {
+            this.squid_glyphs.setScale(scale);
+            if (this.squid_glyphs.display) {
+                this.querySquidGlyphs();
+            }
+        });
+    }
+
+    squidGlyphsSetColor(color: string | d3.RGBColor | [number, number, number, number] | [number, number, number]): void {
+        const rgbColor = parseColor(color);
+        if (color_equals(rgbColor, this.squid_glyphs.color)) return;
+        runInAction(() => {
+            this.squid_glyphs.setColor(rgbColor);
+        });
+    }
+
+    
 }
 
 export default WildfireGlobalContext;

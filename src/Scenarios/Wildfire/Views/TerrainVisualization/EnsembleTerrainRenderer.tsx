@@ -5,17 +5,10 @@ import { Canvas } from "@react-three/fiber";
 import { PerspectiveCamera, GizmoHelper, GizmoViewport } from "@react-three/drei";
 import * as THREE from "three";
 import { useRef } from "react";
-import TerrainScene from "./TerrainScene";
+import EnsembleTerrainScene from "./EnsembleTerrainScene";
 import SharedTrackballControl from "@/Renderers/SharedCameraControl/SharedTrackballControl";
 
-
-interface TerrainRendererProps {
-    use_opacity?: boolean;
-    ctf_name?: string;
-    otf_name?: string;
-}
-
-export const TerrainRenderer = observer((props: TerrainRendererProps) => {
+export const EnsembleTerrainRenderer = observer(() => {
     const control_ref = useRef(null);
     const canvas_ref = useRef(null);
     const last_tap_time = useRef<number>(0);
@@ -59,9 +52,8 @@ export const TerrainRenderer = observer((props: TerrainRendererProps) => {
                 }
                 last_tap_time.current = now;
             }}
-            linear flat >
-            <TerrainScene {...props} />
-            <ambientLight intensity={2.0} />
+            linear flat>
+            <EnsembleTerrainScene />
             <PerspectiveCamera makeDefault
                 position={camera_pos} near={near} far={far} fov={35}>
                 <directionalLight position={[0, 0, 0]} intensity={1} />
@@ -76,13 +68,15 @@ export const TerrainRenderer = observer((props: TerrainRendererProps) => {
                 maxDistance={far / 2}
                 minDistance={near < 1 ? near / 100 : near * 100}
             />
+            <ambientLight intensity={2.0} />
+
             <GizmoHelper alignment="bottom-right" margin={[80 * gizmo_scale, 80 * gizmo_scale]}>
                 <mesh scale={new THREE.Vector3(gizmo_scale, gizmo_scale, gizmo_scale)}>
-                    <GizmoViewport labels={['E', 'N', 'U']}/>
+                    <GizmoViewport labels={['E', 'N', 'U']} />
                 </mesh>
             </GizmoHelper>
-        </Canvas >
+        </Canvas>
     );
-});
+})
 
-export default TerrainRenderer;
+export default EnsembleTerrainRenderer;

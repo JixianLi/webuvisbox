@@ -74,10 +74,14 @@ export class ScalarFields {
                             otf: new OpacityMap([0, 1], [0, 1])
                         };
                     } else if (name === "boxplot") {
+                        const colormap = new PresetLinearColormap("X Ray");
+                        colormap.color_points[0] = [0.95,1.0,0.95]
                         this._tfs[name] = {
-                            ctf: new PresetLinearColormap("X Ray"),
+                            ctf: colormap,
                             otf: new OpacityMap([0, 1], [1, 1])
                         };
+
+
                     } else {
                         this._tfs[name] = {
                             ctf: new PresetLinearColormap("Cool to Warm"),

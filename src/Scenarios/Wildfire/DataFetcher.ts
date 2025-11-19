@@ -9,6 +9,12 @@ export interface ContourQueryConfig {
     time: number;
 }
 
+export interface SquidsQueryConfig {
+    time: number;
+    scale: number;
+    sampling_stride: number;
+}
+
 export interface TerrainQueryResult {
     names: string[];
     terrain: {
@@ -20,6 +26,11 @@ export interface TerrainQueryResult {
         dims: [number, number, number];
         base_scale: number;
     }
+}
+
+export interface SquidsQueryResult {
+    vertices: Float32Array;
+    faces: Uint32Array;
 }
 
 export interface ScalarQueryResult {
@@ -230,5 +241,24 @@ export class WildfireDataFetcher {
         }
         const data = this.parseTimeDiffData(await response.json());
         return data;
+    }
+
+    public fetchSquidData = async (squid_query_config: SquidsQueryConfig): Promise<SquidsQueryResult> => {
+        const response = await fetch(`${this.data_server_address}/squids`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(squid_query_config)
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch wind glyph data: ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log('raw data:', data);
+        return {
+            vertices: decode64(data.vertices, "float32") as Float32Array,
+            faces: decode64(data.faces, "uint32") as Uint32Array
+        };
     }
 }

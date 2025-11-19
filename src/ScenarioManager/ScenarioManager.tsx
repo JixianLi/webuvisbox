@@ -126,7 +126,7 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
     const [scenarioManager] = useState<ScenarioManager>(new ScenarioManager());
 
     useEffect(() => {
-        fetch("ScenarioConfigs/Wildfire.json")
+        fetch("ScenarioConfigs/UVisBoxWildFire.json")
             .then(response => response.json())
             .then(data => scenarioManager.completeInitialization(data))
             .catch(error => {
