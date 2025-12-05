@@ -20,8 +20,8 @@ import { LazyTextField } from "@/Panels/Lazyfields";
 
 const TimeNavigationPanel = observer(() => {
 
-    const global_data = useScenario().global_context as WildfireGlobalContext;
-    const config = global_data.time_diff_configs;
+    const global_context = useScenario().global_context as WildfireGlobalContext;
+    const config = global_context.time_diff_configs;
 
     const [anchor, setAnchor] = useState(null);
 
@@ -34,27 +34,27 @@ const TimeNavigationPanel = observer(() => {
     }
 
     const toggleShowEnsemble = () => {
-        global_data.timeDiffToggleShowEnsemble();
+        global_context.timeDiffToggleShowEnsemble();
         onMenuClose();
     }
 
     const toggleShareYScale = () => {
-        global_data.timeDiffToggleShareYScale();
+        global_context.timeDiffToggleShareYScale();
         onMenuClose();
     }
 
     const resetZoom = () => {
-        global_data.timeDiffResetXDisplayRange();
+        global_context.timeDiffResetXDisplayRange();
         onMenuClose();
     }
 
     const play = () => {
-        global_data.play();
+        global_context.play();
         onMenuClose();
     }
 
     const stop = () => {
-        global_data.stop();
+        global_context.stop();
         onMenuClose();
     }
 
@@ -101,7 +101,7 @@ const TimeNavigationPanel = observer(() => {
                         onBlur={(e) => {
                             const val = parseInt(e.target.value);
                             if (!isNaN(val)) {
-                                global_data.timeDiffSetPlaySteps(val)
+                                global_context.timeDiffSetPlaySteps(val)
                             }
                         }}
                     />

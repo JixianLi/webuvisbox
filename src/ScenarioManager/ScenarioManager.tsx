@@ -26,22 +26,6 @@ class ScenarioManager implements Scenario {
         makeAutoObservable(this);
     }
 
-    // createGlobalContext(scenario_name: string): void {
-    //     runInAction((() => {
-    //         switch (scenario_name) {
-    //             case "Uncertainty Tube":
-    //                 this.global_context = new UncertaintyTubeGlobalData();
-    //                 break;
-    //             case "Wildfire":
-    //                 this.global_context = new WildfireGlobalData();
-    //                 break;
-    //             default:
-    //                 this.global_context = {} as GlobalContext;
-    //                 throw new Error(`Unknown GlobalData type: ${scenario_name}`);
-    //         }
-    //     }))
-    // }
-
     async asyncInitialization(): Promise<void> {
         return this.global_context.asyncInitialize();
     }
@@ -126,7 +110,7 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
     const [scenarioManager] = useState<ScenarioManager>(new ScenarioManager());
 
     useEffect(() => {
-        fetch("ScenarioConfigs/UVisBoxWildFire.json")
+        fetch("ScenarioConfigs/Wildfire.json")
             .then(response => response.json())
             .then(data => scenarioManager.completeInitialization(data))
             .catch(error => {

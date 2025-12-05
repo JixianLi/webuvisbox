@@ -148,18 +148,28 @@ export class WildfireGlobalContext implements GlobalContext {
     }
 
     play() {
-        this._play = setInterval(() => {
-            let next_time = this.current_time_index + this.time_diff_configs.play_steps
+        if (this._play) return;
+
+        const step = async () => {
+            let next_time = this.current_time_index + this.time_diff_configs.play_steps;
             if (next_time > this.time_in_seconds.length - 1) {
-                next_time = 0;
+                next_time = 1;
             }
-            this.setTimeIndex(next_time);
-        }, 1000);
+            await this.setTimeIndex(next_time);
+
+            if (this._play) {
+                this._play = setTimeout(step, 1000);
+            }
+        };
+
+        this._play = setTimeout(step, 0);
     }
 
     stop() {
-        clearInterval(this._play);
-        this._play = null;
+        if (this._play) {
+            clearTimeout(this._play);
+            this._play = null;
+        }
     }
 
     initialize(global_data_object: any): void {
@@ -358,13 +368,19 @@ export class WildfireGlobalContext implements GlobalContext {
         if (this.current_time_index === clipped_index) {
             return Promise.resolve();
         }
-        runInAction(async () => {
+        
+        runInAction(() => {
             this.current_time_index = clipped_index;
-            this.queryScalarData(this.current_ensemble_index, clipped_index);
-            this.queryContourData();
-            this.windGlyphsUpdateInstances();
-            this.querySquidGlyphs();
         });
+
+        await Promise.all([
+            this.queryScalarData(this.current_ensemble_index, clipped_index),
+            this.queryContourData(),
+            this.querySquidGlyphs()
+        ]);
+
+        this.windGlyphsUpdateInstances();
+
         return Promise.resolve();
     }
     

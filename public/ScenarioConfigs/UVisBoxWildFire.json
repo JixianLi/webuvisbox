@@ -250,11 +250,13 @@
       "size_scale": 15,
       "color": "#0000ff"
     },
+    
     "squid_glyphs": {
       "display": true,
       "scale": 30.0,
       "color": "#0000ff",
       "sampling_stride": 400
     }
+
   }
 }

@@ -15,13 +15,16 @@ export class PanelLayoutManager implements PanelLayouts {
     constructor(
         default_layouts: AppLayouts,
         breakpoints: RGLBreakpoints,
-        cols: RGLCols
+        cols?: RGLCols
     ) {
         this.default_layouts = _.cloneDeep(default_layouts);
         this.current_layouts = _.cloneDeep(default_layouts);
         this.cache_layouts = _.cloneDeep(default_layouts);
         this.breakpoints = _.cloneDeep(breakpoints);
-        this.cols = _.cloneDeep(cols);
+        this.cols = cols ? _.cloneDeep(cols) : Object.keys(this.breakpoints).reduce((acc, key) => {
+            acc[key] = 12;
+            return acc;
+        }, {} as RGLCols);
         
         // Initialize panels with visible: false
         // Move their full layout to cache and set them to zero-size in current_layouts
