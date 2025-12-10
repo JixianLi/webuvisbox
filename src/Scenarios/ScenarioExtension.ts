@@ -1,29 +1,19 @@
-import type { GlobalContext } from "@/Types/GlobalContext";
-import { UncertaintyTubeGlobalContext } from "./UncertaintyTube/UncertaintyTubeGlobalData";
-import { WildfireGlobalContext } from "./Wildfire/WildfireGlobalContext";
-import { uncertaintyTubePanelMappingFunction } from "@/Scenarios/UncertaintyTube/uncertaintyTubePanelMappingFunction";
-import { wildFirePanelMappingFunction } from "@/Scenarios/Wildfire/wildFirePanelMappingFunction";
-import type { ReactNode } from "react";
+// ABOUTME: Backward-compatible exports for scenario access.
+// ABOUTME: Delegates to ScenarioRegistry; prefer importing from "@/Scenarios" directly.
 
+import type { GlobalContext } from "@/Types/GlobalContext";
+import type { ReactNode } from "react";
+import { scenarioRegistry } from "./ScenarioRegistry";
+
+// Ensure all scenarios are registered by importing the index
+import "./index";
 
 export function getGlobalContext(scenario_name: string): GlobalContext {
-    switch (scenario_name) {
-        case "Uncertainty Tube":
-            return new UncertaintyTubeGlobalContext();
-        case "Wildfire":
-            return new WildfireGlobalContext();
-        default:
-        throw new Error(`Unknown GlobalData type: ${scenario_name}`);
-    }
+  return scenarioRegistry.get(scenario_name).createGlobalContext();
 }
 
-export function getPanelMappingFunction(scenario_name: string): (string) => ReactNode | null {
-    switch (scenario_name) {
-        case "Uncertainty Tube":
-            return uncertaintyTubePanelMappingFunction;
-        case "Wildfire":
-            return wildFirePanelMappingFunction;
-        default:
-            throw new Error(`Unknown scenario name: ${scenario_name}`);
-    }
+export function getPanelMappingFunction(
+  scenario_name: string
+): (panelId: string) => ReactNode | null {
+  return scenarioRegistry.get(scenario_name).panelMapping;
 }

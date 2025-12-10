@@ -6,8 +6,7 @@ import type { AppLayout, AppLayouts, PanelLayouts } from "@/Types/PanelLayouts";
 import type { Theme } from "@mui/material/styles";
 import HeaderBar from "./HeaderBar/HeaderBar";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import { uncertaintyTubePanelMappingFunction } from "@/Scenarios/UncertaintyTube/uncertaintyTubePanelMappingFunction";
-import { wildFirePanelMappingFunction } from "@/Scenarios/Wildfire/wildFirePanelMappingFunction";
+import { scenarioRegistry } from "@/Scenarios";
 import { usePromiseTracker } from "react-promise-tracker";
 import PacmanLoader from "react-spinners/PacmanLoader";
 // @ts-ignore
@@ -59,21 +58,13 @@ const LayoutManager: React.FC<LayoutManagerProps> = observer((props: LayoutManag
     };
 
     const layoutPanels = () => {
-        const getPanel = () => {
-            if (scenario.name === "Uncertainty Tube") {
-                return uncertaintyTubePanelMappingFunction;
-            } else if (scenario.name === "Wildfire") {
-                return wildFirePanelMappingFunction;
-            } else {
-                throw new Error(`Unknown scenario name: ${scenario.name}`);
-            }
-        }
+        const panelMapping = scenarioRegistry.get(scenario.name).panelMapping;
         const breakpoint = panel_layouts.current_breakpoint;
         const layout = panel_layouts.current_layouts[breakpoint];
         return layout.map((panel) => {
             return panel.visible ? (
                 <div key={panel.i}>
-                    {getPanel()(panel.i)}
+                    {panelMapping(panel.i)}
                 </div>
             ) : <div key={panel.i} />;
         });
