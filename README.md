@@ -70,19 +70,27 @@ npm run preview
 ```
 webuvisbox/
 ├── src/
-│   ├── Scenarios/           # Scenario-specific implementations
-│   │   ├── Wildfire/       # Wildfire simulation visualization
-│   │   └── UncertaintyTube/ # Flow uncertainty visualization
-│   ├── Renderers/          # Rendering components
-│   │   ├── Colormaps/      # Color and opacity mapping
-│   │   ├── Mesh/           # 3D mesh components
-│   │   └── Chartjs/        # Chart utilities
-│   ├── LayoutManager/      # Panel layout management
-│   ├── Panels/             # Reusable panel components
-│   ├── Types/              # TypeScript type definitions
-│   └── Helpers/            # Utility functions
+│   ├── Scenarios/              # Scenario plugin system
+│   │   ├── index.ts            # Scenario discovery (imports all scenarios)
+│   │   ├── ScenarioRegistry.ts # Registry singleton
+│   │   ├── Wildfire/           # Wildfire simulation visualization
+│   │   │   ├── index.ts        # Self-registration entry point
+│   │   │   ├── WildfireGlobalContext.ts
+│   │   │   └── Views/          # Panel components
+│   │   └── UncertaintyTube/    # Flow uncertainty visualization
+│   │       ├── index.ts        # Self-registration entry point
+│   │       ├── UncertaintyTubeGlobalData.ts
+│   │       └── Views/          # Panel components
+│   ├── Renderers/              # Shared rendering components
+│   │   ├── Colormaps/          # Color and opacity mapping
+│   │   ├── Mesh/               # 3D mesh components
+│   │   └── Chartjs/            # Chart utilities
+│   ├── LayoutManager/          # Panel layout management
+│   ├── Panels/                 # Reusable panel components
+│   ├── Types/                  # TypeScript type definitions
+│   └── Helpers/                # Utility functions
 ├── public/
-│   └── ScenarioConfigs/    # Scenario configuration files
+│   └── ScenarioConfigs/        # Scenario configuration files
 └── package.json
 ```
 
@@ -144,11 +152,51 @@ Example structure:
 
 ### Adding a New Scenario
 
-1. Create scenario folder in `src/Scenarios/YourScenario/`
-2. Implement `GlobalContext` for your scenario
-3. Create view components in `Views/` subfolder
-4. Add panel mapping function
-5. Create configuration JSON in `public/ScenarioConfigs/`
+Scenarios self-register via a registry pattern. To add a new scenario:
+
+1. Create your scenario folder:
+```
+src/Scenarios/YourScenario/
+├── index.ts                      # Entry point (registers the scenario)
+├── YourScenarioGlobalContext.ts  # State management (implements GlobalContext)
+├── yourScenarioPanelMapping.tsx  # Maps panel IDs to components
+└── Views/                        # Panel components
+    └── YourPanel/
+        └── YourPanel.tsx
+```
+
+2. Create `index.ts` to register your scenario:
+```typescript
+import { scenarioRegistry } from "../ScenarioRegistry";
+import { YourScenarioGlobalContext } from "./YourScenarioGlobalContext";
+import { yourScenarioPanelMapping } from "./yourScenarioPanelMapping";
+
+scenarioRegistry.register({
+  name: "Your Scenario",
+  description: "Description of your scenario",
+  createGlobalContext: () => new YourScenarioGlobalContext(),
+  panelMapping: yourScenarioPanelMapping,
+  defaultConfigPath: "ScenarioConfigs/YourScenario.json",
+});
+```
+
+3. Implement `GlobalContext` interface in your GlobalContext class:
+```typescript
+interface GlobalContext {
+  initialize(global_data_object: any): void;
+  asyncInitialize(): Promise<void>;
+  toObject(): any;
+}
+```
+
+4. Create configuration JSON in `public/ScenarioConfigs/YourScenario.json`
+
+5. Add one import to `src/Scenarios/index.ts`:
+```typescript
+import "./YourScenario";
+```
+
+That's it! Your scenario is now available in the application.
 
 ### Creating Custom Panels
 
