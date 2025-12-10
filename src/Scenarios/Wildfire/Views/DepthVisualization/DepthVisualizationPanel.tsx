@@ -1,7 +1,10 @@
+// ABOUTME: Panel wrapper for depth visualization of the Wildfire terrain scene.
+// ABOUTME: Displays logarithmic depth as inverted grayscale (near=bright, far=dark).
+
 import { observer } from "mobx-react-lite";
 import { useRef, useState } from "react";
 import { Panel } from "@/Panels/Panel";
-import TerrainRenderer, { type TerrainRendererHandle } from "./TerrainRenderer";
+import DepthTerrainRenderer, { type DepthTerrainRendererHandle } from "./DepthTerrainRenderer";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuList from "@mui/material/MenuList";
@@ -11,8 +14,8 @@ import ListItemText from "@mui/material/ListItemText";
 import MenuIcon from "@mui/icons-material/Menu";
 import SaveAltIcon from "@mui/icons-material/SaveAlt";
 
-const TerrainVisualizationPanel = observer(() => {
-    const rendererRef = useRef<TerrainRendererHandle>(null);
+const DepthVisualizationPanel = observer(() => {
+    const rendererRef = useRef<DepthTerrainRendererHandle>(null);
     const [anchor, setAnchor] = useState<null | HTMLElement>(null);
 
     const onMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -52,10 +55,10 @@ const TerrainVisualizationPanel = observer(() => {
     );
 
     return (
-        <Panel panel_name="Terrain Visualization" appbar_content={appBarContent}>
-            <TerrainRenderer ref={rendererRef} />
+        <Panel panel_name="Depth Visualization" appbar_content={appBarContent}>
+            <DepthTerrainRenderer ref={rendererRef} />
         </Panel>
     );
 });
 
-export default TerrainVisualizationPanel;
+export default DepthVisualizationPanel;

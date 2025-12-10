@@ -1,3 +1,6 @@
+// ABOUTME: Renders the Wildfire terrain scene with depth visualization.
+// ABOUTME: Uses DepthOverride to render all objects as inverted linear depth grayscale.
+
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
 import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalContext";
@@ -5,20 +8,16 @@ import { Canvas } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import { useRef, forwardRef, useImperativeHandle } from "react";
-import TerrainScene from "./TerrainScene";
+import TerrainScene from "../TerrainVisualization/TerrainScene";
 import SharedTrackballControl from "@/Renderers/SharedCameraControl/SharedTrackballControl";
+import { DepthOverride } from "@/Renderers/DepthRenderer/DepthRenderer";
+import { saveGrayscalePng } from "@/Helpers/saveGrayscalePng";
 
-export interface TerrainRendererHandle {
+export interface DepthTerrainRendererHandle {
     saveImage: () => void;
 }
 
-interface TerrainRendererProps {
-    use_opacity?: boolean;
-    ctf_name?: string;
-    otf_name?: string;
-}
-
-export const TerrainRenderer = observer(forwardRef<TerrainRendererHandle, TerrainRendererProps>((props, ref) => {
+export const DepthTerrainRenderer = observer(forwardRef<DepthTerrainRendererHandle>((_, ref) => {
     const control_ref = useRef(null);
     const gl_ref = useRef<THREE.WebGLRenderer | null>(null);
     const last_tap_time = useRef<number>(0);
@@ -26,12 +25,7 @@ export const TerrainRenderer = observer(forwardRef<TerrainRendererHandle, Terrai
     useImperativeHandle(ref, () => ({
         saveImage: () => {
             if (gl_ref.current) {
-                const canvas = gl_ref.current.domElement;
-                const dataURL = canvas.toDataURL("image/png");
-                const link = document.createElement("a");
-                link.download = `terrain_${Date.now()}.png`;
-                link.href = dataURL;
-                link.click();
+                saveGrayscalePng(gl_ref.current, `depth_${Date.now()}.png`);
             }
         }
     }));
@@ -44,7 +38,6 @@ export const TerrainRenderer = observer(forwardRef<TerrainRendererHandle, Terrai
         return <div>No terrain view configuration available</div>;
     }
 
-    // Camera setup
     const center = global_data.terrain.center;
     const diag = global_data.terrain.diag;
     const near = 0.01;
@@ -53,7 +46,7 @@ export const TerrainRenderer = observer(forwardRef<TerrainRendererHandle, Terrai
 
     return (
         <Canvas
-            gl={{ preserveDrawingBuffer: true }}
+            gl={{ preserveDrawingBuffer: true, alpha: true }}
             onCreated={({ gl }) => { gl_ref.current = gl; }}
             onPointerDown={(_e) => {
                 const now = Date.now();
@@ -64,13 +57,18 @@ export const TerrainRenderer = observer(forwardRef<TerrainRendererHandle, Terrai
                 }
                 last_tap_time.current = now;
             }}
-            linear flat >
-            <TerrainScene {...props} />
-            <ambientLight intensity={2.0} />
-            <PerspectiveCamera makeDefault
-                position={camera_pos} near={near} far={far} fov={35}>
-                <directionalLight position={[0, 0, 0]} intensity={1} />
-            </PerspectiveCamera>
+            linear
+            flat
+        >
+            <DepthOverride />
+            <TerrainScene />
+            <PerspectiveCamera
+                makeDefault
+                position={camera_pos}
+                near={near}
+                far={far}
+                fov={35}
+            />
             <SharedTrackballControl
                 ref={control_ref}
                 makeDefault
@@ -85,6 +83,6 @@ export const TerrainRenderer = observer(forwardRef<TerrainRendererHandle, Terrai
     );
 }));
 
-TerrainRenderer.displayName = "TerrainRenderer";
+DepthTerrainRenderer.displayName = "DepthTerrainRenderer";
 
-export default TerrainRenderer;
+export default DepthTerrainRenderer;

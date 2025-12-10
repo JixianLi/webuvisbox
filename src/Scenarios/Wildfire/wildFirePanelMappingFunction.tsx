@@ -7,6 +7,7 @@ import WindGlyphConfigPanel from "./Views/WindGlyphConfigPanel/WindGlyphConfigPa
 import ColorEditorPanel from "./Views/ColorEditorPanel/ColorEditorPanel";
 import OpacityEditorPanel from "./Views/OpacityEditorPanel/OpacityEditorPanel";
 import EnsembleWildfirePanel from "./Views/TerrainVisualization/EnsembleWildfirePanel";
+import DepthVisualizationPanel from "./Views/DepthVisualization/DepthVisualizationPanel";
 
 export function wildFirePanelMappingFunction(viewname:string): React.ReactNode {
     switch(viewname){
@@ -28,6 +29,8 @@ export function wildFirePanelMappingFunction(viewname:string): React.ReactNode {
             return <OpacityEditorPanel />;
         case "Ensemble Wildfire":
             return <EnsembleWildfirePanel />;
+        case "Depth Visualization":
+            return <DepthVisualizationPanel />;
 
         default:
             throw new Error(`Unknown view name: ${viewname}`);
