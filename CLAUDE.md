@@ -19,25 +19,26 @@ npm run preview  # Preview production build
 
 ### Scenario-Based Design
 
-The app uses a scenario pattern where each domain (Wildfire, UncertaintyTube) is self-contained:
+Scenarios self-register via a registry pattern in `src/Scenarios/ScenarioRegistry.ts`:
 
 ```
-src/Scenarios/{ScenarioName}/
-├── {ScenarioName}GlobalContext.ts  # MobX state management (implements GlobalContext interface)
-├── {scenarioName}PanelMappingFunction.tsx  # Maps panel IDs to React components
-├── Views/                          # Panel components organized by feature
-│   └── {PanelName}/
-│       └── {PanelName}.tsx
-└── GlobalDataContainers/           # Data structure classes (Wildfire only)
+src/Scenarios/
+├── index.ts                # Imports all scenarios to trigger registration
+├── ScenarioRegistry.ts     # Registry singleton
+└── {ScenarioName}/
+    ├── index.ts            # Self-registration entry point
+    ├── {ScenarioName}GlobalContext.ts  # MobX state management
+    ├── {scenarioName}PanelMappingFunction.tsx  # Maps panel IDs to components
+    └── Views/              # Panel components
 ```
 
 To add a new scenario:
-1. Create scenario folder in `src/Scenarios/`
+1. Create scenario folder `src/Scenarios/YourScenario/`
 2. Implement `GlobalContext` interface (`initialize()`, `asyncInitialize()`, `toObject()`)
 3. Create panel mapping function
-4. Add JSON config in `public/ScenarioConfigs/`
-5. Register in `src/Scenarios/ScenarioExtension.ts`
-6. Update `src/ScenarioManager/ScenarioManager.tsx` default fetch if needed
+4. Create `index.ts` that calls `scenarioRegistry.register({...})`
+5. Add JSON config in `public/ScenarioConfigs/`
+6. Add import to `src/Scenarios/index.ts`
 
 ### Core Flow
 
@@ -77,7 +78,7 @@ src/Panels/
 ### Configuration Files
 
 Scenario configs in `public/ScenarioConfigs/*.json` define:
-- `name`: Must match case in `ScenarioExtension.ts` switch statement
+- `name`: Must match the name used in `scenarioRegistry.register()`
 - `panel_layouts`: Responsive grid layouts per breakpoint (xl, lg, sm)
 - `global_data`: Scenario-specific initial state passed to GlobalContext
 
