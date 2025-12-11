@@ -103,6 +103,13 @@ export class VSUP extends PresetLinearColormap {
         }
     }
 
+    setPreset(preset_name: string): void {
+        super.setPreset(preset_name);
+        runInAction(() => {
+            this._createTree();
+        });
+    }
+
     getColorForTexture(x: number, y: number): d3.RGBColor {
         const ratio = x;
         let uncertainty = y;
