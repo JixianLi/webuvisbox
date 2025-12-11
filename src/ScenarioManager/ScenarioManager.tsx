@@ -83,6 +83,9 @@ class ScenarioManager implements Scenario {
     }
 
     async completeInitialization(config: any): Promise<void> {
+        // Reset state before loading new scenario
+        this.invalidate();
+
         // Load base configuration
         this.loadFromObject(config);
 

@@ -16,16 +16,15 @@ export const ScenarioMenuList: React.FC<{ handleClose: () => void }> = observer(
     const scenario = useScenario();
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
 
-    const server_load = (filename) => {
+    const server_load = async (filename: string) => {
         handleClose();
-        fetch(filename)
-            .then(response => response.json())
-            .then(data => {
-                scenario.completeInitialization(data);
-            })
-            .catch(error => {
-                console.error(`Failed to load scenario ${filename}:`, error);
-            });
+        try {
+            const response = await fetch(filename);
+            const data = await response.json();
+            await scenario.completeInitialization(data);
+        } catch (error) {
+            console.error(`Failed to load scenario ${filename}:`, error);
+        }
     }
 
 
