@@ -105,9 +105,12 @@ export class VSUP extends PresetLinearColormap {
 
     setPreset(preset_name: string): void {
         super.setPreset(preset_name);
-        runInAction(() => {
-            this._createTree();
-        });
+        // Only rebuild tree if depth is set (not during parent constructor)
+        if (this.depth !== undefined) {
+            runInAction(() => {
+                this._createTree();
+            });
+        }
     }
 
     getColorForTexture(x: number, y: number): d3.RGBColor {
