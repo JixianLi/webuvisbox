@@ -274,9 +274,13 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
 
     async asyncInitialize(): Promise<void> {
         console.log("UncertaintyTubeGlobalData asyncInitialize called");
-        await this.fetch_bounds();
-        if (this.seeds.length > 0) {
-            await this.fetch_trajectories();
+        try {
+            await this.fetch_bounds();
+            if (this.seeds.length > 0) {
+                await this.fetch_trajectories();
+            }
+        } catch (error) {
+            console.error("Failed to fetch initial data:", error);
         }
     }
 
