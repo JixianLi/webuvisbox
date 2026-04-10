@@ -210,6 +210,7 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
             })
         }).then(response => response.json()).then(data => {
             runInAction(() => {
+                const start_timer = performance.now()
                 data.trajectories_length;
                 const stride = data.trajectories_length * data.trajectories_dim;
                 this.primary_trajectories = this.buildCurves(decode64(data.primary_trajectories) as Float32Array, stride);
@@ -221,6 +222,8 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
                     this.uncertainty_tubes.faces = decode64(data.uncertainty_tube.faces, 'uint32') as Uint32Array;
                     this.uncertainty_tubes.uv = decode64(data.uncertainty_tube.uv) as Float32Array;
                 }
+                const end_timer = performance.now()
+                console.log(`Data parsing from server took ${end_timer - start_timer} milliseconds`)
             });
         }).catch(error => {
             console.error("Failed to fetch trajectories:", error);

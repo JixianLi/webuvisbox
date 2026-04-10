@@ -7,7 +7,8 @@ import * as THREE from "three";
 import { useRef, forwardRef, useImperativeHandle } from "react";
 import TerrainScene from "./TerrainScene";
 import SharedTrackballControl from "@/Renderers/SharedCameraControl/SharedTrackballControl";
-
+// @ts-ignore
+import { Perf } from 'r3f-perf';
 export interface TerrainRendererHandle {
     saveImage: () => void;
 }
@@ -81,6 +82,7 @@ export const TerrainRenderer = observer(forwardRef<TerrainRendererHandle, Terrai
                 maxDistance={far / 2}
                 minDistance={near < 1 ? near / 100 : near * 100}
             />
+            <Perf position="top-left" />
         </Canvas>
     );
 }));

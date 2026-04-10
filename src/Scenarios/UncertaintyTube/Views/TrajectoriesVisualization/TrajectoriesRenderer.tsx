@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { Canvas } from "@react-three/fiber";
-import { PerspectiveCamera, TrackballControls, GizmoHelper, GizmoViewport, Stats } from "@react-three/drei";
+import { PerspectiveCamera, TrackballControls, GizmoHelper, GizmoViewport } from "@react-three/drei";
 import { useRef } from "react";
 import UncertaintyPathMesh from "./UncertaintyPathMesh";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
@@ -9,6 +9,7 @@ import { Vector3 } from "three";
 import SeedsMesh from "./SeedsMesh";
 import UncertaintyTubeMesh from "./UncertaintyTubeMesh";
 import SeedBoxMesh from "./SeedBoxMesh";
+import { Perf } from 'r3f-perf';
 
 
 const TrajectoriesRenderer = observer(() => {
@@ -24,7 +25,7 @@ const TrajectoriesRenderer = observer(() => {
 
     const camera_pos = new Vector3(center[0], center[1], center[2] + diag);
 
-    const stats = global_data.trajectory_visualization.show_stats?<Stats />:null;
+    const stats = global_data.trajectory_visualization.show_stats?<Perf />:null;
 
     return (
         <Canvas ref={canvas_ref} onDoubleClick={() => { control_ref.current?.reset() }} linear flat>
