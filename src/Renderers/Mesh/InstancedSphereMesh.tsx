@@ -10,7 +10,7 @@ type Points = Point[];
 
 interface SphereMeshProps {
     points: Points;                // Array of 3D points where spheres will be positioned
-    key_prefix?: string;           // Prefix for React keys to ensure uniqueness
+    keyPrefix?: string;             // Prefix for React keys to ensure uniqueness
     radius?: number;               // Radius of each sphere instance
     widthSegments?: number;        // Number of horizontal segments for sphere geometry
     heightSegments?: number;       // Number of vertical segments for sphere geometry
@@ -50,7 +50,7 @@ interface SphereMeshProps {
 export function InstancedSphereMesh(props: SphereMeshProps) {
     const {
         points,
-        key_prefix = 'sphere_mesh',          // Default prefix for React keys
+        keyPrefix = 'sphere_mesh',            // Default prefix for React keys
         radius = 0.1,                        // Default small sphere radius
         widthSegments = 16,                  // Default geometry detail level
         heightSegments = 16,                 // Default geometry detail level
@@ -93,7 +93,7 @@ export function InstancedSphereMesh(props: SphereMeshProps) {
                 
                 return (
                     <Instance 
-                        key={`${key_prefix}_${index}`}  // Unique key for React reconciliation
+                        key={`${keyPrefix}_${index}`}  // Unique key for React reconciliation
                         position={[x, y, z]}            // Position this sphere instance
                     />
                 );

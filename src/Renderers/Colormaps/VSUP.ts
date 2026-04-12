@@ -6,35 +6,35 @@ import * as d3 from 'd3';
 export class VSUP extends PresetLinearColormap {
     depth: number;
     nodes: d3.RGBColor[];
-    fading_color: d3.RGBColor = d3.rgb(233, 233, 233)
+    fadingColor: d3.RGBColor = d3.rgb(233, 233, 233)
     continuous: boolean = false;
-    flip_y: boolean = false;
+    flipY: boolean = false;
 
     constructor(
         depth: number = 4,
         continuous: boolean = false,
-        flip_y: boolean = false,
-        preset_name: string = "Cool to Warm"
+        flipY: boolean = false,
+        presetName: string = "Cool to Warm"
     ) {
-        super(preset_name);
+        super(presetName);
         this.type = "vsup"
         this.depth = depth;
         this.continuous = continuous;
-        this.flip_y = flip_y;
+        this.flipY = flipY;
         this._validatePreset();
         this._validateDepth();
         this._createTree();
-        makeObservable(this, { depth: true, continuous: true, flip_y: true, fading_color: true, nodes: observable.deep });
+        makeObservable(this, { depth: true, continuous: true, flipY: true, fadingColor: true, nodes: observable.deep });
     }
 
     setFadingColor(color: d3.RGBColor | string | [number, number, number]) {
         runInAction(() => {
             if (typeof color === 'string') {
-                this.fading_color = d3.rgb(color);
+                this.fadingColor = d3.rgb(color);
             } else if (Array.isArray(color) && color.length === 3) {
-                this.fading_color = d3.rgb(color[0], color[1], color[2]);
+                this.fadingColor = d3.rgb(color[0], color[1], color[2]);
             } else if ('r' in color && 'g' in color && 'b' in color) {
-                this.fading_color = d3.rgb(color.r, color.g, color.b);
+                this.fadingColor = d3.rgb(color.r, color.g, color.b);
             } else {
                 console.warn('Invalid color format for setFadingColor.');
                 return;
@@ -59,7 +59,7 @@ export class VSUP extends PresetLinearColormap {
 
     _createTree() {
         const nNodes = 2 ** this.depth - 1;
-        this.nodes = new Array(nNodes).fill(this.fading_color);
+        this.nodes = new Array(nNodes).fill(this.fadingColor);
 
         for (let d = 0; d < this.depth; d++) {
             for (let i = 0; i < 2 ** d; i++) {
@@ -69,7 +69,7 @@ export class VSUP extends PresetLinearColormap {
                     const ratio = i / (2 ** d - 1);
 
                     const color1 = this.getColorByValue(ratio);
-                    const color = d3.rgb(d3.interpolateLab(color1, this.fading_color)(uncertainty));
+                    const color = d3.rgb(d3.interpolateLab(color1, this.fadingColor)(uncertainty));
 
                     this.nodes[idx] = color;
                 }
@@ -78,9 +78,9 @@ export class VSUP extends PresetLinearColormap {
     }
 
     setFlipY(flip: boolean) {
-        if (flip !== this.flip_y) {
+        if (flip !== this.flipY) {
             runInAction(() => {
-                this.flip_y = flip;
+                this.flipY = flip;
             });
         }
     }
@@ -103,8 +103,8 @@ export class VSUP extends PresetLinearColormap {
         }
     }
 
-    setPreset(preset_name: string): void {
-        super.setPreset(preset_name);
+    setPreset(presetName: string): void {
+        super.setPreset(presetName);
         // Only rebuild tree if depth is set (not during parent constructor)
         if (this.depth !== undefined) {
             runInAction(() => {
@@ -118,7 +118,7 @@ export class VSUP extends PresetLinearColormap {
         let uncertainty = y;
         const continuous = this.continuous;
         uncertainty = Math.max(0, Math.min(uncertainty, 1));
-        if (this.flip_y) {
+        if (this.flipY) {
             uncertainty = 1 - uncertainty;
         }
         const value = Math.max(0, Math.min(ratio, 1));
@@ -132,7 +132,7 @@ export class VSUP extends PresetLinearColormap {
 
         if (continuous || this.depth === 1) {
             const color1 = this.getColorByValue(value);
-            result = d3.rgb(d3.interpolateLab(color1, this.fading_color)(1 - uncertainty));
+            result = d3.rgb(d3.interpolateLab(color1, this.fadingColor)(1 - uncertainty));
         } else {
             let depth = Math.floor(this.depth * uncertainty);
             if (depth === this.depth) depth = this.depth - 1;
@@ -145,7 +145,7 @@ export class VSUP extends PresetLinearColormap {
             return this.nodes[idx];
         }
 
-        if (this._colorCache.size < this._cache_size) {
+        if (this._colorCache.size < this._cacheSize) {
             this._colorCache.set(cacheKey, result);
         }
 
@@ -159,12 +159,12 @@ export class VSUP extends PresetLinearColormap {
     toObject() {
         return {
             type: "vsup",
-            preset_name: this.preset_name,
-            color_control_points: this.color_control_points,
-            color_points: this.color_points.map(arr => [...arr]),
+            preset_name: this.presetName,
+            color_control_points: this.colorControlPoints,
+            color_points: this.colorPoints.map(arr => [...arr]),
             depth: this.depth,
-            flip_y: this.flip_y,
-            fading_color: d3.rgb(this.fading_color).formatRgb(),
+            flip_y: this.flipY,
+            fading_color: d3.rgb(this.fadingColor).formatRgb(),
             continuous: this.continuous
         }
     }
@@ -175,22 +175,22 @@ export class VSUP extends PresetLinearColormap {
             console.warn(`Invalid colormap type: ${obj.type}. Expected 'vsup'.`);
         }
         if (obj.preset_name && typeof obj.preset_name === 'string') {
-            colormap.preset_name = obj.preset_name;
+            colormap.presetName = obj.preset_name;
         } else {
             console.warn("Missing or invalid 'preset_name' in colormap object. Defaulting to 'Cool to Warm'.");
-            colormap.preset_name = "Cool to Warm";
+            colormap.presetName = "Cool to Warm";
         }
         if (Array.isArray(obj.color_control_points) && obj.color_control_points.every((v: any) => typeof v === 'number')) {
-            colormap.color_control_points = obj.color_control_points;
+            colormap.colorControlPoints = obj.color_control_points;
         } else {
             console.warn("Missing or invalid 'color_control_points' in colormap object. Using default from preset.");
-            colormap.color_control_points = [...presets[colormap.preset_name].control_points];
+            colormap.colorControlPoints = [...presets[colormap.presetName].control_points];
         }
         if (Array.isArray(obj.color_points) && obj.color_points.every((arr: any) => Array.isArray(arr) && arr.length === 3 && arr.every((v: any) => typeof v === 'number'))) {
-            colormap.color_points = obj.color_points.map(arr => [...arr]);
+            colormap.colorPoints = obj.color_points.map(arr => [...arr]);
         } else {
             console.warn("Missing or invalid 'color_points' in colormap object. Using default from preset.");
-            colormap.color_points = presets[colormap.preset_name].color_points.map(arr => [...arr]);
+            colormap.colorPoints = presets[colormap.presetName].color_points.map(arr => [...arr]);
         }
         if (typeof obj.depth === 'number') {
             colormap.depth = obj.depth;
@@ -199,10 +199,10 @@ export class VSUP extends PresetLinearColormap {
             colormap.depth = 4;
         }
         if (typeof obj.flip_y === 'boolean') {
-            colormap.flip_y = obj.flip_y;
+            colormap.flipY = obj.flip_y;
         } else {
             console.warn("Missing or invalid 'flip_y' in colormap object. Defaulting to false.");
-            colormap.flip_y = false;
+            colormap.flipY = false;
         }
         if (typeof obj.continuous === 'boolean') {
             colormap.continuous = obj.continuous;
@@ -212,18 +212,18 @@ export class VSUP extends PresetLinearColormap {
         }
         if (obj.fading_color) {
             if (typeof obj.fading_color === 'string') {
-                colormap.fading_color = d3.rgb(obj.fading_color);
+                colormap.fadingColor = d3.rgb(obj.fading_color);
             } else if (Array.isArray(obj.fading_color) && obj.fading_color.length === 3) {
-                colormap.fading_color = d3.rgb(obj.fading_color[0], obj.fading_color[1], obj.fading_color[2]);
+                colormap.fadingColor = d3.rgb(obj.fading_color[0], obj.fading_color[1], obj.fading_color[2]);
             } else if (typeof obj.fading_color === 'object' && 'r' in obj.fading_color && 'g' in obj.fading_color && 'b' in obj.fading_color) {
-                colormap.fading_color = d3.rgb(obj.fading_color.r, obj.fading_color.g, obj.fading_color.b);
+                colormap.fadingColor = d3.rgb(obj.fading_color.r, obj.fading_color.g, obj.fading_color.b);
             } else {
                 console.warn("Invalid format for 'fading_color' in colormap object. Defaulting to (233, 233, 233).");
-                colormap.fading_color = d3.rgb(233, 233, 233);
+                colormap.fadingColor = d3.rgb(233, 233, 233);
             }
         } else {
             console.warn("Missing 'fading_color' in colormap object. Defaulting to (233, 233, 233).");
-            colormap.fading_color = d3.rgb(233, 233, 233);
+            colormap.fadingColor = d3.rgb(233, 233, 233);
         }
         colormap._validatePreset();
         colormap._validateDepth();

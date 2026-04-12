@@ -46,27 +46,27 @@ export const ScalarFieldBufferedGeometry = (props: ScalarFieldBufferedGeometryPr
 };
 
 const getAttributeLoaderLogic = (n: number): string => {
-    let color_logic = '';
+    let colorLogic = '';
     for (let i = 0; i < n; i++) {
         if (i == 0) {
-            color_logic += `if (cIndex == ${i})\n{cScalar = aScalar${i};}\n`;
+            colorLogic += `if (cIndex == ${i})\n{cScalar = aScalar${i};}\n`;
         } else if (i == n - 1) {
-            color_logic += `else\n{cScalar = aScalar${i};}\n`;
+            colorLogic += `else\n{cScalar = aScalar${i};}\n`;
         } else {
-            color_logic += `else if (cIndex == ${i})\n{cScalar = aScalar${i};}\n`;
+            colorLogic += `else if (cIndex == ${i})\n{cScalar = aScalar${i};}\n`;
         }
     }
-    let opacity_logic = '';
+    let opacityLogic = '';
     for (let i = 0; i < n; i++) {
         if (i == 0) {
-            opacity_logic += `if (oIndex == ${i})\n{oScalar = aScalar${i};}\n`;
+            opacityLogic += `if (oIndex == ${i})\n{oScalar = aScalar${i};}\n`;
         } else if (i == n - 1) {
-            opacity_logic += `else\n{oScalar = aScalar${i};}\n`;
+            opacityLogic += `else\n{oScalar = aScalar${i};}\n`;
         } else {
-            opacity_logic += `else if (oIndex == ${i})\n{oScalar = aScalar${i};}\n`;
+            opacityLogic += `else if (oIndex == ${i})\n{oScalar = aScalar${i};}\n`;
         }
     }
-    return color_logic + opacity_logic;
+    return colorLogic + opacityLogic;
 };
 
 export const ScalarFieldPhongMaterial = (props) => {

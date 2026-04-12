@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 
 interface SharedTrackballControlProps {
-    global_data: any;
+    globalData: any;
     position0: THREE.Vector3;
     target: THREE.Vector3;
     target0: THREE.Vector3;
@@ -17,7 +17,7 @@ interface SharedTrackballControlProps {
 
 export const SharedTrackballControl = observer(forwardRef<any, SharedTrackballControlProps>((props, ref) => {
     const {
-        global_data,
+        globalData,
         position0,
         target,
         target0,
@@ -26,45 +26,45 @@ export const SharedTrackballControl = observer(forwardRef<any, SharedTrackballCo
         makeDefault = false,
     } = props;
 
-    const internal_ref = useRef(null);
-    const unique_id = useId();
-    const shared_camera = useSharedTrackballPerspectiveCamera(global_data);
+    const internalRef = useRef(null);
+    const uniqueId = useId();
+    const sharedCamera = useSharedTrackballPerspectiveCamera(globalData);
 
-    const control_ref: any = ref || internal_ref;
-    useImperativeHandle(ref, () => control_ref.current, []);
+    const controlRef: any = ref || internalRef;
+    useImperativeHandle(ref, () => controlRef.current, []);
 
     const handleControlChange = (e) => {
-        shared_camera.setCamera(
+        sharedCamera.setCamera(
             e.target.object.position,
             e.target.target,
             e.target.object.up,
             e.target.object.quaternion,
-            unique_id
+            uniqueId
         );
     };
 
     useFrame(() => {
-        if (control_ref.current && shared_camera.last_used_id !== unique_id) {
-            control_ref.current.object.position.copy(shared_camera.position);
-            control_ref.current.object.quaternion.copy(shared_camera.quaternion);
-            control_ref.current.target.copy(shared_camera.target);
-            control_ref.current.object.up.copy(shared_camera.up);
-            control_ref.current.update();
+        if (controlRef.current && sharedCamera.lastUsedId !== uniqueId) {
+            controlRef.current.object.position.copy(sharedCamera.position);
+            controlRef.current.object.quaternion.copy(sharedCamera.quaternion);
+            controlRef.current.target.copy(sharedCamera.target);
+            controlRef.current.object.up.copy(sharedCamera.up);
+            controlRef.current.update();
         }
     });
 
     useEffect(() => {
-        if (control_ref.current) {
-            control_ref.current.object.position.copy(shared_camera.position);
-            control_ref.current.object.quaternion.copy(shared_camera.quaternion);
-            control_ref.current.target.copy(shared_camera.target);
-            control_ref.current.object.up.copy(shared_camera.up);
-            control_ref.current.update();
+        if (controlRef.current) {
+            controlRef.current.object.position.copy(sharedCamera.position);
+            controlRef.current.object.quaternion.copy(sharedCamera.quaternion);
+            controlRef.current.target.copy(sharedCamera.target);
+            controlRef.current.object.up.copy(sharedCamera.up);
+            controlRef.current.update();
         }
     }, []);
 
     return <TrackballControls makeDefault={makeDefault}
-        ref={control_ref}
+        ref={controlRef}
         onChange={handleControlChange}
         target={target}
         maxDistance={maxDistance}

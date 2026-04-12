@@ -40,27 +40,27 @@ export function BoxOutlineMesh(props: BoxOutlineMeshProps) {
 
     // Create tube-based box outline geometry
     const geometry = useMemo(() => {
-        const [x_min, x_max, y_min, y_max, z_min, z_max] = boundingBox;
-        
+        const [xMin, xMax, yMin, yMax, zMin, zMax] = boundingBox;
+
         // Define the 12 edges as line segments
         const edges = [
-            // Bottom face edges (y = y_min)
-            [[x_min, y_min, z_min], [x_max, y_min, z_min]], // front edge
-            [[x_max, y_min, z_min], [x_max, y_min, z_max]], // right edge
-            [[x_max, y_min, z_max], [x_min, y_min, z_max]], // back edge
-            [[x_min, y_min, z_max], [x_min, y_min, z_min]], // left edge
-            
-            // Top face edges (y = y_max)
-            [[x_min, y_max, z_min], [x_max, y_max, z_min]], // front edge
-            [[x_max, y_max, z_min], [x_max, y_max, z_max]], // right edge
-            [[x_max, y_max, z_max], [x_min, y_max, z_max]], // back edge
-            [[x_min, y_max, z_max], [x_min, y_max, z_min]], // left edge
-            
+            // Bottom face edges (y = yMin)
+            [[xMin, yMin, zMin], [xMax, yMin, zMin]], // front edge
+            [[xMax, yMin, zMin], [xMax, yMin, zMax]], // right edge
+            [[xMax, yMin, zMax], [xMin, yMin, zMax]], // back edge
+            [[xMin, yMin, zMax], [xMin, yMin, zMin]], // left edge
+
+            // Top face edges (y = yMax)
+            [[xMin, yMax, zMin], [xMax, yMax, zMin]], // front edge
+            [[xMax, yMax, zMin], [xMax, yMax, zMax]], // right edge
+            [[xMax, yMax, zMax], [xMin, yMax, zMax]], // back edge
+            [[xMin, yMax, zMax], [xMin, yMax, zMin]], // left edge
+
             // Vertical edges
-            [[x_min, y_min, z_min], [x_min, y_max, z_min]], // front-left vertical
-            [[x_max, y_min, z_min], [x_max, y_max, z_min]], // front-right vertical
-            [[x_max, y_min, z_max], [x_max, y_max, z_max]], // back-right vertical
-            [[x_min, y_min, z_max], [x_min, y_max, z_max]]  // back-left vertical
+            [[xMin, yMin, zMin], [xMin, yMax, zMin]], // front-left vertical
+            [[xMax, yMin, zMin], [xMax, yMax, zMin]], // front-right vertical
+            [[xMax, yMin, zMax], [xMax, yMax, zMax]], // back-right vertical
+            [[xMin, yMin, zMax], [xMin, yMax, zMax]]  // back-left vertical
         ];
 
         // Create merged geometry for all tube segments

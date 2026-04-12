@@ -4,47 +4,47 @@ import { makeObservable, observable, runInAction } from 'mobx';
 import { findSmallerIndex } from '@/Helpers/MathHelper';
 
 export class PresetLinearColormap {
-    preset_name: string;
+    presetName: string;
     protected _colorCache: Map<string, d3.RGBColor> = new Map();
-    protected _cache_size: number = 1000;
+    protected _cacheSize: number = 1000;
     type: "default" | "vsup" | "linear" = "linear";
-    color_control_points: number[] = [];
-    color_points: number[][] = [];
+    colorControlPoints: number[] = [];
+    colorPoints: number[][] = [];
 
     constructor(
-        preset_name: string = "Cool to Warm",
+        presetName: string = "Cool to Warm",
     ) {
-        this.setPreset(preset_name);
+        this.setPreset(presetName);
 
         makeObservable(this, {
-            preset_name: observable,
-            color_control_points: observable,
-            color_points: observable,
+            presetName: observable,
+            colorControlPoints: observable,
+            colorPoints: observable,
         });
     }
 
     removeColorControlPoint(index: number) {
-        if (index <= 0 || index >= this.color_control_points.length - 1) {
+        if (index <= 0 || index >= this.colorControlPoints.length - 1) {
             console.warn("Cannot remove first or last color control point.");
             return;
         }
         runInAction(() => {
-            this.color_control_points.splice(index, 1);
-            this.color_points.splice(index, 1);
+            this.colorControlPoints.splice(index, 1);
+            this.colorPoints.splice(index, 1);
         });
     }
 
-    addColorConntrolPoint(value:number) {
-        if (value <= this.color_control_points[0] || value >= this.color_control_points[this.color_control_points.length - 1]) {
+    addColorControlPoint(value:number) {
+        if (value <= this.colorControlPoints[0] || value >= this.colorControlPoints[this.colorControlPoints.length - 1]) {
             console.warn("New color control point must be within the existing range.");
             return;
         }
         const newColor = this.getColorByValue(value);
-        let idx = findSmallerIndex(this.color_control_points, value) + 1;
-        if (idx === this.color_control_points.length) idx = this.color_control_points.length - 1;
+        let idx = findSmallerIndex(this.colorControlPoints, value) + 1;
+        if (idx === this.colorControlPoints.length) idx = this.colorControlPoints.length - 1;
         runInAction(() => {
-            this.color_control_points.splice(idx, 0, value);
-            this.color_points.splice(idx, 0, [newColor.r / 255, newColor.g / 255, newColor.b / 255]);
+            this.colorControlPoints.splice(idx, 0, value);
+            this.colorPoints.splice(idx, 0, [newColor.r / 255, newColor.g / 255, newColor.b / 255]);
         });
     }
 
@@ -58,59 +58,59 @@ export class PresetLinearColormap {
 
     invert() {
         runInAction(() => {
-            this.color_points.reverse();
+            this.colorPoints.reverse();
         });
     }
 
     _validatePreset(): void {
-        if (!presetnames.includes(this.preset_name)) {
-            console.warn(`Invalid preset_name: ${this.preset_name}. Defaulting to 'Cool to Warm'.`);
-            this.preset_name = "Cool to Warm";
+        if (!presetnames.includes(this.presetName)) {
+            console.warn(`Invalid presetName: ${this.presetName}. Defaulting to 'Cool to Warm'.`);
+            this.presetName = "Cool to Warm";
         }
     }
 
     getColorByValue(value: number): d3.RGBColor {
         value = Math.max(0, Math.min(value, 1));
-        const color_control_points = this.color_control_points;
-        const color_points = this.color_points;
+        const controlPoints = this.colorControlPoints;
+        const colors = this.colorPoints;
         let leftIndex = 0;
-        while (leftIndex < color_control_points.length - 1 && color_control_points[leftIndex + 1] <= value) {
+        while (leftIndex < controlPoints.length - 1 && controlPoints[leftIndex + 1] <= value) {
             leftIndex++;
         }
-        const rightIndex = Math.min(leftIndex + 1, color_control_points.length - 1);
-        const ratio = leftIndex === rightIndex ? 0 : (value - color_control_points[leftIndex]) / (color_control_points[rightIndex] - color_control_points[leftIndex]);
-        const [lr, lg, lb] = color_points[leftIndex].map(c => Math.round(c * 255));
-        const [rr, rg, rb] = color_points[rightIndex].map(c => Math.round(c * 255));
+        const rightIndex = Math.min(leftIndex + 1, controlPoints.length - 1);
+        const ratio = leftIndex === rightIndex ? 0 : (value - controlPoints[leftIndex]) / (controlPoints[rightIndex] - controlPoints[leftIndex]);
+        const [lr, lg, lb] = colors[leftIndex].map(c => Math.round(c * 255));
+        const [rr, rg, rb] = colors[rightIndex].map(c => Math.round(c * 255));
         const colorLeft = d3.rgb(lr, lg, lb);
         const colorRight = d3.rgb(rr, rg, rb);
         return d3.rgb(d3.interpolateRgb(colorLeft, colorRight)(ratio));
     }
 
-    setPreset(preset_name: string): void {
+    setPreset(presetName: string): void {
         runInAction(() => {
-            this.preset_name = preset_name;
+            this.presetName = presetName;
             this._validatePreset();
             this._colorCache.clear();
-            this.color_control_points = [...presets[this.preset_name].control_points];
-            this.color_points = presets[this.preset_name].color_points.map(arr => [...arr]);
+            this.colorControlPoints = [...presets[this.presetName].control_points];
+            this.colorPoints = presets[this.presetName].color_points.map(arr => [...arr]);
         });
     }
 
-    setControlPoints(control_points: number[], color_points: number[][]): void {
-        if (control_points.length !== color_points.length) {
-            console.warn("control_points and color_points must have the same length.");
+    setControlPoints(controlPoints: number[], colorPoints: number[][]): void {
+        if (controlPoints.length !== colorPoints.length) {
+            console.warn("controlPoints and colorPoints must have the same length.");
             return;
         }
         runInAction(() => {
-            this.color_control_points = control_points;
-            this.color_points = color_points;
+            this.colorControlPoints = controlPoints;
+            this.colorPoints = colorPoints;
             this._colorCache.clear();
         });
     }
 
     setCacheSize(size: number): void {
-        this._cache_size = Math.max(0, size);
-        if (this._colorCache.size > this._cache_size) this._colorCache.clear();
+        this._cacheSize = Math.max(0, size);
+        if (this._colorCache.size > this._cacheSize) this._colorCache.clear();
     }
 
     getColorForTexture(x: number, _y: number): d3.RGBColor {
@@ -120,9 +120,9 @@ export class PresetLinearColormap {
     toObject() {
         return {
             type: "linear",
-            preset_name: this.preset_name,
-            color_control_points: this.color_control_points,
-            color_points: this.color_points,
+            preset_name: this.presetName,
+            color_control_points: this.colorControlPoints,
+            color_points: this.colorPoints,
         };
     }
 
@@ -132,22 +132,22 @@ export class PresetLinearColormap {
             console.warn(`Invalid colormap type: ${obj.type}. Expected 'linear'.`);
         }
         if (obj.preset_name && typeof obj.preset_name === 'string') {
-            colormap.preset_name = obj.preset_name;
+            colormap.presetName = obj.preset_name;
         } else {
             console.warn("Missing or invalid 'preset_name' in colormap object. Defaulting to 'Cool to Warm'.");
-            colormap.preset_name = "Cool to Warm";
+            colormap.presetName = "Cool to Warm";
         }
         if (Array.isArray(obj.color_control_points) && obj.color_control_points.every((v: any) => typeof v === 'number')) {
-            colormap.color_control_points = obj.color_control_points;
+            colormap.colorControlPoints = obj.color_control_points;
         } else {
             console.warn("Missing or invalid 'color_control_points' in colormap object. Using default from preset.");
-            colormap.color_control_points = [...presets[colormap.preset_name].control_points];
+            colormap.colorControlPoints = [...presets[colormap.presetName].control_points];
         }
         if (Array.isArray(obj.color_points) && obj.color_points.every((arr: any) => Array.isArray(arr) && arr.length === 3 && arr.every((v: any) => typeof v === 'number'))) {
-            colormap.color_points = obj.color_points;
+            colormap.colorPoints = obj.color_points;
         } else {
             console.warn("Missing or invalid 'color_points' in colormap object. Using default from preset.");
-            colormap.color_points = presets[colormap.preset_name].color_points.map(arr => [...arr]);
+            colormap.colorPoints = presets[colormap.presetName].color_points.map(arr => [...arr]);
         }
         colormap._validatePreset();
         return colormap;

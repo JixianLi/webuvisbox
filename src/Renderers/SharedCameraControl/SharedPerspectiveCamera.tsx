@@ -7,13 +7,13 @@ export class SharedTrackballPerspectiveCamera {
     private _target: THREE.Vector3;
     private _up: THREE.Vector3;
     private _quaternion: THREE.Quaternion;
-    private _last_used_id: string | null;
+    private _lastUsedId: string | null;
 
     constructor() {
         this._position = new THREE.Vector3(0, 0, 5);
         this._target = new THREE.Vector3(0, 0, 0);
         this._quaternion = new THREE.Quaternion();
-        this._last_used_id = null;
+        this._lastUsedId = null;
         this._up = new THREE.Vector3(0, 1, 0);
         makeAutoObservable(this);
     }
@@ -23,7 +23,7 @@ export class SharedTrackballPerspectiveCamera {
     get position(): THREE.Vector3 { return this._position; }
     get target(): THREE.Vector3 { return this._target; }
     get quaternion(): THREE.Quaternion { return this._quaternion; }
-    get last_used_id(): string | null { return this._last_used_id; }
+    get lastUsedId(): string | null { return this._lastUsedId; }
 
 
     // Utility methods for updating camera state
@@ -33,7 +33,7 @@ export class SharedTrackballPerspectiveCamera {
             this._target.copy(target);
             this._up.copy(up);
             this._quaternion.copy(quaternion);
-            this._last_used_id = id;
+            this._lastUsedId = id;
         });
     }
 }
@@ -44,11 +44,11 @@ export function createSharedTrackballPerspectiveCamera(
     return camera;
 }
 
-export function useSharedTrackballPerspectiveCamera(global_data:GlobalContext): SharedTrackballPerspectiveCamera {
-    if (!('shared_trackball_perspective_camera' in global_data)) {
-        (global_data as any).shared_trackball_perspective_camera = createSharedTrackballPerspectiveCamera();
+export function useSharedTrackballPerspectiveCamera(globalData:GlobalContext): SharedTrackballPerspectiveCamera {
+    if (!('shared_trackball_perspective_camera' in globalData)) {
+        (globalData as any).shared_trackball_perspective_camera = createSharedTrackballPerspectiveCamera();
     }
-    return (global_data as any).shared_trackball_perspective_camera;
+    return (globalData as any).shared_trackball_perspective_camera;
 }
 
 export default SharedTrackballPerspectiveCamera;

@@ -3,8 +3,8 @@
 
 export interface InstanceTransform {
     position: [number, number, number];
-    h_rotation: number;
-    v_rotation: number;
-    scale_factor: number;
+    hRotation: number;
+    vRotation: number;
+    scaleFactor: number;
     color: d3.RGBColor;
 }

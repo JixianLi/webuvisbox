@@ -3,10 +3,10 @@ import type { InstanceTransform } from "@/Types/Geometry";
 
 interface ConeMeshProps {
     instances: InstanceTransform[]; // Array of instances to be rendered
-    key_prefix?: string;                  // Prefix for React keys to ensure uniqueness
+    keyPrefix?: string;                    // Prefix for React keys to ensure uniqueness
     radius?: number;                      // Radius of each cone instance
-    length_scale?: number;                // Length scale of each cone instance
-    radial_segments?: number;              // Number of radial segments for the cone geometry
+    lengthScale?: number;                 // Length scale of each cone instance
+    radialSegments?: number;              // Number of radial segments for the cone geometry
     color?: string;                       // Base color of the cones
     opacity?: number;              // Transparency level (0-1)
     transparent?: boolean;         // Enable transparency rendering
@@ -17,10 +17,10 @@ interface ConeMeshProps {
 export const InstancedConeMesh = (props: ConeMeshProps) => {
     const {
         instances,
-        key_prefix = 'cone_mesh',          // Default prefix for React keys
+        keyPrefix = 'cone_mesh',            // Default prefix for React keys
         radius = 0.1,                      // Default cone radius
-        length_scale = 1,                  // Default cone length scale
-        radial_segments = 3,               // Default number of radial segments
+        lengthScale = 1,                   // Default cone length scale
+        radialSegments = 3,                // Default number of radial segments
         color = "white",                   // Default white color
         opacity = 1,                       // Default fully opaque
         transparent = false,               // Default opaque rendering
@@ -32,7 +32,7 @@ export const InstancedConeMesh = (props: ConeMeshProps) => {
     return (
         <Instances limit={instances.length} frustumCulled={false}>
             {/* Shared geometry - created once and reused for all instances */}
-            <coneGeometry args={[radius, length_scale, radial_segments]} />
+            <coneGeometry args={[radius, lengthScale, radialSegments]} />
             <meshPhongMaterial
                 color={color}
                 opacity={opacity}
@@ -43,10 +43,10 @@ export const InstancedConeMesh = (props: ConeMeshProps) => {
             />
             {instances.map((instance, idx) => (
                 <Instance
-                    key={`${key_prefix}_instance_${idx}`}
+                    key={`${keyPrefix}_instance_${idx}`}
                     position={instance.position}
-                    rotation={[instance.v_rotation, instance.v_rotation, instance.h_rotation, 'ZYX']}
-                    scale={[instance.scale_factor, instance.scale_factor, instance.scale_factor]}
+                    rotation={[instance.vRotation, instance.vRotation, instance.hRotation, 'ZYX']}
+                    scale={[instance.scaleFactor, instance.scaleFactor, instance.scaleFactor]}
                     color={instance.color.toString()}
                 />
             ))}
