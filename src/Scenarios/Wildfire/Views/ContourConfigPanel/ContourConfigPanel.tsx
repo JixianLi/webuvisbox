@@ -7,7 +7,7 @@ import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
 import type WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalContext";
 import { LazyTextField } from "@/Panels/Lazyfields";
-import { GridLayoutContainer } from "@/Panels/GridLayoutContainer";
+import { FormGrid } from "@/Panels/FormGrid";
 
 const ContourConfigPanel = observer(() => {
     const scenario = useScenario();
@@ -21,7 +21,7 @@ const ContourConfigPanel = observer(() => {
 
 
     const content = (
-        <GridLayoutContainer>
+        <FormGrid>
             <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
                 <Switch checked={contour_config.display_primary} onChange={(e) => {
                     contour_config.setDisplayPrimary(e.target.checked);
@@ -56,7 +56,7 @@ const ContourConfigPanel = observer(() => {
                     }}
                 />
             </Grid>
-        </GridLayoutContainer>
+        </FormGrid>
     )
     return <Panel panel_name="Contour Configuration">{content}</Panel>
 })

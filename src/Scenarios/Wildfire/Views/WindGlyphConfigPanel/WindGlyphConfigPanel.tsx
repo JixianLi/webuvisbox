@@ -6,7 +6,7 @@ import Panel from "@/Panels/Panel";
 import Grid from "@mui/material/Grid";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
-import GridLayoutContainer from "@/Panels/GridLayoutContainer";
+import FormGrid from "@/Panels/FormGrid";
 import { LazyTextField } from "@/Panels/Lazyfields";
 
 export const WindGlyphConfigPanel = observer(() => {
@@ -14,7 +14,7 @@ export const WindGlyphConfigPanel = observer(() => {
     const config = global_data.wind_glyphs_config;
 
     const content = (<>
-        <GridLayoutContainer>
+        <FormGrid>
             <Grid size={{ xl: 6, lg: 12 }} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                 <Switch checked={config.display} onChange={(e) => {
                     config.setDisplay(e.target.checked);
@@ -99,7 +99,7 @@ export const WindGlyphConfigPanel = observer(() => {
                 />
             </Grid>
 
-        </GridLayoutContainer>
+        </FormGrid>
     </>)
     return <Panel panel_name="Wind Glyph Configuration">{content}</Panel>;
 });

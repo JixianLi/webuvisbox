@@ -8,7 +8,7 @@ interface ConfigContentContainerProps {
     sx?: object;
 }
 
-export const GridLayoutContainer = (props: ConfigContentContainerProps) => {
+export const FormGrid = (props: ConfigContentContainerProps) => {
     return <Box sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex', p: "10px" }}>
         <Grid container spacing={props.spacing || 2} sx={{ p: props.padding || "10px", ...props.sx }}>
             {props.children}
@@ -16,4 +16,4 @@ export const GridLayoutContainer = (props: ConfigContentContainerProps) => {
     </Box>
 };
 
-export default GridLayoutContainer;
+export default FormGrid;

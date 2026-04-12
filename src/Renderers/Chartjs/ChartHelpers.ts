@@ -1,6 +1,6 @@
 import * as helpers from "chart.js/helpers"
 import 'chart.js/auto';
-import type { ChartEvent } from "node_modules/chart.js/dist/plugins/plugin.tooltip";
+import type { ChartEvent } from "chart.js";
 
 export function getDataPosition(chart_ref: any, e: Event | ChartEvent | TouchEvent | MouseEvent) {
     const chart = chart_ref.current;
