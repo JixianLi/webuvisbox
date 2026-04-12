@@ -8,7 +8,7 @@ import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
 import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalContext";
 import { runInAction } from "mobx";
-import MenuToggleItem from "@/Panels/MenuToggleItem";
+import CheckMenuItem from "@/Panels/CheckMenuItem";
 import TrajectoriesRenderer from "./TrajectoriesVisualization/TrajectoriesRenderer";
 
 
@@ -68,27 +68,27 @@ const TrajectoriesVisualizationPanel = observer(() => {
         </IconButton>
         <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={menuClosed}>
             <MenuList dense>
-                <MenuToggleItem
+                <CheckMenuItem
                     text="Show Paths"
                     checked={trajectory_visualization_config.show_path}
                     onClick={toggleShowPaths}
                 />
-                <MenuToggleItem
+                <CheckMenuItem
                     text="Show Uncertainty Paths"
                     checked={trajectory_visualization_config.show_uncertainty_path}
                     onClick={toggleShowUncertaintyPaths}
                 />
-                <MenuToggleItem
+                <CheckMenuItem
                     text="Show Uncertainty Tubes"
                     checked={trajectory_visualization_config.show_uncertainty_tube}
                     onClick={toggleShowUncertaintyTubes}
                 />
-                <MenuToggleItem
+                <CheckMenuItem
                     text="Show Seeds"
                     checked={trajectory_visualization_config.show_seeds}
                     onClick={toggleShowSeeds}
                 />
-                <MenuToggleItem
+                <CheckMenuItem
                     text="Show Rendering Performance Stats"
                     checked={trajectory_visualization_config.show_stats}
                     onClick={toggleShowStats}

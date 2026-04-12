@@ -8,12 +8,12 @@ import { Check } from "@mui/icons-material";
  * @returns A menu item component.
  */
 
-interface MenuToggleItemProps {
+interface CheckMenuItemProps {
     text?: string;
     onClick?: () => void;
     checked?: boolean;
 }
-export const MenuToggleItem = (props: MenuToggleItemProps) => {
+export const CheckMenuItem = (props: CheckMenuItemProps) => {
     return (
         <MenuItem onClick={props.onClick}>
             <ListItemIcon>
@@ -23,4 +23,4 @@ export const MenuToggleItem = (props: MenuToggleItemProps) => {
         </MenuItem>
     );
 };
-export default MenuToggleItem;
+export default CheckMenuItem;
