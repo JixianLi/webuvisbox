@@ -6,7 +6,7 @@ import Menu from "@mui/material/Menu";
 import MenuList from "@mui/material/MenuList";
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalContext";
 import { runInAction } from "mobx";
 import MenuToggleItem from "@/Panels/MenuToggleItem";
 import TrajectoriesRenderer from "./TrajectoriesVisualization/TrajectoriesRenderer";

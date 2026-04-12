@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { toJS } from "mobx";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalContext";
 import TexturedBufferedMesh from "@/Renderers/Mesh/TexturedBufferedMesh";
 
 interface UncertaintyTubeMeshProps {

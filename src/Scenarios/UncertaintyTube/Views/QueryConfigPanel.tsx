@@ -13,7 +13,7 @@ import { observer } from "mobx-react-lite";
 import { LazyTextField } from "@/Panels/Lazyfields";
 import Panel from "@/Panels/Panel";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalContext";
 import { trackPromise } from "react-promise-tracker";
 
 

@@ -9,7 +9,7 @@ import OpacityEditorPanel from "./Views/OpacityEditorPanel/OpacityEditorPanel";
 import EnsembleWildfirePanel from "./Views/TerrainVisualization/EnsembleWildfirePanel";
 import DepthVisualizationPanel from "./Views/DepthVisualization/DepthVisualizationPanel";
 
-export function wildFirePanelMappingFunction(viewname:string): React.ReactNode {
+export function wildfirePanelMappingFunction(viewname:string): React.ReactNode {
     switch(viewname){
         case "Terrain Visualization":
             return <TerrainVisualizationPanel />;

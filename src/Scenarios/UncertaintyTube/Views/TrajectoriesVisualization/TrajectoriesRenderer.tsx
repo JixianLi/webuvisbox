@@ -4,7 +4,7 @@ import { PerspectiveCamera, TrackballControls, GizmoHelper, GizmoViewport } from
 import { useRef } from "react";
 import UncertaintyPathMesh from "./UncertaintyPathMesh";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalContext";
 import { Vector3 } from "three";
 import SeedsMesh from "./SeedsMesh";
 import UncertaintyTubeMesh from "./UncertaintyTubeMesh";

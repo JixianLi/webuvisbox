@@ -199,19 +199,20 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
     }
 
     async fetch_trajectories() {
-        await fetch(`${this.data_server_address}/get_trajectories`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                seeds: this.seeds,
-                query_config: this.query_config
-            })
-        }).then(response => response.json()).then(data => {
+        try {
+            const response = await fetch(`${this.data_server_address}/get_trajectories`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    seeds: this.seeds,
+                    query_config: this.query_config
+                })
+            });
+            const data = await response.json();
             runInAction(() => {
                 const start_timer = performance.now()
-                data.trajectories_length;
                 const stride = data.trajectories_length * data.trajectories_dim;
                 this.primary_trajectories = this.buildCurves(decode64(data.primary_trajectories) as Float32Array, stride);
                 this.secondary_trajectories = this.buildCurves(decode64(data.secondary_trajectories) as Float32Array, stride);
@@ -225,9 +226,9 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
                 const end_timer = performance.now()
                 console.log(`Data parsing from server took ${end_timer - start_timer} milliseconds`)
             });
-        }).catch(error => {
+        } catch (error) {
             console.error("Failed to fetch trajectories:", error);
-        });
+        }
     }
 
     buildColormap(colormap_config: any): PresetLinearColormap | null {
@@ -276,7 +277,7 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
     }
 
     async asyncInitialize(): Promise<void> {
-        console.log("UncertaintyTubeGlobalData asyncInitialize called");
+        console.log("UncertaintyTubeGlobalContext asyncInitialize called");
         try {
             await this.fetch_bounds();
             if (this.seeds.length > 0) {

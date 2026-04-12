@@ -3,13 +3,13 @@
 
 import { scenarioRegistry } from "../ScenarioRegistry";
 import { WildfireGlobalContext } from "./WildfireGlobalContext";
-import { wildFirePanelMappingFunction } from "./wildFirePanelMappingFunction";
+import { wildfirePanelMappingFunction } from "./wildfirePanelMappingFunction";
 
 scenarioRegistry.register({
   name: "Wildfire",
   description: "WRF-SFire ensemble simulation visualization",
   createGlobalContext: () => new WildfireGlobalContext(),
-  panelMapping: wildFirePanelMappingFunction,
+  panelMapping: wildfirePanelMappingFunction,
   defaultConfigPath: "ScenarioConfigs/Wildfire.json",
 });
 

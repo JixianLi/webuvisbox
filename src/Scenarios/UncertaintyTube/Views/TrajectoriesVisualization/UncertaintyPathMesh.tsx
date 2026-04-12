@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalContext";
 import { LinearTubeMesh } from "@/Renderers/Mesh/LinearTubeMesh";
 
 interface UncertaintyPathMeshProps {

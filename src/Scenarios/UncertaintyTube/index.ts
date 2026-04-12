@@ -2,7 +2,7 @@
 // ABOUTME: Self-registers with the scenario registry on import.
 
 import { scenarioRegistry } from "../ScenarioRegistry";
-import { UncertaintyTubeGlobalContext } from "./UncertaintyTubeGlobalData";
+import { UncertaintyTubeGlobalContext } from "./UncertaintyTubeGlobalContext";
 import { uncertaintyTubePanelMappingFunction } from "./uncertaintyTubePanelMappingFunction";
 
 scenarioRegistry.register({

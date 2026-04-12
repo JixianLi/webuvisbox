@@ -10,7 +10,7 @@ import Grid from "@mui/material/Grid";
 
 import Panel from "@/Panels/Panel";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalData";
+import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalContext";
 import { range } from "@/Helpers/MathHelper";
 import PresetLinearColormap  from "@/Renderers/Colormaps/PresetLinearColormap";
 import VSUP from "@/Renderers/Colormaps/VSUP";
