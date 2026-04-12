@@ -1,8 +1,8 @@
 import { Instance, Instances } from "@react-three/drei";
-import type { TransformationInstance } from "@/Types/Geometry";
+import type { InstanceTransform } from "@/Types/Geometry";
 
 interface ConeMeshProps {
-    instances: TransformationInstance[]; // Array of instances to be rendered
+    instances: InstanceTransform[]; // Array of instances to be rendered
     key_prefix?: string;                  // Prefix for React keys to ensure uniqueness
     radius?: number;                      // Radius of each cone instance
     length_scale?: number;                // Length scale of each cone instance

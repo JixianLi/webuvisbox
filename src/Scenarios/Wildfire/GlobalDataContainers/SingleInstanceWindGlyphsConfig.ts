@@ -5,7 +5,7 @@ import { clip, degree2radian } from "@/Helpers/MathHelper";
 import { runInAction } from "mobx";
 import * as d3 from "d3";
 import { makeAutoObservable } from "mobx";
-import type { TransformationInstance } from "@/Types/Geometry";
+import type { InstanceTransform } from "@/Types/Geometry";
 import { parseColor } from "@/Helpers/ColorParser";
 
 interface WindField {
@@ -34,7 +34,7 @@ export class SingleInstanceWindGlyphsConfig {
     private _radius: number;
     private _size_scale: number;
     private _color: d3.RGBColor;
-    private _instances: TransformationInstance[];
+    private _instances: InstanceTransform[];
     private _onChanged: (() => void) | null;
 
     constructor() {
@@ -61,7 +61,7 @@ export class SingleInstanceWindGlyphsConfig {
     get radius(): number { return this._radius; }
     get size_scale(): number { return this._size_scale; }
     get color(): d3.RGBColor { return this._color; }
-    get instances(): TransformationInstance[] { return this._instances; }
+    get instances(): InstanceTransform[] { return this._instances; }
 
     setOnChanged(callback: () => void): void {
         this._onChanged = callback;
@@ -78,9 +78,9 @@ export class SingleInstanceWindGlyphsConfig {
         this.loadFromObject(obj);
     }
 
-    private computeGlyphs(wind_field: WindField, terrain: TerrainData, color_getter: ColorGetter): TransformationInstance[] {
+    private computeGlyphs(wind_field: WindField, terrain: TerrainData, color_getter: ColorGetter): InstanceTransform[] {
         const { u, v, mag, mag_max } = wind_field;
-        const instances: TransformationInstance[] = [];
+        const instances: InstanceTransform[] = [];
         const indices_length = Math.floor(u.length / this._sampling_stride);
         const z_scale_factor = this._scale_by_magnitude ? (this._size_scale * mag_max) : (this._size_scale);
         for (let i = 0; i < indices_length; i++) {
@@ -208,7 +208,7 @@ export class SingleInstanceWindGlyphsConfig {
                     v_rotation: instance.v_rotation,
                     scale_factor: instance.scale_factor,
                     color: d3.rgb(instance.color)
-                })) as TransformationInstance[]
+                })) as InstanceTransform[]
                 : [];
         } catch {
             this._instances = [];

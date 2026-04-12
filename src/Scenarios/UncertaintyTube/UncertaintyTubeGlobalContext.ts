@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import type { Point3D } from "@/Types/Geometry";
+
 import type { GlobalContext } from "@/Types/GlobalContext";
 import { runInAction } from "mobx";
 import { VSUP } from "@/Renderers/Colormaps/VSUP";
@@ -11,7 +11,7 @@ import { getTextureManager } from "@/Renderers/Colormaps/TextureManager";
 
 export class UncertaintyTubeGlobalContext implements GlobalContext {
     data_server_address: string;
-    seeds: Point3D[];
+    seeds: [number, number, number][];
 
     texture_manager = getTextureManager();
     colormap: PresetLinearColormap;
