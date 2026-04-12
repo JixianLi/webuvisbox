@@ -1,3 +1,6 @@
+// ABOUTME: Application header bar with scenario name and hamburger menu.
+// ABOUTME: Contains dark mode toggle, layout options, and view list menus.
+
 import React from "react";
 import { observer } from "mobx-react-lite";
 
@@ -10,20 +13,18 @@ import Menu from "@mui/material/Menu";
 import MenuList from "@mui/material/MenuList";
 import MenuIcon from "@mui/icons-material/Menu";
 import Divider from "@mui/material/Divider";
+import Switch from "@mui/material/Switch";
+import { useTheme } from "@mui/material/styles";
 
 import ViewMenuList from "./ViewMenuList";
 import LayoutMenuList from "./LayoutMenuList";
 import ScenarioMenuList from "./ScenarioMenuList";
-import Switch from "@mui/material/Switch";
-import type { Theme } from "@mui/material/styles";
+import { useThemeMode } from "../../ThemeModeContext";
 import { useScenario } from "../../ScenarioManager/ScenarioManager";
 
-interface HeaderMenuProps {
-    setMode?: (mode: 'light' | 'dark') => void;
-    theme?: Theme;
-}
-
-const HeaderMenu: React.FC<HeaderMenuProps> = (props: HeaderMenuProps) => {
+const HeaderMenu: React.FC = () => {
+    const theme = useTheme();
+    const { toggleMode } = useThemeMode();
 
     const [anchor, setAnchor] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchor);
@@ -60,26 +61,21 @@ const HeaderMenu: React.FC<HeaderMenuProps> = (props: HeaderMenuProps) => {
                     <Divider>View List</Divider>
                     <ViewMenuList />
                     <Divider />
-                    <Switch checked={props.theme.palette.mode === 'dark'} onChange={() => props.setMode?.(props.theme.palette.mode === 'dark' ? 'light' : 'dark')} /> Dark Mode
+                    <Switch checked={theme.palette.mode === 'dark'} onChange={toggleMode} /> Dark Mode
                 </MenuList>
             </Menu>
         </>
     );
 };
 
-interface HeaderBarProps {
-    setMode?: (mode: 'light' | 'dark') => void;
-    theme?: Theme;
-}
-
-const HeaderBar: React.FC<HeaderBarProps> = observer((props: HeaderBarProps) => {
+const HeaderBar: React.FC = observer(() => {
     const scenario = useScenario();
     const name = scenario.name;
     return (
         <Box>
             <AppBar position="static">
                 <Toolbar>
-                    <HeaderMenu setMode={props.setMode} theme={props.theme} />
+                    <HeaderMenu />
                     <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>{name}</Typography>
                 </Toolbar>
             </AppBar>

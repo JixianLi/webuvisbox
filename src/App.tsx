@@ -1,4 +1,7 @@
-import React, { useEffect } from 'react';
+// ABOUTME: Root application component. Sets up MUI theming with dark/light mode support,
+// ABOUTME: scenario context, and the layout manager.
+
+import React, { useMemo, useCallback } from 'react';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -8,18 +11,20 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import './App.css';
 
-import { ThemeProvider, createTheme, type Theme } from '@mui/material/styles';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import LayoutManager from './LayoutManager/LayoutManager';
 import { ScenarioProvider } from './ScenarioManager/ScenarioManager';
+import ThemeModeContext from './ThemeModeContext';
 
 function App() {
-    const system_theme =
+    const systemTheme =
         window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
             ? 'dark'
             : 'light';
-    const [mode, setMode] = React.useState<'light' | 'dark'>(system_theme);
+    const [mode, setMode] = React.useState<'light' | 'dark'>(systemTheme);
 
-    const theme: Theme = createTheme({
+    const theme = useMemo(() => createTheme({
         palette: {
             mode: mode,
             primary: {
@@ -33,18 +38,22 @@ function App() {
             fontFamily: 'Roboto, Arial, sans-serif',
             fontSize: 20,
         },
-    });
+    }), [mode]);
 
-    useEffect(() => {
-        document.body.style.backgroundColor = theme.palette.background.default;
-        document.body.style.color = theme.palette.text.primary;
-    }, [theme]);
+    const toggleMode = useCallback(() => {
+        setMode(prev => prev === 'dark' ? 'light' : 'dark');
+    }, []);
+
+    const themeModeValue = useMemo(() => ({ mode, toggleMode }), [mode, toggleMode]);
 
     return (
         <ScenarioProvider>
-            <ThemeProvider theme={theme}>
-                <LayoutManager theme={theme} setMode={setMode} />
-            </ThemeProvider>
+            <ThemeModeContext.Provider value={themeModeValue}>
+                <ThemeProvider theme={theme}>
+                    <CssBaseline />
+                    <LayoutManager />
+                </ThemeProvider>
+            </ThemeModeContext.Provider>
         </ScenarioProvider>
     );
 }

@@ -1,9 +1,12 @@
+// ABOUTME: Manages the responsive grid layout of scenario panels.
+// ABOUTME: Renders the header bar, panel grid, and loading indicator.
+
 import React from "react";
 import { observer } from "mobx-react-lite";
 import { Responsive, WidthProvider } from "react-grid-layout";
 
 import type { AppLayout, AppLayouts, PanelLayouts } from "@/Types/PanelLayouts";
-import type { Theme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import HeaderBar from "./HeaderBar/HeaderBar";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
 import { scenarioRegistry } from "@/Scenarios";
@@ -15,15 +18,8 @@ import { toJS } from "mobx";
 // Use WidthProvider to get the correct container width for responsiveness
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-interface LayoutManagerProps {
-    theme: Theme; // Replace 'any' with the appropriate type for your theme if available
-    setMode?: (mode: 'light' | 'dark') => void;
-}
-
-interface LoadingIndicatorProps {
-    theme: Theme;
-}
-const LoadingIndicator = observer(function LoadingIndicator({ theme }: LoadingIndicatorProps) {
+const LoadingIndicator = observer(function LoadingIndicator() {
+    const theme = useTheme();
     const { promiseInProgress } = usePromiseTracker()
 
     return promiseInProgress ? (
@@ -36,15 +32,14 @@ const LoadingIndicator = observer(function LoadingIndicator({ theme }: LoadingIn
     ) : null
 });
 
-const LayoutManager: React.FC<LayoutManagerProps> = observer((props: LayoutManagerProps) => {
+const LayoutManager: React.FC = observer(() => {
     const scenario = useScenario();
     const panel_layouts: PanelLayouts = scenario.panel_layouts!;
-    const theme: Theme = props.theme;
-    
+    const theme = useTheme();
 
     if (!scenario.fully_loaded) {
         return <div style={{ width: '100vw', height: '100vh', backgroundColor: theme.palette.background.default }}>
-            <HeaderBar theme={theme} setMode={props.setMode} />
+            <HeaderBar />
         </div>;
     }
     const current_layouts = panel_layouts.current_layouts;
@@ -71,7 +66,7 @@ const LayoutManager: React.FC<LayoutManagerProps> = observer((props: LayoutManag
     };
 
     return <div style={{ width: '100vw', minHeight: '100vh', backgroundColor: theme.palette.background.default }}>
-        <HeaderBar theme={theme} setMode={props.setMode} />
+        <HeaderBar />
         <ResponsiveGridLayout
             className="layout"
             layouts={current_layouts}
@@ -84,7 +79,7 @@ const LayoutManager: React.FC<LayoutManagerProps> = observer((props: LayoutManag
         >
             {layoutPanels()}
         </ResponsiveGridLayout>
-        <LoadingIndicator theme={theme} />
+        <LoadingIndicator />
     </div>
 });
 
