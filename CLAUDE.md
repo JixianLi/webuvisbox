@@ -82,6 +82,23 @@ Scenario configs in `public/ScenarioConfigs/*.json` define:
 - `panel_layouts`: Responsive grid layouts per breakpoint (xl, lg, sm)
 - `global_data`: Scenario-specific initial state passed to GlobalContext
 
+## Naming Conventions
+
+| Category | Convention | Example |
+|----------|-----------|---------|
+| Directories | PascalCase | `Helpers/`, `Renderers/`, `Scenarios/` |
+| Component files (.tsx) | PascalCase | `Panel.tsx`, `HeaderBar.tsx` |
+| Non-component files (.ts) | PascalCase | `DataHelper.ts`, `MathHelper.ts` |
+| React components | PascalCase | `FormGrid`, `CheckMenuItem` |
+| Classes | PascalCase | `WildfireGlobalContext`, `PanelLayoutManager` |
+| Interfaces / Types | PascalCase, no `I` prefix | `Scenario`, `PanelProps` |
+| Variables and properties | camelCase | `currentTimeIndex`, `ensembleNames` |
+| Functions | camelCase | `computeHistogram()`, `timeInSecondsToString()` |
+| Custom hooks | `useXxx` | `useThemeMode()`, `useScenario()` |
+| Constants | UPPER_CASE | `STEP_DIVISOR` |
+| MobX store properties | camelCase | `ensembleNames`, `currentTimeIndex` |
+| Scenario config JSON keys | snake_case | `panel_layouts`, `global_data` |
+
 ## Data Server
 
 The app fetches ensemble data from a backend server. The server URL is configured in scenario JSON (`global_data.data_server_address`). The backend is not included in this repo.
