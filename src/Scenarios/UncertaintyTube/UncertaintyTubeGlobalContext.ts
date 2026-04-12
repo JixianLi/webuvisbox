@@ -5,6 +5,7 @@ import { runInAction } from "mobx";
 import { VSUP } from "@/Renderers/Colormaps/VSUP";
 import * as GenSeeds from "./GenSeeds";
 import { decode64, encode64 } from "@/Helpers/DataHelper";
+import { computeCenterAndDiag } from "@/Helpers/MathHelper";
 import PresetLinearColormap from "@/Renderers/Colormaps/PresetLinearColormap";
 import { getTextureManager } from "@/Renderers/Colormaps/TextureManager";
 
@@ -173,17 +174,9 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
                 (this.sb_bounds[5] - this.sb_bounds[4]) / 10
             ];
 
-            this.center = [
-                0.5 * (this.sb_bounds[0] + this.sb_bounds[1]),
-                0.5 * (this.sb_bounds[2] + this.sb_bounds[3]),
-                0.5 * (this.sb_bounds[4] + this.sb_bounds[5]),
-            ];
-
-            this.diag = Math.sqrt(
-                (this.sb_bounds[1] - this.sb_bounds[0]) ** 2 +
-                (this.sb_bounds[3] - this.sb_bounds[2]) ** 2 +
-                (this.sb_bounds[5] - this.sb_bounds[4]) ** 2
-            );
+            const [center, diag] = computeCenterAndDiag(this.sb_bounds);
+            this.center = center;
+            this.diag = diag;
         });
     }
 

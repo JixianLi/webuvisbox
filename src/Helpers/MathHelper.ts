@@ -252,6 +252,26 @@ export function findSmallerIndex(array: number[], value: number): number {
     return high; // 'high' is the index of the largest element smaller than 'value'
 }
 
+/**
+ * Computes the center point and diagonal length of a 3D axis-aligned bounding box.
+ * @param bounds - [xmin, xmax, ymin, ymax, zmin, zmax]
+ * @returns [center, diagonal] where center is [x, y, z] and diagonal is the length
+ */
+export function computeCenterAndDiag(bounds: [number, number, number, number, number, number]): [[number, number, number], number] {
+    const [x_min, x_max, y_min, y_max, z_min, z_max] = bounds;
+    const center: [number, number, number] = [
+        (x_min + x_max) / 2,
+        (y_min + y_max) / 2,
+        (z_min + z_max) / 2
+    ];
+    const diag = Math.sqrt(
+        (x_max - x_min) ** 2 +
+        (y_max - y_min) ** 2 +
+        (z_max - z_min) ** 2
+    );
+    return [center, diag];
+}
+
 export function euclideanDistance2D(pointA: [number, number], pointB: [number, number]): number {
     const dx = pointA[0] - pointB[0];
     const dy = pointA[1] - pointB[1];

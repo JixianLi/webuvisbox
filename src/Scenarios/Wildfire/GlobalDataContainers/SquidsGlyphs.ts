@@ -1,8 +1,11 @@
+// ABOUTME: Observable container for squid glyph geometry and display settings.
+// ABOUTME: Manages vertices, faces, scale, color, and display state for squid glyphs.
+
 import { clip } from "@/Helpers/MathHelper";
 import { runInAction } from "mobx";
 import * as d3 from "d3";
 import { makeAutoObservable } from "mobx";
-import { parseColor } from "@/Helpers/ColorParser";
+import { color_equals, parseColor } from "@/Helpers/ColorParser";
 
 export class SquidsGlyphs {
 
@@ -11,11 +14,13 @@ export class SquidsGlyphs {
     private _display: boolean;
     private _scale: number;
     private _color: d3.RGBColor;
+    private _onChanged: (() => void) | null;
 
     constructor() {
         this._display = false;
         this._scale = 1.0;
         this._color = d3.rgb(0, 0, 255);
+        this._onChanged = null;
 
         makeAutoObservable(this);
     }
@@ -26,6 +31,10 @@ export class SquidsGlyphs {
     get display(): boolean { return this._display; }
     get scale(): number { return this._scale; }
     get color(): d3.RGBColor { return this._color; }
+
+    setOnChanged(callback: () => void): void {
+        this._onChanged = callback;
+    }
 
     public setVertices(vertices: Float32Array): void {
         runInAction(() => {
@@ -43,18 +52,25 @@ export class SquidsGlyphs {
         runInAction(() => {
             this._display = display;
         });
+        if (this._display && this._onChanged) {
+            this._onChanged();
+        }
     }
 
     public setScale(scale: number): void {
         const clipped_scale = clip(scale, 1e-10, undefined);
+        if (clipped_scale === this._scale) return;
         runInAction(() => {
             this._scale = clipped_scale;
         });
+        if (this._display && this._onChanged) {
+            this._onChanged();
+        }
     }
 
     public setColor(color: string | d3.RGBColor | [number, number, number, number] | [number, number, number]): void {
         const rgbColor = parseColor(color);
-
+        if (color_equals(rgbColor, this._color)) return;
         runInAction(() => {
             this._color = rgbColor;
         });

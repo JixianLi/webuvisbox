@@ -1,4 +1,5 @@
 import { decode64 } from "@/Helpers/DataHelper";
+import { computeCenterAndDiag } from "@/Helpers/MathHelper";
 
 export interface ScalarQueryConfig {
     idx: number;
@@ -88,23 +89,8 @@ export class WildfireDataFetcher {
         WildfireDataFetcher.instance.data_server_address = address;
     }
 
-    private computeTerrainGeometry(bounds): [[number, number, number], number] {
-        const [x_min, x_max, y_min, y_max, z_min, z_max] = bounds;
-        const center: [number, number, number] = [
-            (x_min + x_max) / 2,
-            (y_min + y_max) / 2,
-            (z_min + z_max) / 2
-        ];
-        const diag = Math.sqrt(
-            (x_max - x_min) ** 2 +
-            (y_max - y_min) ** 2 +
-            (z_max - z_min) ** 2
-        );
-        return [center, diag];
-    }
-
     private parseTerrainData(data: any): TerrainQueryResult {
-        const [center, diag] = this.computeTerrainGeometry(data.bounds);
+        const [center, diag] = computeCenterAndDiag(data.bounds);
         return {
             names: data.names,
             terrain: {

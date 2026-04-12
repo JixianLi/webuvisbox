@@ -1,3 +1,6 @@
+// ABOUTME: Observable configuration and instance data for wind glyph visualization.
+// ABOUTME: Manages glyph display settings, computes instanced transforms from wind field data.
+
 import { clip, degree2radian } from "@/Helpers/MathHelper";
 import { runInAction } from "mobx";
 import * as d3 from "d3";
@@ -32,6 +35,7 @@ export class SingleInstanceWindGlyphsConfig {
     private _size_scale: number;
     private _color: d3.RGBColor;
     private _instances: TransformationInstance[];
+    private _onChanged: (() => void) | null;
 
     constructor() {
         this._display = false;
@@ -45,10 +49,10 @@ export class SingleInstanceWindGlyphsConfig {
         this._color = d3.rgb(0, 0, 255);
 
         this._instances = [];
+        this._onChanged = null;
         makeAutoObservable(this);
     }
 
-    // Public getters - everyone can read
     get display(): boolean { return this._display; }
     get scale_by_magnitude(): boolean { return this._scale_by_magnitude; }
     get color_by_magnitude(): boolean { return this._color_by_magnitude; }
@@ -58,6 +62,16 @@ export class SingleInstanceWindGlyphsConfig {
     get size_scale(): number { return this._size_scale; }
     get color(): d3.RGBColor { return this._color; }
     get instances(): TransformationInstance[] { return this._instances; }
+
+    setOnChanged(callback: () => void): void {
+        this._onChanged = callback;
+    }
+
+    private notifyChanged(): void {
+        if (this._display && this._onChanged) {
+            this._onChanged();
+        }
+    }
 
     loadFromJson(json: string): void {
         const obj = JSON.parse(json);
@@ -106,62 +120,73 @@ export class SingleInstanceWindGlyphsConfig {
 
     public setColor(color: string | d3.RGBColor | [number, number, number, number] | [number, number, number]): void {
         const rgbColor = parseColor(color);
-
         runInAction(() => {
             this._color = rgbColor;
         });
+        this.notifyChanged();
     }
 
     public setRadius(radius: number): void {
         const clipped_radius = clip(radius, 1e-10, undefined);
         runInAction(() => {
             this._radius = clipped_radius;
-        })
+        });
+        this.notifyChanged();
     }
 
     public setSizeScale(size_scale: number): void {
         const clipped_size_scale = clip(size_scale, 1e-10, undefined);
         runInAction(() => {
             this._size_scale = clipped_size_scale;
-        })
+        });
+        this.notifyChanged();
     }
 
     public setLengthScale(length_scale: number): void {
         const clipped_length_scale = clip(length_scale, 1e-10, undefined);
         runInAction(() => {
             this._length_scale = clipped_length_scale;
-        })
+        });
+        this.notifyChanged();
     }
 
     public setStride(stride: number): void {
         runInAction(() => {
             this._sampling_stride = stride;
-        })
+        });
+        this.notifyChanged();
     }
 
     public setDisplay(display: boolean): void {
         runInAction(() => {
             this._display = display;
-        })
+        });
+        // Notify even when display changes (caller handles compute vs reset)
+        if (this._onChanged) {
+            this._onChanged();
+        }
     }
 
     public setScaleByMagnitude(scale_by_magnitude: boolean): void {
         runInAction(() => {
             this._scale_by_magnitude = scale_by_magnitude;
-        })
+        });
+        this.notifyChanged();
     }
 
     public setColorByMagnitude(color_by_magnitude: boolean): void {
         runInAction(() => {
             this._color_by_magnitude = color_by_magnitude;
-        })
+        });
+        this.notifyChanged();
     }
 
     public setSamplingStride(stride: number): void {
         const clipped_stride = Math.max(1, Math.round(stride));
         runInAction(() => {
             this._sampling_stride = clipped_stride;
-        })
+        });
+        this.notifyChanged();
     }
 
     loadFromObject(obj: any): void {

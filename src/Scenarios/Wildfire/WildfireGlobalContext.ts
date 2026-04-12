@@ -1,3 +1,6 @@
+// ABOUTME: Central state coordinator for the Wildfire scenario.
+// ABOUTME: Manages lifecycle, data fetching, and wires together sub-object configurations.
+
 import * as d3 from "d3";
 import * as THREE from "three";
 import { makeAutoObservable, runInAction } from "mobx";
@@ -14,7 +17,9 @@ import { ScalarFields } from "./GlobalDataContainers/ScalarFields";
 import { SingleInstanceWindGlyphsConfig } from "./GlobalDataContainers/SingleInstanceWindGlyphsConfig";
 import { SquidsGlyphs } from "./GlobalDataContainers/SquidsGlyphs";
 import TerrainData from "./GlobalDataContainers/TerrainData";
-import { color_equals, parseColor } from "@/Helpers/ColorParser";
+import { ContourConfig } from "./GlobalDataContainers/ContourConfig";
+import { TimeDiffConfig } from "./GlobalDataContainers/TimeDiffConfig";
+import { TimeDiffData } from "./GlobalDataContainers/TimeDiffData";
 
 
 export class WildfireGlobalContext implements GlobalContext {
@@ -34,6 +39,9 @@ export class WildfireGlobalContext implements GlobalContext {
     terrain: TerrainData;
     wind_glyphs_config: SingleInstanceWindGlyphsConfig;
     squid_glyphs: SquidsGlyphs;
+    contour_config: ContourConfig;
+    time_diff_config: TimeDiffConfig;
+    time_diff_data: TimeDiffData;
 
     ensemble_colors: {
         "primary": string;
@@ -51,38 +59,7 @@ export class WildfireGlobalContext implements GlobalContext {
         current_otf_name: string;
     }
 
-    contours: Float32Array[]; // array of contours, each contour is an array of 3D points
-
-    contour_configs: {
-        display_primary: boolean;
-        display_secondary: boolean;
-        radius: number;
-        primary_scale: number;
-        secondary_scale: number;
-        radial_segments: number;
-    }
-
-    time_diff_data: {
-        data_names: string[];
-        datasets: { [key: string]: { datasets: any[] } };
-        ensemble_min: number[];
-        ensemble_max: number[];
-        min: number;
-        max: number;
-        x_range: [number, number];
-    }
-
-    time_diff_configs: {
-        hover_time: number | null;
-        show_hover_time: boolean;
-        show_ensemble: boolean;
-        show_zoom_box: boolean;
-        share_y_scale: boolean;
-        x_range: [number, number] | null;
-        x_display_range: [number, number] | null;
-        zoom_box_range: [number, number] | null;
-        play_steps: number;
-    }
+    contours: Float32Array[];
 
     _play: any
 
@@ -91,21 +68,18 @@ export class WildfireGlobalContext implements GlobalContext {
     constructor() {
         this.name = "Wildfire";
         this.description = "A scenario for visualizing wildfire spread data.";
-        this.data_server_address = "http://localhost:8000"; // Default address, can be changed
+        this.data_server_address = "http://localhost:8000";
         this.data_fetcher = WildfireDataFetcher.getInstance(this.data_server_address);
 
         this._shared_camera = new SharedTrackballPerspectiveCamera();
 
-        // for wildfire attributes
         this.ensemble_names = [];
         this.time_in_seconds = [];
         this.current_time_index = 60;
         this.current_ensemble_index = 15;
 
-        // empty terrain data structure
         this.terrain = new TerrainData();
         this.scalars = new ScalarFields();
-
 
         this.ensemble_colors = {
             primary: "#EA0000",
@@ -116,29 +90,15 @@ export class WildfireGlobalContext implements GlobalContext {
             plot_label_size: 22
         };
 
-        this.contour_configs = {
-            display_primary: true,
-            display_secondary: true,
-            radius: 0.001,
-            primary_scale: 2,
-            secondary_scale: 1,
-            radial_segments: 6
-        }
-
-        this.time_diff_configs = {
-            hover_time: null,
-            show_hover_time: true,
-            show_ensemble: true,
-            show_zoom_box: false,
-            share_y_scale: false,
-            x_range: null,
-            x_display_range: null,
-            zoom_box_range: null,
-            play_steps: 5
-        };
+        this.contour_config = new ContourConfig();
+        this.time_diff_config = new TimeDiffConfig();
+        this.time_diff_data = new TimeDiffData();
 
         this.wind_glyphs_config = new SingleInstanceWindGlyphsConfig();
+        this.wind_glyphs_config.setOnChanged(() => this.recomputeWindGlyphs());
+
         this.squid_glyphs = new SquidsGlyphs();
+        this.squid_glyphs.setOnChanged(() => this.querySquidGlyphs());
 
         makeAutoObservable(this);
     }
@@ -151,7 +111,7 @@ export class WildfireGlobalContext implements GlobalContext {
         if (this._play) return;
 
         const step = async () => {
-            let next_time = this.current_time_index + this.time_diff_configs.play_steps;
+            let next_time = this.current_time_index + this.time_diff_config.play_steps;
             if (next_time > this.time_in_seconds.length - 1) {
                 next_time = 1;
             }
@@ -182,15 +142,13 @@ export class WildfireGlobalContext implements GlobalContext {
         this.current_ensemble_index = global_data_object.current_ensemble_index || this.current_ensemble_index;
         this.ensemble_colors = global_data_object.ensemble_colors || this.ensemble_colors;
         this.ui_configs = global_data_object.ui_configs || this.ui_configs;
-        this.contour_configs = global_data_object.contour_configs || this.contour_configs;
-        this.time_diff_data = global_data_object.time_diff_data || this.time_diff_data;
-        this.time_diff_configs = global_data_object.time_diff_configs || this.time_diff_configs;
-
 
         this.data_fetcher.setDataServerAddress(this.data_server_address!);
         this.terrain.loadFromObject(global_data_object.terrain || {});
         this.wind_glyphs_config.loadFromObject(global_data_object.wind_glyphs_config || {});
         this.squid_glyphs.loadFromObject(global_data_object.squid_glyphs || {});
+        this.contour_config.loadFromObject(global_data_object.contour_configs || {});
+        this.time_diff_config.loadFromObject(global_data_object.time_diff_configs || {});
     }
 
     async asyncInitialize(): Promise<void> {
@@ -205,7 +163,7 @@ export class WildfireGlobalContext implements GlobalContext {
             }
 
             this.updateTerrainViewConfig();
-            this.windGlyphsUpdateInstances();
+            this.recomputeWindGlyphs();
 
         });
         return Promise.resolve();
@@ -222,8 +180,8 @@ export class WildfireGlobalContext implements GlobalContext {
             current_ensemble_index: this.current_ensemble_index,
             ensemble_colors: this.ensemble_colors,
             ui_configs: this.ui_configs,
-            contour_configs: this.contour_configs,
-            time_diff_configs: this.time_diff_configs,
+            contour_configs: this.contour_config.toObject(),
+            time_diff_configs: this.time_diff_config.toObject(),
 
             terrain: this.terrain.toObject(),
             wind_glyphs_config: this.wind_glyphs_config.toObject(),
@@ -276,44 +234,12 @@ export class WildfireGlobalContext implements GlobalContext {
         return Promise.resolve();
     }
 
-
-    private buildDatasetsForTimeDiff(timeDiffResult: any) {
-        const datasets: { [key: string]: { datasets: any[] } } = {};
-        const data_names = timeDiffResult.data_names;
-        const data_arrays = timeDiffResult.data_arrays;
-
-        data_names.forEach((name: string) => {
-            datasets[name] = {
-                datasets: data_arrays[name].map((data_array, edx) => {
-                    return {
-                        type: 'line',
-                        label: `edx_${edx}_label_${name}`,
-                        data: data_array,
-                        yAxisID: 'y',
-                        pointRadius: 0,
-                        borderColor: this.ensemble_colors.secondary,
-                        borderWidth: 1,
-                        hidden: false,
-                    };
-                })
-            };
-        });
-        return datasets;
-    }
-
     private async queryTimeDiffData() {
         const timeDiffResult = await this.data_fetcher.fetchTimeDiffData();
         runInAction(() => {
-            this.time_diff_data = {
-                data_names: timeDiffResult.data_names,
-                ensemble_min: timeDiffResult.ensemble_min,
-                ensemble_max: timeDiffResult.ensemble_max,
-                min: timeDiffResult.min,
-                max: timeDiffResult.max,
-                x_range: timeDiffResult.x_range,
-                datasets: this.buildDatasetsForTimeDiff(timeDiffResult)
-            };
-            this.time_diff_configs.x_display_range = [this.time_diff_data.x_range[0], this.time_diff_data.x_range[1]];
+            this.time_diff_data.loadFromQueryResult(timeDiffResult, this.ensemble_colors.secondary);
+            this.time_diff_config.setXRange(this.time_diff_data.x_range);
+            this.time_diff_config.setXDisplayRange([this.time_diff_data.x_range[0], this.time_diff_data.x_range[1]]);
         });
         return Promise.resolve();
     }
@@ -354,11 +280,10 @@ export class WildfireGlobalContext implements GlobalContext {
         if (this.current_ensemble_index === query_index) {
             return Promise.resolve();
         }
-        // update current ensemble index and fetch new scalar data
         runInAction(async () => {
             this.current_ensemble_index = query_index;
             this.queryScalarData(query_index, this.current_time_index);
-            this.windGlyphsUpdateInstances();
+            this.recomputeWindGlyphs();
         });
         return Promise.resolve();
     }
@@ -368,7 +293,7 @@ export class WildfireGlobalContext implements GlobalContext {
         if (this.current_time_index === clipped_index) {
             return Promise.resolve();
         }
-        
+
         runInAction(() => {
             this.current_time_index = clipped_index;
         });
@@ -379,236 +304,36 @@ export class WildfireGlobalContext implements GlobalContext {
             this.querySquidGlyphs()
         ]);
 
-        this.windGlyphsUpdateInstances();
+        this.recomputeWindGlyphs();
 
         return Promise.resolve();
     }
-    
 
-    contourConfigSetDisplayPrimary(display: boolean) {
-        runInAction(() => {
-            this.contour_configs.display_primary = display;
-        });
-    }
-
-    contourConfigSetDisplaySecondary(display: boolean) {
-        runInAction(() => {
-            this.contour_configs.display_secondary = display;
-        });
-    }
-
-    contourConfigSetPrimaryScale(scale: number) {
-        const clipped_scale = clip(scale, 1, 100);
-        runInAction(() => {
-            this.contour_configs.primary_scale = clipped_scale;
-        });
-    }
-
-    contourConfigSetSecondaryScale(scale: number) {
-        const clipped_scale = clip(scale, 1, 100);
-        runInAction(() => {
-            this.contour_configs.secondary_scale = clipped_scale;
-        });
-    }
-
-    timeDiffResetXDisplayRange() {
-        runInAction(() => {
-            this.time_diff_configs.x_display_range = [this.time_diff_data.x_range[0], this.time_diff_data.x_range[1]];
-        });
-    }
-
-    timeDiffSetXDisplayRange(range: [number, number]) {
-        runInAction(() => {
-            this.time_diff_configs.x_display_range = range;
-        });
-    }
-
-    timeDiffSetZoomBoxRange(range: [number, number] | null) {
-        runInAction(() => {
-            this.time_diff_configs.zoom_box_range = range;
-        });
-    }
-
-    timeDiffToggleShowEnsemble() {
-        runInAction(() => {
-            this.time_diff_configs.show_ensemble = !this.time_diff_configs.show_ensemble;
-        });
-    }
-
-    timeDiffToggleShareYScale() {
-        runInAction(() => {
-            this.time_diff_configs.share_y_scale = !this.time_diff_configs.share_y_scale;
-        });
-    }
-
-    timeDiffSetShowZoomBox(show: boolean) {
-        runInAction(() => {
-            this.time_diff_configs.show_zoom_box = show;
-        });
-    }
-
-    timeDiffSetShowHoverTime(show: boolean) {
-        runInAction(() => {
-            this.time_diff_configs.show_hover_time = show;
-        });
-    }
-
-    timeDiffSetHoverTime(timeIndex: number) {
-        const clipped_input = clip(timeIndex, this.time_diff_data.x_range[0], this.time_diff_data.x_range[1]);
-        runInAction(() => {
-            this.time_diff_configs.hover_time = Math.round(clipped_input);
-        });
-    }
-
-    timeDiffSetPlaySteps(steps: number) {
-        const clipped_steps = clip(steps, 1, 100);
-        runInAction(() => {
-            this.time_diff_configs.play_steps = clipped_steps;
-        });
-    }
-
-    windGlyphsSetDisplay(display: boolean): void {
-        runInAction(() => {
-            this.wind_glyphs_config.setDisplay(display);
-            if (this.wind_glyphs_config.display) {
-                const start = performance.now();
-                this.windGlyphsComputeGlyphs();
-                const end = performance.now();
-                console.log(`windGlyphsComputeGlyphs took ${(end - start).toFixed(2)} ms`);
-            }
-        });
-    }
-
-    windGlyphsSetScaleByMagnitude(scale_by_magnitude: boolean): void {
-        runInAction(() => {
-            this.wind_glyphs_config.setScaleByMagnitude(scale_by_magnitude);
-            if (this.wind_glyphs_config.display) {
-                this.windGlyphsUpdateInstances();
-            }
-        });
-    }
-
-    windGlyphsSetColorByMagnitude(color_by_magnitude: boolean): void {
-        runInAction(() => {
-            this.wind_glyphs_config.setColorByMagnitude(color_by_magnitude);
-            if (this.wind_glyphs_config.display) {
-                this.windGlyphsUpdateInstances();
-            }
-        });
-    }
-
-
-    /**
-     * Returns the size of the scalar field (number of 3D positions).
-     */
-    private getScalarFieldSize(): number {
-        return this.terrain.positions.length > 0 ? this.terrain.positions.length / 3 : 1;
-    }
-
-    windGlyphsSetSamplingStride(stride: number): void {
-        runInAction(() => {
-            // Ensure stride is a positive integer and less than scalar field size
-            const scalarFieldSize = this.getScalarFieldSize();
-            const clippedStride = Math.max(1, Math.min(Math.floor(stride), scalarFieldSize - 1));
-            this.wind_glyphs_config.setSamplingStride(clippedStride);
-            if (this.wind_glyphs_config.display) {
-                this.windGlyphsUpdateInstances();
-            }
-        });
-    }
-
-    windGlyphsSetLengthScale(length_scale: number): void {
-        runInAction(() => {
-            this.wind_glyphs_config.setLengthScale(length_scale);
-            if (this.wind_glyphs_config.display) {
-                this.windGlyphsUpdateInstances();
-            }
-        });
-    }
-
-    windGlyphsSetSizeScale(size_scale: number): void {
-        runInAction(() => {
-            this.wind_glyphs_config.setSizeScale(size_scale);
-            if (this.wind_glyphs_config.display) {
-                this.windGlyphsUpdateInstances();
-            }
-        });
-    }
-
-    windGlyphsSetRadius(radius: number): void {
-        runInAction(() => {
-            this.wind_glyphs_config.setRadius(radius);
-            if (this.wind_glyphs_config.display) {
-                this.windGlyphsUpdateInstances();
-            }
-        });
-    }
-
-    windGlyphsSetColor(color: string | d3.RGBColor | [number, number, number, number] | [number, number, number]): void {
-        this.wind_glyphs_config.setColor(color);
-        if (this.wind_glyphs_config.display) {
-            this.windGlyphsUpdateInstances();
-        }
-    }
-
-    private windGlyphsComputeGlyphs() {
-        const colormap = this.texture_manager.getColormap("WIND_MAG");
-        const color_getter = colormap ? (magnitude, max_magnitude) => {
-            const t = magnitude / max_magnitude;
-            return colormap.getColor(t);
-        } : (_magnitude, _max_magnitude) => d3.rgb(0, 0, 255);
-        this.wind_glyphs_config.updateInstances(
-            {
-                u: this.scalars.scalar_data["UF"],
-                v: this.scalars.scalar_data["VF"],
-                mag: this.scalars.scalar_data["WIND_MAG"],
-                mag_max: this.scalars.scalar_tags["WIND_MAG"].max
-            },
-            {
-                positions: this.terrain.positions,
-                base_scale: this.terrain.base_scale
-            },
-            color_getter
-        )
-    }
-
-    windGlyphsUpdateInstances(): void {
+    private recomputeWindGlyphs() {
         runInAction(() => {
             this.wind_glyphs_config.resetInstances();
             if (this.wind_glyphs_config.display) {
-                this.windGlyphsComputeGlyphs();
+                const colormap = this.texture_manager.getColormap("WIND_MAG");
+                const color_getter = colormap ? (magnitude: number, max_magnitude: number) => {
+                    const t = magnitude / max_magnitude;
+                    return colormap.getColor(t);
+                } : (_magnitude: number, _max_magnitude: number) => d3.rgb(0, 0, 255);
+                this.wind_glyphs_config.updateInstances(
+                    {
+                        u: this.scalars.scalar_data["UF"],
+                        v: this.scalars.scalar_data["VF"],
+                        mag: this.scalars.scalar_data["WIND_MAG"],
+                        mag_max: this.scalars.scalar_tags["WIND_MAG"].max
+                    },
+                    {
+                        positions: this.terrain.positions,
+                        base_scale: this.terrain.base_scale
+                    },
+                    color_getter
+                );
             }
         });
     }
-
-    squidGlyphsSetDisplay(display: boolean): void {
-        runInAction(() => {
-            this.squid_glyphs.setDisplay(display);
-            if (this.squid_glyphs.display) {
-                this.querySquidGlyphs();
-            }
-        });
-    }
-
-    squidGlyphsSetScale(scale: number): void {
-        if (scale === this.squid_glyphs.scale) return;
-        runInAction(() => {
-            this.squid_glyphs.setScale(scale);
-            if (this.squid_glyphs.display) {
-                this.querySquidGlyphs();
-            }
-        });
-    }
-
-    squidGlyphsSetColor(color: string | d3.RGBColor | [number, number, number, number] | [number, number, number]): void {
-        const rgbColor = parseColor(color);
-        if (color_equals(rgbColor, this.squid_glyphs.color)) return;
-        runInAction(() => {
-            this.squid_glyphs.setColor(rgbColor);
-        });
-    }
-
-    
 }
 
 export default WildfireGlobalContext;

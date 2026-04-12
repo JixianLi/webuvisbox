@@ -17,7 +17,7 @@ export const WindGlyphConfigPanel = observer(() => {
         <GridLayoutContainer>
             <Grid size={{ xl: 6, lg: 12 }} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                 <Switch checked={config.display} onChange={(e) => {
-                    global_data.windGlyphsSetDisplay(e.target.checked);
+                    config.setDisplay(e.target.checked);
                 }} />
                 <Typography color={config.display ? "primary" : "textSecondary"}>Display</Typography>
             </Grid>
@@ -29,14 +29,14 @@ export const WindGlyphConfigPanel = observer(() => {
                     onBlur={(event) => {
                         const v = parseInt(event.target.value);
                         if (!isNaN(v) && v > 0) {
-                            global_data.windGlyphsSetSamplingStride(v);
+                            config.setSamplingStride(v);
                         }
                     }}
                 />
             </Grid>
             <Grid size={{ xl: 6, lg: 12 }} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                 <Switch checked={config.scale_by_magnitude} onChange={(e) => {
-                    global_data.windGlyphsSetScaleByMagnitude(e.target.checked);
+                    config.setScaleByMagnitude(e.target.checked);
                 }} />
                 <Typography color={config.scale_by_magnitude ? "primary" : "textSecondary"}>Scale by Magnitude</Typography>
             </Grid>
@@ -49,7 +49,7 @@ export const WindGlyphConfigPanel = observer(() => {
                     onBlur={(event) => {
                         const v = parseFloat(event.target.value);
                         if (!isNaN(v) && v > 0) {
-                            global_data.windGlyphsSetLengthScale(v);
+                            config.setLengthScale(v);
                         }
                     }}
                 />
@@ -62,7 +62,7 @@ export const WindGlyphConfigPanel = observer(() => {
                     onBlur={(event) => {
                         const v = parseFloat(event.target.value);
                         if (!isNaN(v) && v > 0) {
-                            global_data.windGlyphsSetRadius(v);
+                            config.setRadius(v);
                         }
                     }}
                 />
@@ -75,7 +75,7 @@ export const WindGlyphConfigPanel = observer(() => {
                     onBlur={(event) => {
                         const v = parseFloat(event.target.value);
                         if (!isNaN(v) && v > 0) {
-                            global_data.windGlyphsSetSizeScale(v);
+                            config.setSizeScale(v);
                         }
                     }}
                 />
@@ -83,7 +83,7 @@ export const WindGlyphConfigPanel = observer(() => {
 
             <Grid size={{ xl: 6, lg: 12 }} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                 <Switch checked={config.color_by_magnitude} onChange={(e) => {
-                    global_data.windGlyphsSetColorByMagnitude(e.target.checked);
+                    config.setColorByMagnitude(e.target.checked);
                 }} />
                 <Typography color={config.color_by_magnitude ? "primary" : "textSecondary"}>Color by Magnitude</Typography>
             </Grid>
@@ -94,7 +94,7 @@ export const WindGlyphConfigPanel = observer(() => {
                     defaultValue={config.color.formatHex()}
                     onBlur={(event) => {
                         const v = event.target.value;
-                        global_data.windGlyphsSetColor(v);
+                        config.setColor(v);
                     }}
                 />
             </Grid>

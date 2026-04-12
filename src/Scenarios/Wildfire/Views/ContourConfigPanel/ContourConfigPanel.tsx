@@ -12,7 +12,7 @@ import { GridLayoutContainer } from "@/Panels/GridLayoutContainer";
 const ContourConfigPanel = observer(() => {
     const scenario = useScenario();
     const global_data = scenario.global_context as WildfireGlobalContext;
-    const contour_configs = global_data.contour_configs;
+    const contour_config = global_data.contour_config;
     if (!scenario.initialized) {
         return <Panel panel_name={"Contour Configuration"}>
             <div>Loading...</div>
@@ -23,36 +23,36 @@ const ContourConfigPanel = observer(() => {
     const content = (
         <GridLayoutContainer>
             <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
-                <Switch checked={contour_configs.display_primary} onChange={(e) => {
-                    global_data.contourConfigSetDisplayPrimary(e.target.checked);
+                <Switch checked={contour_config.display_primary} onChange={(e) => {
+                    contour_config.setDisplayPrimary(e.target.checked);
                 }} />
-                <Typography color={contour_configs.display_primary ? "primary" : "textSecondary"}>Display Primary</Typography>
+                <Typography color={contour_config.display_primary ? "primary" : "textSecondary"}>Display Primary</Typography>
             </Grid>
             <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
                 <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
-                    <Switch checked={contour_configs.display_secondary} onChange={(e) => {
-                        global_data.contourConfigSetDisplaySecondary(e.target.checked);
+                    <Switch checked={contour_config.display_secondary} onChange={(e) => {
+                        contour_config.setDisplaySecondary(e.target.checked);
                     }} />
-                    <Typography color={contour_configs.display_secondary ? "primary" : "textSecondary"}>Display Secondary</Typography>
+                    <Typography color={contour_config.display_secondary ? "primary" : "textSecondary"}>Display Secondary</Typography>
                 </Stack>
             </Grid>
             <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
                 <LazyTextField type='number' label="Radius"
-                    defaultValue={contour_configs.primary_scale}
-                    key={"contour-config-scale-" + contour_configs.primary_scale}
+                    defaultValue={contour_config.primary_scale}
+                    key={"contour-config-scale-" + contour_config.primary_scale}
                     onBlur={(value) => {
                         const val = parseFloat(value.target.value);
-                        global_data.contourConfigSetPrimaryScale(val);
+                        contour_config.setPrimaryScale(val);
                     }}
                 />
             </Grid>
             <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
                 <LazyTextField type='number' label="Secondary Scale"
-                    defaultValue={contour_configs.secondary_scale}
-                    key={"contour-config-secondary-scale-" + contour_configs.secondary_scale}
+                    defaultValue={contour_config.secondary_scale}
+                    key={"contour-config-secondary-scale-" + contour_config.secondary_scale}
                     onBlur={(value) => {
                         const val = parseFloat(value.target.value);
-                        global_data.contourConfigSetSecondaryScale(val);
+                        contour_config.setSecondaryScale(val);
                     }}
                 />
             </Grid>

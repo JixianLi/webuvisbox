@@ -54,7 +54,7 @@ const TimeLineChart = observer((props: TimeLineChartProps) => {
     const scenario = useScenario();
     const global_data = scenario.global_context as WildfireGlobalContext;
     const time_diff_data = global_data.time_diff_data;
-    const configs = global_data.time_diff_configs;
+    const configs = global_data.time_diff_config;
     const time_in_seconds = global_data.time_in_seconds;
     const ensemble_colors = global_data.ensemble_colors;
     const [mouse_down, setMouseDown] = useState(false);
@@ -151,14 +151,14 @@ const TimeLineChart = observer((props: TimeLineChartProps) => {
 
     const onMouseEnter = (event) => {
         const [x] = getDataPosition(chartRef, event);
-        global_data.timeDiffSetHoverTime(x);
-        global_data.timeDiffSetShowHoverTime(true);
+        configs.setHoverTime(x, time_diff_data.x_range);
+        configs.setShowHoverTime(true);
     }
 
     const onMouseLeave = () => {
-        global_data.timeDiffSetShowZoomBox(false);
-        global_data.timeDiffSetZoomBoxRange(null);
-        global_data.timeDiffSetShowHoverTime(false);
+        configs.setShowZoomBox(false);
+        configs.setZoomBoxRange(null);
+        configs.setShowHoverTime(false);
         setMouseDown(false);
         setMouseDownX(0);
     }
@@ -167,13 +167,13 @@ const TimeLineChart = observer((props: TimeLineChartProps) => {
         if (mouse_down) {
             const [x] = getDataPosition(chartRef, event);
             setMouseDown(false);
-            global_data.timeDiffSetShowZoomBox(false);
-            global_data.timeDiffSetZoomBoxRange(null);
+            configs.setShowZoomBox(false);
+            configs.setZoomBoxRange(null);
             if (x !== mouse_down_x) {
                 const x_min = Math.min(x, mouse_down_x);
                 const x_max = Math.max(x, mouse_down_x);
-                global_data.timeDiffSetXDisplayRange([x_min, x_max]);
-                global_data.timeDiffSetShowZoomBox(false);
+                configs.setXDisplayRange([x_min, x_max]);
+                configs.setShowZoomBox(false);
             } else {
                 global_data.setTimeIndex(Math.round(x));
             }
@@ -184,13 +184,13 @@ const TimeLineChart = observer((props: TimeLineChartProps) => {
         const [x] = getDataPosition(chartRef, event);
         if (mouse_down) {
             if (x !== mouse_down_x) {
-                global_data.timeDiffSetShowZoomBox(true);
-                global_data.timeDiffSetZoomBoxRange(x < mouse_down_x ? [x, mouse_down_x] : [mouse_down_x, x]);
+                configs.setShowZoomBox(true);
+                configs.setZoomBoxRange(x < mouse_down_x ? [x, mouse_down_x] : [mouse_down_x, x]);
             } else {
-                global_data.timeDiffSetShowZoomBox(false);
+                configs.setShowZoomBox(false);
             }
         }
-        global_data.timeDiffSetHoverTime(x);
+        configs.setHoverTime(x, time_diff_data.x_range);
     }
 
     const onMouseDown = (event) => {
