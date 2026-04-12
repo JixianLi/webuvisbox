@@ -35,18 +35,18 @@ export function range(start: number = 0, end?: number, step: number = 1): number
 /**
  * Rescales a value from one range to another, with optional clamping.
  * @param value - The value to rescale
- * @param target_min - The minimum of the target range
- * @param target_max - The maximum of the target range
- * @param source_min - The minimum of the source range (default: 0)
- * @param source_max - The maximum of the source range (default: 1)
+ * @param targetMin - The minimum of the target range
+ * @param targetMax - The maximum of the target range
+ * @param sourceMin - The minimum of the source range (default: 0)
+ * @param sourceMax - The maximum of the source range (default: 1)
  * @returns The rescaled value, clamped to the target range
  */
-export function rescale(value: number, target_min: number, target_max: number, source_min: number = 0, source_max: number = 1): number {
-    if (source_min === source_max) return (target_min + target_max) / 2; // Handle zero-width source range
-    if (target_min === target_max) return target_min; // Handle zero-width target range
-    
-    const ratio = (value - source_min) / (source_max - source_min);
-    return clamp(target_min + ratio * (target_max - target_min), target_min, target_max);
+export function rescale(value: number, targetMin: number, targetMax: number, sourceMin: number = 0, sourceMax: number = 1): number {
+    if (sourceMin === sourceMax) return (targetMin + targetMax) / 2; // Handle zero-width source range
+    if (targetMin === targetMax) return targetMin; // Handle zero-width target range
+
+    const ratio = (value - sourceMin) / (sourceMax - sourceMin);
+    return clamp(targetMin + ratio * (targetMax - targetMin), targetMin, targetMax);
 }
 
 /**
@@ -258,16 +258,16 @@ export function findSmallerIndex(array: number[], value: number): number {
  * @returns [center, diagonal] where center is [x, y, z] and diagonal is the length
  */
 export function computeCenterAndDiag(bounds: [number, number, number, number, number, number]): [[number, number, number], number] {
-    const [x_min, x_max, y_min, y_max, z_min, z_max] = bounds;
+    const [xMin, xMax, yMin, yMax, zMin, zMax] = bounds;
     const center: [number, number, number] = [
-        (x_min + x_max) / 2,
-        (y_min + y_max) / 2,
-        (z_min + z_max) / 2
+        (xMin + xMax) / 2,
+        (yMin + yMax) / 2,
+        (zMin + zMax) / 2
     ];
     const diag = Math.sqrt(
-        (x_max - x_min) ** 2 +
-        (y_max - y_min) ** 2 +
-        (z_max - z_min) ** 2
+        (xMax - xMin) ** 2 +
+        (yMax - yMin) ** 2 +
+        (zMax - zMin) ** 2
     );
     return [center, diag];
 }

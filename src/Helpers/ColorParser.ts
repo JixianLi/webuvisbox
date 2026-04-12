@@ -21,6 +21,6 @@ export function parseColor(color: string | d3.RGBColor | [number, number, number
     return rgbColor;
 }
 
-export function color_equals(c1: d3.RGBColor, c2: d3.RGBColor): boolean {
+export function colorEquals(c1: d3.RGBColor, c2: d3.RGBColor): boolean {
     return c1.r === c2.r && c1.g === c2.g && c1.b === c2.b;
 }

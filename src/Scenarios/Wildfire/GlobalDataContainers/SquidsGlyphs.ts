@@ -5,7 +5,7 @@ import { clip } from "@/Helpers/MathHelper";
 import { runInAction } from "mobx";
 import * as d3 from "d3";
 import { makeAutoObservable } from "mobx";
-import { color_equals, parseColor } from "@/Helpers/ColorParser";
+import { colorEquals, parseColor } from "@/Helpers/ColorParser";
 
 export class SquidsGlyphs {
 
@@ -70,7 +70,7 @@ export class SquidsGlyphs {
 
     public setColor(color: string | d3.RGBColor | [number, number, number, number] | [number, number, number]): void {
         const rgbColor = parseColor(color);
-        if (color_equals(rgbColor, this._color)) return;
+        if (colorEquals(rgbColor, this._color)) return;
         runInAction(() => {
             this._color = rgbColor;
         });

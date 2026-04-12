@@ -7,15 +7,15 @@ type TypedArray = Float32Array | Float64Array | Int32Array | Int16Array | Int8Ar
 /**
  * Decodes a base64 string into a typed array of the specified data type.
  * @param str - The base64 encoded string.
- * @param data_type - The desired data type of the output array. Defaults to "float32".
+ * @param dataType - The desired data type of the output array. Defaults to "float32".
  * @returns A typed array corresponding to the decoded data.
  * @throws Will throw an error if the specified data type is unsupported.
  */
 
-export const decode64 = (str: string, data_type: DataType = "float32"): TypedArray => {
+export const decode64 = (str: string, dataType: DataType = "float32"): TypedArray => {
     const buffer = Buffer.from(str, 'base64').buffer;
 
-    switch (data_type) {
+    switch (dataType) {
         case "float32":
             return new Float32Array(buffer);
         case "float64":
@@ -33,7 +33,7 @@ export const decode64 = (str: string, data_type: DataType = "float32"): TypedArr
         case "uint8":
             return new Uint8Array(buffer);
         default:
-            throw new Error(`Unsupported data type: ${data_type}`);
+            throw new Error(`Unsupported data type: ${dataType}`);
     }
 }
 
