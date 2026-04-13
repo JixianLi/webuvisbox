@@ -20,7 +20,7 @@ import { trackPromise } from "react-promise-tracker";
 const QueryConfigPanel = observer(() => {
 
     const scenario = useScenario();
-    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
+    const globalContext = scenario.globalContext as UncertaintyTubeGlobalContext;
 
     if (!scenario.initialized) {
         return <Panel panelName={"Query Config"}>
@@ -28,51 +28,49 @@ const QueryConfigPanel = observer(() => {
         </Panel>;
     }
 
-    // global_data is ready to use here
-
-    const create_content = () => {
+    const createContent = () => {
         return (
             <Box sx={{ flexGrow: 1 }}>
                 <Grid container spacing={2} style={{ padding: '10px' }}>
                     <Grid size={{ xl: 6, lg: 12 }} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-                        <Switch checked={global_context.query_config.sym} onChange={(e) => {
+                        <Switch checked={globalContext.queryConfig.sym} onChange={(e) => {
                             runInAction(() => {
-                                global_context.query_config.sym = e.target.checked;
+                                globalContext.queryConfig.sym = e.target.checked;
                             });
                         }} />
-                        <Typography color={global_context.query_config.sym ? "primary" : "textSecondary"}>Symmetric Tubes</Typography>
+                        <Typography color={globalContext.queryConfig.sym ? "primary" : "textSecondary"}>Symmetric Tubes</Typography>
                     </Grid>
                     <Grid size={{ xl: 6, lg: 12 }} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                         <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
-                            <Typography color={global_context.query_config.method === "swag" ? "primary" : "textSecondary"}>SWAG</Typography>
-                            <Switch checked={global_context.query_config.method === "mcdropout"}
+                            <Typography color={globalContext.queryConfig.method === "swag" ? "primary" : "textSecondary"}>SWAG</Typography>
+                            <Switch checked={globalContext.queryConfig.method === "mcdropout"}
                                 color={'default'}
                                 onChange={(e) => {
                                     runInAction(() => {
-                                        global_context.query_config.method = e.target.checked ? "mcdropout" : "swag";
+                                        globalContext.queryConfig.method = e.target.checked ? "mcdropout" : "swag";
                                     });
                                 }} />
-                            <Typography color={global_context.query_config.method === "mcdropout" ? "primary" : "textSecondary"}>MCDropout</Typography>
+                            <Typography color={globalContext.queryConfig.method === "mcdropout" ? "primary" : "textSecondary"}>MCDropout</Typography>
                         </Stack>
                     </Grid>
                     <Grid size={12} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                         <Grid size={6}>
                             <LazyTextField type='text' label="Tube roundness"
-                                key={"eproj-" + global_context.query_config.eproj}
-                                defaultValue={global_context.query_config.eproj}
+                                key={"eproj-" + globalContext.queryConfig.eproj}
+                                defaultValue={globalContext.queryConfig.eproj}
                                 onBlur={(e) => {
                                     const val = parseFloat(e.target.value);
                                     if (!isNaN(val) && val > 0 && val <= 2.0) {
                                         runInAction(() => {
-                                            global_context.query_config.eproj = val;
+                                            globalContext.queryConfig.eproj = val;
                                         });
                                     }
                                 }} autoComplete="off" />
                         </Grid>
                         <Grid size={6} sx={{ paddingLeft: '20px', paddingRight: '20px' }}>
-                            <Slider value={global_context.query_config.eproj} min={0.0} max={2.0} step={0.1} onChange={(_, val) => {
+                            <Slider value={globalContext.queryConfig.eproj} min={0.0} max={2.0} step={0.1} onChange={(_, val) => {
                                 runInAction(() => {
-                                    global_context.query_config.eproj = val;
+                                    globalContext.queryConfig.eproj = val;
                                 });
 
                             }} valueLabelDisplay="auto" />
@@ -81,11 +79,11 @@ const QueryConfigPanel = observer(() => {
                     <Grid size={12} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                         <Button variant="contained" endIcon={<SendIcon />}
                             onClick={async () => {
-                                if (global_context.seeds.length === 0) {
+                                if (globalContext.seeds.length === 0) {
                                     alert("Please add seeds first!");
                                     return;
                                 }
-                                trackPromise(global_context.fetch_trajectories());
+                                trackPromise(globalContext.fetchTrajectories());
                             }
                             }>Send Query</Button>
                     </Grid>
@@ -96,7 +94,7 @@ const QueryConfigPanel = observer(() => {
 
     return (
         <Panel panelName={"Query Config"}>
-            {create_content()}
+            {createContent()}
         </Panel>
     );
 });

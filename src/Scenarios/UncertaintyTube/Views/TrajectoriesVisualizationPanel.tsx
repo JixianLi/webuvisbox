@@ -28,41 +28,41 @@ const TrajectoriesVisualizationPanel = observer(() => {
             <div>Loading...</div>
         </Panel>;
     }
-    const global_data = scenario.globalContext as UncertaintyTubeGlobalContext;
+    const globalData = scenario.globalContext as UncertaintyTubeGlobalContext;
 
-    const trajectory_visualization_config = global_data.trajectory_visualization;
+    const trajectoryVisualizationConfig = globalData.trajectoryVisualization;
 
     const toggleShowPaths = () =>{
         runInAction(()=>{
-            trajectory_visualization_config.show_path = !trajectory_visualization_config.show_path;
+            trajectoryVisualizationConfig.showPath = !trajectoryVisualizationConfig.showPath;
         });
     }
 
     const toggleShowUncertaintyPaths = () =>{
         runInAction(()=>{
-            trajectory_visualization_config.show_uncertainty_path = !trajectory_visualization_config.show_uncertainty_path;
+            trajectoryVisualizationConfig.showUncertaintyPath = !trajectoryVisualizationConfig.showUncertaintyPath;
         });
     }
 
     const toggleShowUncertaintyTubes = () =>{
         runInAction(()=>{
-            trajectory_visualization_config.show_uncertainty_tube = !trajectory_visualization_config.show_uncertainty_tube;
+            trajectoryVisualizationConfig.showUncertaintyTube = !trajectoryVisualizationConfig.showUncertaintyTube;
         });
     }
 
     const toggleShowSeeds = () =>{
         runInAction(()=>{
-            trajectory_visualization_config.show_seeds = !trajectory_visualization_config.show_seeds;
+            trajectoryVisualizationConfig.showSeeds = !trajectoryVisualizationConfig.showSeeds;
         });
     }
 
     const toggleShowStats = () =>{
         runInAction(()=>{
-            trajectory_visualization_config.show_stats = !trajectory_visualization_config.show_stats;
+            trajectoryVisualizationConfig.showStats = !trajectoryVisualizationConfig.showStats;
         });
     }
 
-    const appbar_content = <>
+    const appbarContent = <>
         <IconButton size='small' edge='start' aria-label='menu' sx={{ mr: 2 }} onClick={menuIconClicked}>
             <MenuIcon />
         </IconButton>
@@ -70,35 +70,35 @@ const TrajectoriesVisualizationPanel = observer(() => {
             <MenuList dense>
                 <CheckMenuItem
                     text="Show Paths"
-                    checked={trajectory_visualization_config.show_path}
+                    checked={trajectoryVisualizationConfig.showPath}
                     onClick={toggleShowPaths}
                 />
                 <CheckMenuItem
                     text="Show Uncertainty Paths"
-                    checked={trajectory_visualization_config.show_uncertainty_path}
+                    checked={trajectoryVisualizationConfig.showUncertaintyPath}
                     onClick={toggleShowUncertaintyPaths}
                 />
                 <CheckMenuItem
                     text="Show Uncertainty Tubes"
-                    checked={trajectory_visualization_config.show_uncertainty_tube}
+                    checked={trajectoryVisualizationConfig.showUncertaintyTube}
                     onClick={toggleShowUncertaintyTubes}
                 />
                 <CheckMenuItem
                     text="Show Seeds"
-                    checked={trajectory_visualization_config.show_seeds}
+                    checked={trajectoryVisualizationConfig.showSeeds}
                     onClick={toggleShowSeeds}
                 />
                 <CheckMenuItem
                     text="Show Rendering Performance Stats"
-                    checked={trajectory_visualization_config.show_stats}
+                    checked={trajectoryVisualizationConfig.showStats}
                     onClick={toggleShowStats}
                 />
             </MenuList>
         </Menu>
     </>
-    
+
     return (
-        <Panel panelName="Trajectories Visualization" appbarContent={appbar_content}>
+        <Panel panelName="Trajectories Visualization" appbarContent={appbarContent}>
             <TrajectoriesRenderer />
         </Panel>
     );

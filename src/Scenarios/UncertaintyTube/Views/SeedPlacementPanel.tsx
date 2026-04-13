@@ -16,10 +16,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 const SeedPlacementPanel = observer(() => {
     const scenario = useScenario();
-    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
+    const globalContext = scenario.globalContext as UncertaintyTubeGlobalContext;
 
-    const seed_placement_config = global_context.seed_placement;
-    const [min_x, max_x, min_y, max_y, min_z, max_z] = global_context.sb_bounds;
+    const seedPlacementConfig = globalContext.seedPlacement;
+    const [minX, maxX, minY, maxY, minZ, maxZ] = globalContext.sbBounds;
 
     return (
         <Panel panelName="Seed Placement">
@@ -29,10 +29,10 @@ const SeedPlacementPanel = observer(() => {
                         <Stack direction='row'>
                             <FormControlLabel
                                 control={<Switch
-                                    checked={seed_placement_config.use_random_seeding}
+                                    checked={seedPlacementConfig.useRandomSeeding}
                                     onChange={(e) => {
                                         runInAction(() => {
-                                            global_context.seed_placement.use_random_seeding = e.target.checked;
+                                            globalContext.seedPlacement.useRandomSeeding = e.target.checked;
                                         });
                                     }}
                                     name="seedPlacement"
@@ -41,13 +41,13 @@ const SeedPlacementPanel = observer(() => {
                                 label='Random'
                             />
                             <LazyTextField type='number' label='Number of Seeds'
-                                defaultValue={seed_placement_config.random_seed_count}
-                                key={'seed_placement_random_seed_count_field' + seed_placement_config.random_seed_count + ''}
+                                defaultValue={seedPlacementConfig.randomSeedCount}
+                                key={'seed_placement_random_seed_count_field' + seedPlacementConfig.randomSeedCount + ''}
                                 onBlur={(e) => {
                                     runInAction(() => {
                                         let value = parseInt(e.target.value);
                                         if (typeof value === 'number' && !isNaN(value) && value >= 0) {
-                                            seed_placement_config.random_seed_count = value;
+                                            seedPlacementConfig.randomSeedCount = value;
                                         }
                                     });
                                 }}
@@ -57,47 +57,47 @@ const SeedPlacementPanel = observer(() => {
                         <Stack direction='row' spacing={0} >
                             <FormControlLabel
                                 control={<Switch
-                                    checked={seed_placement_config.use_uniform_seeding}
+                                    checked={seedPlacementConfig.useUniformSeeding}
                                     onChange={(e) => {
                                         runInAction(() => {
-                                            seed_placement_config.use_uniform_seeding = e.target.checked;
+                                            seedPlacementConfig.useUniformSeeding = e.target.checked;
                                         });
                                     }}
                                 />}
                                 label='Uniform'
                             />
                             <LazyTextField type='number' label='x'
-                                defaultValue={seed_placement_config.num_uniform_seeds[0]}
-                                key={'seed_placement_uniform_seed_count_field_x' + seed_placement_config.num_uniform_seeds[0] + ''}
+                                defaultValue={seedPlacementConfig.numUniformSeeds[0]}
+                                key={'seed_placement_uniform_seed_count_field_x' + seedPlacementConfig.numUniformSeeds[0] + ''}
                                 onBlur={(v) => {
                                     runInAction(() => {
                                         let value = parseFloat(v.target.value);
                                         if (typeof value === 'number' && !isNaN(value) && value >= 0) {
-                                            seed_placement_config.num_uniform_seeds[0] = value;
+                                            seedPlacementConfig.numUniformSeeds[0] = value;
                                         }
                                     });
                                 }}
                             />
                             <LazyTextField type='number' label='y'
-                                defaultValue={seed_placement_config.num_uniform_seeds[1]}
-                                key={'seed_placement_uniform_seed_count_field_y' + seed_placement_config.num_uniform_seeds[1] + ''}
+                                defaultValue={seedPlacementConfig.numUniformSeeds[1]}
+                                key={'seed_placement_uniform_seed_count_field_y' + seedPlacementConfig.numUniformSeeds[1] + ''}
                                 onBlur={(v) => {
                                     runInAction(() => {
                                         let value = parseFloat(v.target.value);
                                         if (typeof value === 'number' && !isNaN(value) && value >= 0) {
-                                            seed_placement_config.num_uniform_seeds[1] = value;
+                                            seedPlacementConfig.numUniformSeeds[1] = value;
                                         }
                                     });
                                 }}
                             />
                             <LazyTextField type='number' label='z'
-                                defaultValue={seed_placement_config.num_uniform_seeds[2]}
-                                key={'seed_placement_uniform_seed_count_field_z' + seed_placement_config.num_uniform_seeds[2] + ''}
+                                defaultValue={seedPlacementConfig.numUniformSeeds[2]}
+                                key={'seed_placement_uniform_seed_count_field_z' + seedPlacementConfig.numUniformSeeds[2] + ''}
                                 onBlur={(v) => {
                                     runInAction(() => {
                                         let value = parseFloat(v.target.value);
                                         if (typeof value === 'number' && !isNaN(value) && value >= 0) {
-                                            seed_placement_config.num_uniform_seeds[2] = value;
+                                            seedPlacementConfig.numUniformSeeds[2] = value;
                                         }
                                     });
                                 }}
@@ -108,50 +108,50 @@ const SeedPlacementPanel = observer(() => {
                         <Stack direction='row'>
                             <FormControlLabel
                                 control={<Switch
-                                    checked={seed_placement_config.use_manual_seeding}
+                                    checked={seedPlacementConfig.useManualSeeding}
                                     onChange={(e) => {
                                         runInAction(() => {
-                                            seed_placement_config.use_manual_seeding = e.target.checked;
+                                            seedPlacementConfig.useManualSeeding = e.target.checked;
                                         });
                                     }}
                                 />}
                                 label='manual'
                             />
                             <LazyTextField type='text' label='x'
-                                defaultValue={seed_placement_config.manual_seed_location[0]}
-                                key={'seed_placement_manual_seed_location_field_x' + seed_placement_config.manual_seed_location[0] + ''}
+                                defaultValue={seedPlacementConfig.manualSeedLocation[0]}
+                                key={'seed_placement_manual_seed_location_field_x' + seedPlacementConfig.manualSeedLocation[0] + ''}
                                 onBlur={(v) => {
                                     runInAction(() => {
                                         let value = parseFloat(v.target.value);
                                         if (typeof value === 'number' && !isNaN(value)) {
-                                            value = clamp(value, min_x, max_x);
-                                            seed_placement_config.manual_seed_location[0] = value;
+                                            value = clamp(value, minX, maxX);
+                                            seedPlacementConfig.manualSeedLocation[0] = value;
                                         }
                                     });
                                 }}
                             />
                             <LazyTextField type='text' label='y'
-                                defaultValue={seed_placement_config.manual_seed_location[1]}
-                                key={'seed_placement_manual_seed_location_field_y' + seed_placement_config.manual_seed_location[1] + ''}
+                                defaultValue={seedPlacementConfig.manualSeedLocation[1]}
+                                key={'seed_placement_manual_seed_location_field_y' + seedPlacementConfig.manualSeedLocation[1] + ''}
                                 onBlur={(v) => {
                                     runInAction(() => {
                                         let value = parseFloat(v.target.value);
                                         if (typeof value === 'number' && !isNaN(value)) {
-                                            value = clamp(value, min_y, max_y);
-                                            seed_placement_config.manual_seed_location[1] = value;
+                                            value = clamp(value, minY, maxY);
+                                            seedPlacementConfig.manualSeedLocation[1] = value;
                                         }
                                     });
                                 }}
                             />
                             <LazyTextField type='text' label='z'
-                                defaultValue={seed_placement_config.manual_seed_location[2]}
-                                key={'seed_placement_manual_seed_location_field_z' + seed_placement_config.manual_seed_location[2] + ''}
+                                defaultValue={seedPlacementConfig.manualSeedLocation[2]}
+                                key={'seed_placement_manual_seed_location_field_z' + seedPlacementConfig.manualSeedLocation[2] + ''}
                                 onBlur={(v) => {
                                     runInAction(() => {
                                         let value = parseFloat(v.target.value);
                                         if (typeof value === 'number' && !isNaN(value)) {
-                                            value = clamp(value, min_z, max_z);
-                                            seed_placement_config.manual_seed_location[2] = value;
+                                            value = clamp(value, minZ, maxZ);
+                                            seedPlacementConfig.manualSeedLocation[2] = value;
                                         }
                                     });
                                 }}
@@ -160,8 +160,8 @@ const SeedPlacementPanel = observer(() => {
                     </Grid>
                     <Grid size={12} sx={{ mt: 2 ,justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
                         <Stack direction='row' spacing={2}>
-                            <Button variant="contained" startIcon={<QueueIcon />} onClick={global_context.addSeeds}>Add Seeds</Button>
-                            <Button variant="contained" startIcon={<DeleteIcon />} onClick={global_context.deleteSeeds}>Delete Seeds</Button>
+                            <Button variant="contained" startIcon={<QueueIcon />} onClick={globalContext.addSeeds}>Add Seeds</Button>
+                            <Button variant="contained" startIcon={<DeleteIcon />} onClick={globalContext.deleteSeeds}>Delete Seeds</Button>
                         </Stack>
                     </Grid>
                 </Grid>

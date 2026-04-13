@@ -4,50 +4,50 @@ import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalContex
 import { LinearTubeMesh } from "@/Renderers/Mesh/LinearTubeMesh";
 
 interface UncertaintyPathMeshProps {
-    show_primary_path?: boolean;
-    show_uncertainty_path?: boolean;
+    showPrimaryPath?: boolean;
+    showUncertaintyPath?: boolean;
 }
 
 const UncertaintyPathMesh = observer((props: UncertaintyPathMeshProps) => {
     const scenario = useScenario();
-    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
-    const primary_paths = global_context.primary_trajectories;
-    const diag = global_context.diag;
+    const globalContext = scenario.globalContext as UncertaintyTubeGlobalContext;
+    const primaryPaths = globalContext.primaryTrajectories;
+    const diag = globalContext.diag;
 
     // Use props value if provided, otherwise use global context
-    const shouldShowPrimary = props.show_primary_path !== undefined
-        ? props.show_primary_path
-        : global_context.trajectory_visualization.show_path;
+    const shouldShowPrimary = props.showPrimaryPath !== undefined
+        ? props.showPrimaryPath
+        : globalContext.trajectoryVisualization.showPath;
 
-    const primary_tubes = shouldShowPrimary ? (
+    const primaryTubes = shouldShowPrimary ? (
         <LinearTubeMesh
-            paths={primary_paths}
-            radius={diag / global_context.render_config.paths.primary.radius_divisor}
-            color={global_context.render_config.paths.primary.color}
-            radialSegments={global_context.render_config.paths.primary.radial_segments}
+            paths={primaryPaths}
+            radius={diag / globalContext.renderConfig.paths.primary.radiusDivisor}
+            color={globalContext.renderConfig.paths.primary.color}
+            radialSegments={globalContext.renderConfig.paths.primary.radialSegments}
         />
     ) : null;
 
-    const secondary_paths = global_context.secondary_trajectories;
+    const secondaryPaths = globalContext.secondaryTrajectories;
 
     // Use props value if provided, otherwise use global context
-    const shouldShowUncertainty = props.show_uncertainty_path !== undefined
-        ? props.show_uncertainty_path
-        : global_context.trajectory_visualization.show_uncertainty_path;
+    const shouldShowUncertainty = props.showUncertaintyPath !== undefined
+        ? props.showUncertaintyPath
+        : globalContext.trajectoryVisualization.showUncertaintyPath;
 
-    const secondary_tubes = shouldShowUncertainty ? (
+    const secondaryTubes = shouldShowUncertainty ? (
         <LinearTubeMesh
-            paths={secondary_paths}
-            radius={diag / global_context.render_config.paths.secondary.radius_divisor}
-            color={global_context.render_config.paths.secondary.color}
-            radialSegments={global_context.render_config.paths.secondary.radial_segments}
+            paths={secondaryPaths}
+            radius={diag / globalContext.renderConfig.paths.secondary.radiusDivisor}
+            color={globalContext.renderConfig.paths.secondary.color}
+            radialSegments={globalContext.renderConfig.paths.secondary.radialSegments}
         />
     ) : null;
 
     // Your mesh implementation here
     return <>
-        {primary_tubes}
-        {secondary_tubes}
+        {primaryTubes}
+        {secondaryTubes}
     </>;
 });
 

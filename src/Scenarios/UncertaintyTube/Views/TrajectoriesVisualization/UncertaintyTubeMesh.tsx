@@ -5,31 +5,31 @@ import type UncertaintyTubeGlobalContext from "../../UncertaintyTubeGlobalContex
 import TexturedBufferedMesh from "@/Renderers/Mesh/TexturedBufferedMesh";
 
 interface UncertaintyTubeMeshProps {
-    show_uncertainty_tube?: boolean;
+    showUncertaintyTube?: boolean;
 }
 
 const UncertaintyTubeMesh = observer((props: UncertaintyTubeMeshProps) => {
     const scenario = useScenario();
-    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
-    const texture_height = global_context.colormap_config.texture_height;
-    const texuter_width = global_context.colormap_config.texture_width;
-    const texture = global_context.texture_manager.getTexture("uncertainty_tube_colormap", undefined, texuter_width, texture_height);
-    const loaded = global_context.uncertainty_tubes.loaded;
-    
+    const globalContext = scenario.globalContext as UncertaintyTubeGlobalContext;
+    const textureHeight = globalContext.colormapConfig.textureHeight;
+    const textureWidth = globalContext.colormapConfig.textureWidth;
+    const texture = globalContext.textureManager.getTexture("uncertainty_tube_colormap", undefined, textureWidth, textureHeight);
+    const loaded = globalContext.uncertaintyTubes.loaded;
+
     // Use props value if provided, otherwise use global context
-    const shouldShow = props.show_uncertainty_tube !== undefined 
-        ? props.show_uncertainty_tube 
-        : global_context.trajectory_visualization.show_uncertainty_tube;
-    
+    const shouldShow = props.showUncertaintyTube !== undefined
+        ? props.showUncertaintyTube
+        : globalContext.trajectoryVisualization.showUncertaintyTube;
+
     if (!(loaded && shouldShow)) {
         return null;
     }
 
-    const vertices = global_context.uncertainty_tubes.vertices;
-    const indices = global_context.uncertainty_tubes.faces;
-    const uv = global_context.uncertainty_tubes.uv;
+    const vertices = globalContext.uncertaintyTubes.vertices;
+    const indices = globalContext.uncertaintyTubes.faces;
+    const uv = globalContext.uncertaintyTubes.uv;
 
-    console.log(toJS(global_context.uncertainty_tubes))
+    console.log(toJS(globalContext.uncertaintyTubes))
 
     return (
         <TexturedBufferedMesh

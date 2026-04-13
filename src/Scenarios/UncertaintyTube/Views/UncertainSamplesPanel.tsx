@@ -5,7 +5,7 @@ import { SharedCameraRenderer } from "./TrajectoriesVisualization/SharedCameraRe
 const UncertaintySamplesPanel = () => {
     return (
         <Panel panelName="Uncertainty Samples (Spaghetti Plot)" >
-            <SharedCameraRenderer show_uncertainty_path={true} show_uncertainty_tube={false} show_primary_path={false} />
+            <SharedCameraRenderer showUncertaintyPath={true} showUncertaintyTube={false} showPrimaryPath={false} />
         </Panel>
     );
 };

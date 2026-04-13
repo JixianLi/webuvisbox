@@ -11,51 +11,51 @@ import UncertaintyTubeMesh from "./UncertaintyTubeMesh";
 import UncertaintyPathMesh from "./UncertaintyPathMesh";
 
 interface SharedCameraRendererProps {
-    show_uncertainty_tube: boolean;
-    show_uncertainty_path: boolean;
-    show_primary_path: boolean;
+    showUncertaintyTube: boolean;
+    showUncertaintyPath: boolean;
+    showPrimaryPath: boolean;
 }
 
 export const SharedCameraRenderer = observer((props: SharedCameraRendererProps) => {
-    const control_ref = useRef(null);
-    const canvas_ref = useRef(null);
-    const last_tap_time = useRef<number>(0);
+    const controlRef = useRef(null);
+    const canvasRef = useRef(null);
+    const lastTapTime = useRef<number>(0);
 
     const scenario = useScenario();
-    const global_data = scenario.globalContext as UncertaintyTubeGlobalContext;
+    const globalData = scenario.globalContext as UncertaintyTubeGlobalContext;
 
-    const center = global_data.center;
-    const diag = global_data.diag;
-    const near = global_data.render_config.camera.near;
-    const far = global_data.render_config.camera.farMultiplier * diag;
+    const center = globalData.center;
+    const diag = globalData.diag;
+    const near = globalData.renderConfig.camera.near;
+    const far = globalData.renderConfig.camera.farMultiplier * diag;
 
-    const camera_pos = new THREE.Vector3(center[0], center[1], center[2] + diag);
+    const cameraPos = new THREE.Vector3(center[0], center[1], center[2] + diag);
 
-    const seeds = <SeedsMesh show_seeds={true} />;
+    const seeds = <SeedsMesh showSeeds={true} />;
 
-    const uncertainty_tube = <UncertaintyTubeMesh show_uncertainty_tube={props.show_uncertainty_tube} />;
+    const uncertaintyTube = <UncertaintyTubeMesh showUncertaintyTube={props.showUncertaintyTube} />;
 
-    const paths = <UncertaintyPathMesh show_primary_path={props.show_primary_path} show_uncertainty_path={props.show_uncertainty_path} />;
+    const paths = <UncertaintyPathMesh showPrimaryPath={props.showPrimaryPath} showUncertaintyPath={props.showUncertaintyPath} />;
 
 
     return (
-        <Canvas ref={canvas_ref}
+        <Canvas ref={canvasRef}
             onPointerDown={(_e) => {
                 const now = Date.now();
-                const time_diff = now - last_tap_time.current;
-                if (time_diff < 300 && time_diff > 0) {
-                    control_ref.current?.reset();
-                    last_tap_time.current = 0;
+                const timeDiff = now - lastTapTime.current;
+                if (timeDiff < 300 && timeDiff > 0) {
+                    controlRef.current?.reset();
+                    lastTapTime.current = 0;
                 }
-                last_tap_time.current = now;
+                lastTapTime.current = now;
             }} linear flat >
             {seeds}
-            {uncertainty_tube}
+            {uncertaintyTube}
             {paths}
             <ambientLight intensity={0.5} />
             <PerspectiveCamera
                 makeDefault
-                position={camera_pos}
+                position={cameraPos}
                 near={near}
                 far={far}>
                 <directionalLight position={[0, 0, 0]} intensity={2.0} />
@@ -63,10 +63,10 @@ export const SharedCameraRenderer = observer((props: SharedCameraRendererProps) 
             <GizmoHelper>
                 <GizmoViewport />
             </GizmoHelper>
-            <SharedTrackballControl ref={control_ref}
+            <SharedTrackballControl ref={controlRef}
                 makeDefault
-                global_data={global_data}
-                position0={camera_pos}
+                globalData={globalData}
+                position0={cameraPos}
                 target={new THREE.Vector3(center[0], center[1], center[2])}
                 target0={new THREE.Vector3(center[0], center[1], center[2])}
                 maxDistance={far}

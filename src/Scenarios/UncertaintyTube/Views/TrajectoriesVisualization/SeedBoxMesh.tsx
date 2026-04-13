@@ -6,23 +6,23 @@ import { BoxOutlineMesh } from "@/Renderers/Mesh/BoxOutlineMesh";
 
 const SeedBoxMesh = observer(() => {
     const scenario = useScenario();
-    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
+    const globalContext = scenario.globalContext as UncertaintyTubeGlobalContext;
 
-    if (!global_context.seedbox.visible) {
+    if (!globalContext.seedbox.visible) {
         return null;
     }
 
-    const position = global_context.seedbox.position;
-    const size = global_context.seedbox.size;
+    const position = globalContext.seedbox.position;
+    const size = globalContext.seedbox.size;
 
-    const color= global_context.seedbox.active ? "red" : "gray";
+    const color= globalContext.seedbox.active ? "red" : "gray";
 
     const bounds: [number, number, number, number, number, number] = [position[0], position[0] + size[0], position[1], position[1] + size[1], position[2], position[2] + size[2]];
     return (
         <BoxOutlineMesh
             boundingBox={bounds}
             color={color}
-            linewidth={global_context.diag/800}
+            linewidth={globalContext.diag/800}
             shininess={0}
             radialSegments={8}
         />

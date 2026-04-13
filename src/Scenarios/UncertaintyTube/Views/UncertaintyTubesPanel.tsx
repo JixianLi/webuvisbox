@@ -5,7 +5,7 @@ import { SharedCameraRenderer } from "./TrajectoriesVisualization/SharedCameraRe
 const UncertaintyTubesPanel = () => {
     return (
         <Panel panelName="Uncertainty Tubes" >
-            <SharedCameraRenderer show_uncertainty_path={false} show_uncertainty_tube={true} show_primary_path={false} />
+            <SharedCameraRenderer showUncertaintyPath={false} showUncertaintyTube={true} showPrimaryPath={false} />
         </Panel>
     );
 };

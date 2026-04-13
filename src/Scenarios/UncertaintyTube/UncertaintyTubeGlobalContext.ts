@@ -10,30 +10,30 @@ import PresetLinearColormap from "@/Renderers/Colormaps/PresetLinearColormap";
 import { getTextureManager } from "@/Renderers/Colormaps/TextureManager";
 
 export class UncertaintyTubeGlobalContext implements GlobalContext {
-    data_server_address: string;
+    dataServerAddress: string;
     seeds: [number, number, number][];
 
-    texture_manager = getTextureManager();
+    textureManager = getTextureManager();
     colormap: PresetLinearColormap;
 
-    colormap_config: {
+    colormapConfig: {
         type: string,
-        preset_name?: string,
-        texture_height?: number,
-        texture_width?: number,
+        presetName?: string,
+        textureHeight?: number,
+        textureWidth?: number,
         [key: string]: any
     }
 
-    sb_bounds: [number, number, number, number, number, number]; // xmin, xmax, ymin, ymax, zmin, zmax
-    bb_bounds: [number, number, number, number, number, number]; // xmin, xmax, ymin, ymax, zmin, zmax
+    sbBounds: [number, number, number, number, number, number]; // xmin, xmax, ymin, ymax, zmin, zmax
+    bbBounds: [number, number, number, number, number, number]; // xmin, xmax, ymin, ymax, zmin, zmax
 
-    seed_placement: {
-        use_random_seeding: boolean;
-        random_seed_count: number;
-        use_uniform_seeding: boolean;
-        num_uniform_seeds: [number, number, number]; // x, y, z
-        use_manual_seeding: boolean;
-        manual_seed_location: [number, number, number];
+    seedPlacement: {
+        useRandomSeeding: boolean;
+        randomSeedCount: number;
+        useUniformSeeding: boolean;
+        numUniformSeeds: [number, number, number]; // x, y, z
+        useManualSeeding: boolean;
+        manualSeedLocation: [number, number, number];
     }
 
     seedbox: {
@@ -43,41 +43,41 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
         active: boolean;
     };
 
-    uncertainty_tubes: {
+    uncertaintyTubes: {
         loaded: boolean;
         vertices: Float32Array | null;
         faces: Uint32Array | null;
         uv: Float32Array | null;
     };
 
-    query_config: {
+    queryConfig: {
         method: "swag" | "mcdropout";
-        uncertainty_tube: boolean;
+        uncertaintyTube: boolean;
         eproj: number;
         sym: boolean;
     };
 
     views: string[];
 
-    trajectory_visualization: {
-        show_path: boolean;
-        show_uncertainty_path: boolean;
-        show_uncertainty_tube: boolean;
-        show_seeds: boolean;
-        show_stats: boolean;
+    trajectoryVisualization: {
+        showPath: boolean;
+        showUncertaintyPath: boolean;
+        showUncertaintyTube: boolean;
+        showSeeds: boolean;
+        showStats: boolean;
     }
 
-    render_config: {
+    renderConfig: {
         camera: { near: number, farMultiplier: number },
         paths: {
-            primary: { color: string, radius_divisor: number, radial_segments: number },
-            secondary: { color: string, radius_divisor: number, radial_segments: number }
+            primary: { color: string, radiusDivisor: number, radialSegments: number },
+            secondary: { color: string, radiusDivisor: number, radialSegments: number }
         },
-        seeds: { color: string, radius_divisor: number }
+        seeds: { color: string, radiusDivisor: number }
     }
 
-    primary_trajectories: Float32Array[];
-    secondary_trajectories: Float32Array[];
+    primaryTrajectories: Float32Array[];
+    secondaryTrajectories: Float32Array[];
 
     center: [number, number, number] = [0, 0, 0];
     diag: number = 1;
@@ -85,16 +85,16 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
 
 
     constructor() {
-        this.data_server_address = "http://localhost:8000";
+        this.dataServerAddress = "http://localhost:8000";
         this.seeds = [];
 
-        this.seed_placement = {
-            use_random_seeding: false,
-            random_seed_count: 10,
-            use_uniform_seeding: false,
-            num_uniform_seeds: [5, 5, 5],
-            use_manual_seeding: true,
-            manual_seed_location: [0, 0, 0]
+        this.seedPlacement = {
+            useRandomSeeding: false,
+            randomSeedCount: 10,
+            useUniformSeeding: false,
+            numUniformSeeds: [5, 5, 5],
+            useManualSeeding: true,
+            manualSeedLocation: [0, 0, 0]
         };
 
         this.seedbox = {
@@ -104,77 +104,77 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
             active: false
         };
 
-        this.uncertainty_tubes = {
+        this.uncertaintyTubes = {
             loaded: false,
             vertices: null,
             faces: null,
             uv: null
         };
 
-        this.sb_bounds = [-1, 1, -1, 1, -1, 1];
-        this.bb_bounds = [-1, 1, -1, 1, -1, 1];
+        this.sbBounds = [-1, 1, -1, 1, -1, 1];
+        this.bbBounds = [-1, 1, -1, 1, -1, 1];
 
         this.colormap = new PresetLinearColormap("Cool to Warm");
-        this.colormap_config = {
+        this.colormapConfig = {
             type: "linear",
-            preset_name: "Cool to Warm",
-            texture_height: 256,
-            texture_width: 1
+            presetName: "Cool to Warm",
+            textureHeight: 256,
+            textureWidth: 1
         }
 
-        this.texture_manager.registerColormap("uncertainty_tube_colormap", this.colormap);
+        this.textureManager.registerColormap("uncertainty_tube_colormap", this.colormap);
 
-        this.query_config = {
-            uncertainty_tube: true,
+        this.queryConfig = {
+            uncertaintyTube: true,
             method: "swag",
             eproj: 0.5,
             sym: false
         };
 
-        this.trajectory_visualization = {
-            show_path: true,
-            show_uncertainty_path: true,
-            show_uncertainty_tube: true,
-            show_seeds: true,
-            show_stats: false,
+        this.trajectoryVisualization = {
+            showPath: true,
+            showUncertaintyPath: true,
+            showUncertaintyTube: true,
+            showSeeds: true,
+            showStats: false,
         };
 
-        this.render_config = {
+        this.renderConfig = {
             camera: { near: 0.1, farMultiplier: 3.0 },
             paths: {
-                primary: { color: "orange", radius_divisor: 500, radial_segments: 8 },
-                secondary: { color: "lightgray", radius_divisor: 700, radial_segments: 3 }
+                primary: { color: "orange", radiusDivisor: 500, radialSegments: 8 },
+                secondary: { color: "lightgray", radiusDivisor: 700, radialSegments: 3 }
             },
-            seeds: { color: "red", radius_divisor: 100 }
+            seeds: { color: "red", radiusDivisor: 100 }
         };
 
-        this.primary_trajectories = [];
-        this.secondary_trajectories = [];
+        this.primaryTrajectories = [];
+        this.secondaryTrajectories = [];
 
         makeAutoObservable(this);
 
-        this.get_active_bounds = this.get_active_bounds.bind(this);
+        this.getActiveBounds = this.getActiveBounds.bind(this);
         this.addSeeds = this.addSeeds.bind(this);
         this.deleteSeeds = this.deleteSeeds.bind(this);
     }
 
-    async fetch_bounds() {
-        const response = await fetch(`${this.data_server_address}/get_bounds`, {
+    async fetchBounds() {
+        const response = await fetch(`${this.dataServerAddress}/get_bounds`, {
             method: "GET"
         });
         const data = await response.json();
         runInAction(() => {
-            this.sb_bounds = data.sb_bounds;
-            this.bb_bounds = data.bb_bounds;
+            this.sbBounds = data.sb_bounds;
+            this.bbBounds = data.bb_bounds;
 
-            this.seedbox.position = [this.sb_bounds[0], this.sb_bounds[2], this.sb_bounds[4]];
+            this.seedbox.position = [this.sbBounds[0], this.sbBounds[2], this.sbBounds[4]];
             this.seedbox.size = [
-                (this.sb_bounds[1] - this.sb_bounds[0]) / 10,
-                (this.sb_bounds[3] - this.sb_bounds[2]) / 10,
-                (this.sb_bounds[5] - this.sb_bounds[4]) / 10
+                (this.sbBounds[1] - this.sbBounds[0]) / 10,
+                (this.sbBounds[3] - this.sbBounds[2]) / 10,
+                (this.sbBounds[5] - this.sbBounds[4]) / 10
             ];
 
-            const [center, diag] = computeCenterAndDiag(this.sb_bounds);
+            const [center, diag] = computeCenterAndDiag(this.sbBounds);
             this.center = center;
             this.diag = diag;
         });
@@ -191,53 +191,53 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
         return curves;
     }
 
-    async fetch_trajectories() {
+    async fetchTrajectories() {
         try {
-            const response = await fetch(`${this.data_server_address}/get_trajectories`, {
+            const response = await fetch(`${this.dataServerAddress}/get_trajectories`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     seeds: this.seeds,
-                    query_config: this.query_config
+                    query_config: this.queryConfig
                 })
             });
             const data = await response.json();
             runInAction(() => {
-                const start_timer = performance.now()
+                const startTimer = performance.now()
                 const stride = data.trajectories_length * data.trajectories_dim;
-                this.primary_trajectories = this.buildCurves(decode64(data.primary_trajectories) as Float32Array, stride);
-                this.secondary_trajectories = this.buildCurves(decode64(data.secondary_trajectories) as Float32Array, stride);
+                this.primaryTrajectories = this.buildCurves(decode64(data.primary_trajectories) as Float32Array, stride);
+                this.secondaryTrajectories = this.buildCurves(decode64(data.secondary_trajectories) as Float32Array, stride);
 
-                if (this.query_config.uncertainty_tube) {
-                    this.uncertainty_tubes.loaded = true;
-                    this.uncertainty_tubes.vertices = decode64(data.uncertainty_tube.vertices) as Float32Array;
-                    this.uncertainty_tubes.faces = decode64(data.uncertainty_tube.faces, 'uint32') as Uint32Array;
-                    this.uncertainty_tubes.uv = decode64(data.uncertainty_tube.uv) as Float32Array;
+                if (this.queryConfig.uncertaintyTube) {
+                    this.uncertaintyTubes.loaded = true;
+                    this.uncertaintyTubes.vertices = decode64(data.uncertainty_tube.vertices) as Float32Array;
+                    this.uncertaintyTubes.faces = decode64(data.uncertainty_tube.faces, 'uint32') as Uint32Array;
+                    this.uncertaintyTubes.uv = decode64(data.uncertainty_tube.uv) as Float32Array;
                 }
-                const end_timer = performance.now()
-                console.log(`Data parsing from server took ${end_timer - start_timer} milliseconds`)
+                const endTimer = performance.now()
+                console.log(`Data parsing from server took ${endTimer - startTimer} milliseconds`)
             });
         } catch (error) {
             console.error("Failed to fetch trajectories:", error);
         }
     }
 
-    buildColormap(colormap_config: any): PresetLinearColormap | null {
-        const type = colormap_config?.type || "linear";
-        const preset_name = colormap_config?.preset_name || "Cool to Warm";
+    buildColormap(colormapConfig: any): PresetLinearColormap | null {
+        const type = colormapConfig?.type || "linear";
+        const presetName = colormapConfig?.preset_name || "Cool to Warm";
 
         switch (type) {
             case "linear":
-                return new PresetLinearColormap(preset_name);
+                return new PresetLinearColormap(presetName);
             case "vsup":
-                const depth = colormap_config?.depth || 5;
-                const continuous = colormap_config?.continuous || false;
-                const flip_y = colormap_config?.flip_y || false;
-                const colormap = new VSUP(depth, continuous, flip_y, preset_name);
-                if (colormap_config?.fading_color) {
-                    colormap.setFadingColor(colormap_config.fading_color);
+                const depth = colormapConfig?.depth || 5;
+                const continuous = colormapConfig?.continuous || false;
+                const flipY = colormapConfig?.flip_y || false;
+                const colormap = new VSUP(depth, continuous, flipY, presetName);
+                if (colormapConfig?.fading_color) {
+                    colormap.setFadingColor(colormapConfig.fading_color);
                 }
                 return colormap;
             default:
@@ -246,35 +246,35 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
         return null;
     }
 
-    initialize(global_data: any): void {
-        this.data_server_address = global_data.data_server_address || this.data_server_address;
-        this.seeds = global_data.seeds || this.seeds;
-        this.seed_placement = global_data.seed_placement || this.seed_placement;
-        this.seedbox = global_data.seedbox || this.seedbox;
-        this.sb_bounds = global_data.bounds || this.sb_bounds;
-        this.query_config = global_data.query_config || this.query_config;
-        this.colormap_config = global_data.colormap_config || this.colormap_config;
-        this.colormap = this.buildColormap(this.colormap_config) || this.colormap;
-        this.texture_manager.registerColormap("uncertainty_tube_colormap", this.colormap);
-        this.trajectory_visualization = global_data.trajectory_visualization || this.trajectory_visualization;
-        this.primary_trajectories = global_data.primary_trajectories ? [decode64(global_data.primary_trajectories) as Float32Array] : this.primary_trajectories;
-        this.secondary_trajectories = global_data.secondary_trajectories ? [decode64(global_data.secondary_trajectories) as Float32Array] : this.secondary_trajectories;
-        this.render_config = global_data.render_config || this.render_config;
+    initialize(globalData: any): void {
+        this.dataServerAddress = globalData.data_server_address || this.dataServerAddress;
+        this.seeds = globalData.seeds || this.seeds;
+        this.seedPlacement = globalData.seed_placement || this.seedPlacement;
+        this.seedbox = globalData.seedbox || this.seedbox;
+        this.sbBounds = globalData.bounds || this.sbBounds;
+        this.queryConfig = globalData.query_config || this.queryConfig;
+        this.colormapConfig = globalData.colormap_config || this.colormapConfig;
+        this.colormap = this.buildColormap(this.colormapConfig) || this.colormap;
+        this.textureManager.registerColormap("uncertainty_tube_colormap", this.colormap);
+        this.trajectoryVisualization = globalData.trajectory_visualization || this.trajectoryVisualization;
+        this.primaryTrajectories = globalData.primary_trajectories ? [decode64(globalData.primary_trajectories) as Float32Array] : this.primaryTrajectories;
+        this.secondaryTrajectories = globalData.secondary_trajectories ? [decode64(globalData.secondary_trajectories) as Float32Array] : this.secondaryTrajectories;
+        this.renderConfig = globalData.render_config || this.renderConfig;
 
-        if (global_data.uncertainty_tubes) {
-            this.uncertainty_tubes.loaded = global_data.uncertainty_tubes.loaded || this.uncertainty_tubes.loaded;
-            this.uncertainty_tubes.vertices = global_data.uncertainty_tubes.vertices ? decode64(global_data.uncertainty_tubes.vertices) as Float32Array : this.uncertainty_tubes.vertices;
-            this.uncertainty_tubes.faces = global_data.uncertainty_tubes.faces ? decode64(global_data.uncertainty_tubes.faces, 'uint32') as Uint32Array : this.uncertainty_tubes.faces;
-            this.uncertainty_tubes.uv = global_data.uncertainty_tubes.uv ? decode64(global_data.uncertainty_tubes.uv) as Float32Array : this.uncertainty_tubes.uv;
+        if (globalData.uncertainty_tubes) {
+            this.uncertaintyTubes.loaded = globalData.uncertainty_tubes.loaded || this.uncertaintyTubes.loaded;
+            this.uncertaintyTubes.vertices = globalData.uncertainty_tubes.vertices ? decode64(globalData.uncertainty_tubes.vertices) as Float32Array : this.uncertaintyTubes.vertices;
+            this.uncertaintyTubes.faces = globalData.uncertainty_tubes.faces ? decode64(globalData.uncertainty_tubes.faces, 'uint32') as Uint32Array : this.uncertaintyTubes.faces;
+            this.uncertaintyTubes.uv = globalData.uncertainty_tubes.uv ? decode64(globalData.uncertainty_tubes.uv) as Float32Array : this.uncertaintyTubes.uv;
         }
     }
 
     async asyncInitialize(): Promise<void> {
         console.log("UncertaintyTubeGlobalContext asyncInitialize called");
         try {
-            await this.fetch_bounds();
+            await this.fetchBounds();
             if (this.seeds.length > 0) {
-                await this.fetch_trajectories();
+                await this.fetchTrajectories();
             }
         } catch (error) {
             console.error("Failed to fetch initial data:", error);
@@ -283,30 +283,30 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
 
     toObject(): any {
         return {
-            data_server_address: this.data_server_address,
-            seed_placement: this.seed_placement,
+            data_server_address: this.dataServerAddress,
+            seed_placement: this.seedPlacement,
             seedbox: this.seedbox,
-            bounds: this.sb_bounds,
-            trajectory_visualization: this.trajectory_visualization,
-            render_config: this.render_config,
-            query_config: this.query_config,
-            colormap_config: this.colormap_config,
+            bounds: this.sbBounds,
+            trajectory_visualization: this.trajectoryVisualization,
+            render_config: this.renderConfig,
+            query_config: this.queryConfig,
+            colormap_config: this.colormapConfig,
             seeds: this.seeds,
 
             uncertainty_tubes: {
-                loaded: this.uncertainty_tubes.loaded,
-                vertices: this.uncertainty_tubes.vertices ? encode64(this.uncertainty_tubes.vertices) : null,
-                faces: this.uncertainty_tubes.faces ? encode64(this.uncertainty_tubes.faces) : null,
-                uv: this.uncertainty_tubes.uv ? encode64(this.uncertainty_tubes.uv) : null
+                loaded: this.uncertaintyTubes.loaded,
+                vertices: this.uncertaintyTubes.vertices ? encode64(this.uncertaintyTubes.vertices) : null,
+                faces: this.uncertaintyTubes.faces ? encode64(this.uncertaintyTubes.faces) : null,
+                uv: this.uncertaintyTubes.uv ? encode64(this.uncertaintyTubes.uv) : null
             },
-            primary_trajectories: this.primary_trajectories.map(arr => encode64(arr)),
-            secondary_trajectories: this.secondary_trajectories.map(arr => encode64(arr))
+            primary_trajectories: this.primaryTrajectories.map(arr => encode64(arr)),
+            secondary_trajectories: this.secondaryTrajectories.map(arr => encode64(arr))
         };
     }
 
-    get_active_bounds(): [number, number, number, number, number, number] {
+    getActiveBounds(): [number, number, number, number, number, number] {
         if (!this.seedbox.active) {
-            return this.sb_bounds;
+            return this.sbBounds;
         } else {
             return [
                 this.seedbox.position[0], this.seedbox.position[0] + this.seedbox.size[0],
@@ -317,16 +317,16 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
     }
 
     addSeeds() {
-        const active_bounds = this.get_active_bounds();
+        const activeBounds = this.getActiveBounds();
         let seeds = [];
-        if (this.seed_placement.use_random_seeding) {
-            seeds = seeds.concat(GenSeeds.random_gen(active_bounds, this.seed_placement.random_seed_count));
+        if (this.seedPlacement.useRandomSeeding) {
+            seeds = seeds.concat(GenSeeds.randomGen(activeBounds, this.seedPlacement.randomSeedCount));
         }
-        if (this.seed_placement.use_uniform_seeding) {
-            seeds = seeds.concat(GenSeeds.uniform_gen(active_bounds, ...this.seed_placement.num_uniform_seeds));
+        if (this.seedPlacement.useUniformSeeding) {
+            seeds = seeds.concat(GenSeeds.uniformGen(activeBounds, ...this.seedPlacement.numUniformSeeds));
         }
-        if (this.seed_placement.use_manual_seeding) {
-            const [x, y, z] = this.seed_placement.manual_seed_location;
+        if (this.seedPlacement.useManualSeeding) {
+            const [x, y, z] = this.seedPlacement.manualSeedLocation;
             seeds.push([x, y, z]);
         }
         runInAction(() => {
@@ -337,9 +337,9 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
     deleteSeeds() {
         runInAction(() => {
             this.seeds = [];
-            this.primary_trajectories = [];
-            this.secondary_trajectories = [];
-            this.uncertainty_tubes = {
+            this.primaryTrajectories = [];
+            this.secondaryTrajectories = [];
+            this.uncertaintyTubes = {
                 loaded: false,
                 vertices: null,
                 faces: null,

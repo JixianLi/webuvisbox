@@ -13,22 +13,22 @@ import { Perf } from 'r3f-perf';
 
 
 const TrajectoriesRenderer = observer(() => {
-    const canvas_ref = useRef(null);
-    const control_ref = useRef(null);
+    const canvasRef = useRef(null);
+    const controlRef = useRef(null);
     const scenario = useScenario();
-    const global_data = scenario.globalContext as UncertaintyTubeGlobalContext;
+    const globalData = scenario.globalContext as UncertaintyTubeGlobalContext;
 
-    const center = global_data.center;
-    const diag = global_data.diag;
-    const near = global_data.render_config.camera.near;
-    const far = global_data.render_config.camera.farMultiplier * diag;
+    const center = globalData.center;
+    const diag = globalData.diag;
+    const near = globalData.renderConfig.camera.near;
+    const far = globalData.renderConfig.camera.farMultiplier * diag;
 
-    const camera_pos = new Vector3(center[0], center[1], center[2] + diag);
+    const cameraPos = new Vector3(center[0], center[1], center[2] + diag);
 
-    const stats = global_data.trajectory_visualization.show_stats?<Perf />:null;
+    const stats = globalData.trajectoryVisualization.showStats?<Perf />:null;
 
     return (
-        <Canvas ref={canvas_ref} onDoubleClick={() => { control_ref.current?.reset() }} linear flat>
+        <Canvas ref={canvasRef} onDoubleClick={() => { controlRef.current?.reset() }} linear flat>
             <group>
                 <SeedsMesh />
                 <UncertaintyPathMesh />
@@ -36,13 +36,13 @@ const TrajectoriesRenderer = observer(() => {
                 <SeedBoxMesh />
             </group>
             <ambientLight intensity={0.5} />
-            <PerspectiveCamera makeDefault position={camera_pos} near={near} far={far} fov={50}>
+            <PerspectiveCamera makeDefault position={cameraPos} near={near} far={far} fov={50}>
                 <directionalLight position={[0, 0, 0]} intensity={2.0} />
             </PerspectiveCamera>
-            <TrackballControls ref={control_ref} makeDefault
+            <TrackballControls ref={controlRef} makeDefault
                 target={center} maxDistance={far / 2} minDistance={near < 1 ? near / 100 : near * 100}
                 // @ts-ignore
-                target0={center} position0={camera_pos}
+                target0={center} position0={cameraPos}
             />
             <GizmoHelper>
                 <GizmoViewport />

@@ -5,7 +5,7 @@ import { SharedCameraRenderer } from "./TrajectoriesVisualization/SharedCameraRe
 const PredictedTrajectoriesPanel = () => {
     return (
         <Panel panelName="Predicted Trajectories" >
-            <SharedCameraRenderer show_uncertainty_path={false} show_uncertainty_tube={false} show_primary_path={true} />
+            <SharedCameraRenderer showUncertaintyPath={false} showUncertaintyTube={false} showPrimaryPath={true} />
         </Panel>
     );
 };

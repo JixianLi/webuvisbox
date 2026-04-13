@@ -18,10 +18,10 @@ import VSUP from "@/Renderers/Colormaps/VSUP";
 const ColormapRenderer = observer(() => {
     const scenario = useScenario();
     const planeRef = useRef(null);
-    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
-    const texture_height = global_context.colormap_config.texture_height;
-    const texture_width = global_context.colormap_config.texture_width;
-    const texture = global_context.texture_manager.getTexture("uncertainty_tube_colormap", undefined, texture_width, texture_height);
+    const globalContext = scenario.globalContext as UncertaintyTubeGlobalContext;
+    const textureHeight = globalContext.colormapConfig.textureHeight;
+    const textureWidth = globalContext.colormapConfig.textureWidth;
+    const texture = globalContext.textureManager.getTexture("uncertainty_tube_colormap", undefined, textureWidth, textureHeight);
 
 
     if (!scenario.initialized) {
@@ -50,19 +50,19 @@ const ColormapPanel = observer(() => {
         </Panel>;
     }
 
-    const global_data = scenario.globalContext as UncertaintyTubeGlobalContext;
-    const type = global_data.colormap.type;
+    const globalData = scenario.globalContext as UncertaintyTubeGlobalContext;
+    const type = globalData.colormap.type;
     let colormap;
     switch (type) {
         case "vsup":
-            colormap = global_data.colormap as VSUP;
+            colormap = globalData.colormap as VSUP;
             break;
         case "linear":
-            colormap = global_data.colormap as PresetLinearColormap;
+            colormap = globalData.colormap as PresetLinearColormap;
             break;
         default:
             throw new Error(`Unknown colormap type: ${type}`);
-            colormap = global_data.colormap as PresetLinearColormap;
+            colormap = globalData.colormap as PresetLinearColormap;
     }
 
     return (
@@ -70,7 +70,7 @@ const ColormapPanel = observer(() => {
             <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" sx={{ marginBottom: '10px' }}>
                 <Typography variant="h6">Colormap:</Typography>
                 <Select
-                    value={colormap.preset_name}
+                    value={colormap.presetName}
                     onChange={(e) => {
                         colormap.setPreset(e.target.value);
                     }}
@@ -86,14 +86,14 @@ const ColormapPanel = observer(() => {
             <Grid container alignItems="center">
                 {/* Vertical "- Uncertainty +" label */}
                 <Grid size={1}>
-                    <Box sx={{ 
-                        height: '100%', 
-                        display: 'flex', 
-                        alignItems: 'center', 
+                    <Box sx={{
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
                         justifyContent: 'center'
                     }}>
-                        <Typography 
-                            sx={{ 
+                        <Typography
+                            sx={{
                                 transform: 'rotate(-90deg)',
                                 whiteSpace: 'nowrap',
                                 fontWeight: 'medium',
@@ -104,18 +104,18 @@ const ColormapPanel = observer(() => {
                         </Typography>
                     </Box>
                 </Grid>
-                
+
                 {/* ColorMap Renderer */}
                 <Grid size={11}>
                     <Box sx={{ width: '90%' }} style={{ aspectRatio: '6 / 4' }}>
-                        <ColormapRenderer /> 
+                        <ColormapRenderer />
                     </Box>
-                    
+
                     {/* Horizontal "- symmetry +" label */}
-                    <Box sx={{ 
-                        width: '90%', 
-                        display: 'flex', 
-                        justifyContent: 'center', 
+                    <Box sx={{
+                        width: '90%',
+                        display: 'flex',
+                        justifyContent: 'center',
                         mt: 0,
                         pt: 0
                     }}>

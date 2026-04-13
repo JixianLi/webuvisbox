@@ -12,35 +12,35 @@ import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/Uncer
 
 const SeedboxConfigPanel = observer(() => {
     const scenario = useScenario();
-    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
-    const seedbox_config = global_context.seedbox;
+    const globalContext = scenario.globalContext as UncertaintyTubeGlobalContext;
+    const seedboxConfig = globalContext.seedbox;
 
     // Number of steps for sliders (higher value = finer control)
     const STEP_DIVISOR = 20;
 
-    const [x_min,x_max,y_min,y_max,z_min,z_max] = global_context.sb_bounds;
-    
-    const px_min = x_min;
-    const px_max = x_max - seedbox_config.size[0];
-    const py_min = y_min;
-    const py_max = y_max - seedbox_config.size[1];
-    const pz_min = z_min;
-    const pz_max = z_max - seedbox_config.size[2];
+    const [xMin,xMax,yMin,yMax,zMin,zMax] = globalContext.sbBounds;
 
-    const sx_min = 0;
-    const sx_max = x_max - seedbox_config.position[0];
-    const sy_min = 0;
-    const sy_max = y_max - seedbox_config.position[1];
-    const sz_min = 0;
-    const sz_max = z_max - seedbox_config.position[2];
+    const pxMin = xMin;
+    const pxMax = xMax - seedboxConfig.size[0];
+    const pyMin = yMin;
+    const pyMax = yMax - seedboxConfig.size[1];
+    const pzMin = zMin;
+    const pzMax = zMax - seedboxConfig.size[2];
 
-    const disable_px_slider = (px_max - px_min) < 1e-6;
-    const disable_py_slider = (py_max - py_min) < 1e-6;
-    const disable_pz_slider = (pz_max - pz_min) < 1e-6;
+    const sxMin = 0;
+    const sxMax = xMax - seedboxConfig.position[0];
+    const syMin = 0;
+    const syMax = yMax - seedboxConfig.position[1];
+    const szMin = 0;
+    const szMax = zMax - seedboxConfig.position[2];
 
-    const disable_sx_slider = (sx_max - sx_min) < 1e-6;
-    const disable_sy_slider = (sy_max - sy_min) < 1e-6;
-    const disable_sz_slider = (sz_max - sz_min) < 1e-6;
+    const disablePxSlider = (pxMax - pxMin) < 1e-6;
+    const disablePySlider = (pyMax - pyMin) < 1e-6;
+    const disablePzSlider = (pzMax - pzMin) < 1e-6;
+
+    const disableSxSlider = (sxMax - sxMin) < 1e-6;
+    const disableSySlider = (syMax - syMin) < 1e-6;
+    const disableSzSlider = (szMax - szMin) < 1e-6;
 
     // Helper to format numbers to 6 digits after decimal
     const format6 = (num: number) => num.toFixed(6);
@@ -49,15 +49,15 @@ const SeedboxConfigPanel = observer(() => {
         <Panel panelName="Seedbox Config">
             <Grid container spacing={0} sx={{ p: "10px" }}>
                 <Grid size={12} sx={{ display: 'flex', flexDirection: 'row', justifyContent: "center" }}>
-                    <FormControlLabel control={<Switch checked={seedbox_config.visible} onChange={(e) => {
+                    <FormControlLabel control={<Switch checked={seedboxConfig.visible} onChange={(e) => {
                         runInAction(() => {
-                            seedbox_config.visible = e.target.checked;
+                            seedboxConfig.visible = e.target.checked;
                         });
                     }} />} label="Visible" />
 
-                    <FormControlLabel control={<Switch checked={seedbox_config.active} onChange={(e) => {
+                    <FormControlLabel control={<Switch checked={seedboxConfig.active} onChange={(e) => {
                         runInAction(() => {
-                            seedbox_config.active = e.target.checked;
+                            seedboxConfig.active = e.target.checked;
                         });
                     }} />} label="Active" />
                 </Grid>
@@ -67,13 +67,13 @@ const SeedboxConfigPanel = observer(() => {
                         <LazyTextField
                             label="Position X"
                             type="text"
-                            defaultValue={format6(seedbox_config.position[0])}
-                            key={'seedbox_position_x_field' + seedbox_config.position[0] + ''}
+                            defaultValue={format6(seedboxConfig.position[0])}
+                            key={'seedbox_position_x_field' + seedboxConfig.position[0] + ''}
                             onBlur={e => {
                                 const val = parseFloat(e.target.value);
-                                if (!isNaN(val) && val >= px_min && val <= px_max) {
+                                if (!isNaN(val) && val >= pxMin && val <= pxMax) {
                                     runInAction(() => {
-                                        seedbox_config.position[0] = val;
+                                        seedboxConfig.position[0] = val;
                                     });
                                 }
                             }}
@@ -81,18 +81,18 @@ const SeedboxConfigPanel = observer(() => {
                     </Grid>
                     <Grid size={6} sx={{px:'20px', mt:1}}>
                         <Slider
-                            value={seedbox_config.position[0]}
-                            min={px_min}
-                            max={px_max}
-                            step={(px_max - px_min)/STEP_DIVISOR}
+                            value={seedboxConfig.position[0]}
+                            min={pxMin}
+                            max={pxMax}
+                            step={(pxMax - pxMin)/STEP_DIVISOR}
                             onChange={(_, val) => {
                                 runInAction(() => {
-                                    seedbox_config.position[0] = val as number;
+                                    seedboxConfig.position[0] = val as number;
                                 });
                             }}
                             valueLabelDisplay="auto"
                             valueLabelFormat={format6}
-                            disabled={disable_px_slider}
+                            disabled={disablePxSlider}
                         />
                     </Grid>
                 </Grid>
@@ -102,13 +102,13 @@ const SeedboxConfigPanel = observer(() => {
                         <LazyTextField
                             label="Position Y"
                             type="text"
-                            defaultValue={format6(seedbox_config.position[1])}
-                            key={'seedbox_position_y_field' + seedbox_config.position[1] + ''}
+                            defaultValue={format6(seedboxConfig.position[1])}
+                            key={'seedbox_position_y_field' + seedboxConfig.position[1] + ''}
                             onBlur={e => {
                                 const val = parseFloat(e.target.value);
-                                if (!isNaN(val) && val >= py_min && val <= py_max) {
+                                if (!isNaN(val) && val >= pyMin && val <= pyMax) {
                                     runInAction(() => {
-                                        seedbox_config.position[1] = val;
+                                        seedboxConfig.position[1] = val;
                                     });
                                 }
                             }}
@@ -116,34 +116,34 @@ const SeedboxConfigPanel = observer(() => {
                     </Grid>
                     <Grid size={6} sx={{px:'20px', mt:1}}>
                         <Slider
-                            value={seedbox_config.position[1]}
-                            min={py_min}
-                            max={py_max}
-                            step={(py_max - py_min)/STEP_DIVISOR}
+                            value={seedboxConfig.position[1]}
+                            min={pyMin}
+                            max={pyMax}
+                            step={(pyMax - pyMin)/STEP_DIVISOR}
                             onChange={(_, val) => {
                                 runInAction(() => {
-                                    seedbox_config.position[1] = val as number;
+                                    seedboxConfig.position[1] = val as number;
                                 });
                             }}
                             valueLabelDisplay="auto"
                             valueLabelFormat={format6}
-                            disabled={disable_py_slider}
+                            disabled={disablePySlider}
                         />
                     </Grid>
                 </Grid>
-                
+
                 <Grid size={12} sx={{ mt: 2, display: 'flex', flexDirection: 'row', justifyContent: "left" }}>
                     <Grid size={6}>
                         <LazyTextField
                             label="Position Z"
                             type="text"
-                            defaultValue={format6(seedbox_config.position[2])}
-                            key={'seedbox_position_z_field' + seedbox_config.position[2] + ''}
+                            defaultValue={format6(seedboxConfig.position[2])}
+                            key={'seedbox_position_z_field' + seedboxConfig.position[2] + ''}
                             onBlur={e => {
                                 const val = parseFloat(e.target.value);
-                                if (!isNaN(val) && val >= pz_min && val <= pz_max) {
+                                if (!isNaN(val) && val >= pzMin && val <= pzMax) {
                                     runInAction(() => {
-                                        seedbox_config.position[2] = val;
+                                        seedboxConfig.position[2] = val;
                                     });
                                 }
                             }}
@@ -151,34 +151,34 @@ const SeedboxConfigPanel = observer(() => {
                     </Grid>
                     <Grid size={6} sx={{px:'20px', mt:1}}>
                         <Slider
-                            value={seedbox_config.position[2]}
-                            min={pz_min}
-                            max={pz_max}
-                            step={(pz_max - pz_min)/STEP_DIVISOR}
+                            value={seedboxConfig.position[2]}
+                            min={pzMin}
+                            max={pzMax}
+                            step={(pzMax - pzMin)/STEP_DIVISOR}
                             onChange={(_, val) => {
                                 runInAction(() => {
-                                    seedbox_config.position[2] = val as number;
+                                    seedboxConfig.position[2] = val as number;
                                 });
                             }}
                             valueLabelDisplay="auto"
                             valueLabelFormat={format6}
-                            disabled={disable_pz_slider}
+                            disabled={disablePzSlider}
                         />
                     </Grid>
                 </Grid>
-                
+
                 <Grid size={12} sx={{ mt: 2, display: 'flex', flexDirection: 'row', justifyContent: "left" }}>
                     <Grid size={6}>
                         <LazyTextField
                             label="Size X"
                             type="text"
-                            defaultValue={format6(seedbox_config.size[0])}
-                            key={'seedbox_size_x_field' + seedbox_config.size[0] + ''}
+                            defaultValue={format6(seedboxConfig.size[0])}
+                            key={'seedbox_size_x_field' + seedboxConfig.size[0] + ''}
                             onBlur={e => {
                                 const val = parseFloat(e.target.value);
-                                if (!isNaN(val) && val >= sx_min && val <= sx_max) {
+                                if (!isNaN(val) && val >= sxMin && val <= sxMax) {
                                     runInAction(() => {
-                                        seedbox_config.size[0] = val;
+                                        seedboxConfig.size[0] = val;
                                     });
                                 }
                             }}
@@ -186,34 +186,34 @@ const SeedboxConfigPanel = observer(() => {
                     </Grid>
                     <Grid size={6} sx={{px:'20px', mt:1}}>
                         <Slider
-                            value={seedbox_config.size[0]}
-                            min={sx_min}
-                            max={sx_max}
-                            step={(sx_max - sx_min)/STEP_DIVISOR}
+                            value={seedboxConfig.size[0]}
+                            min={sxMin}
+                            max={sxMax}
+                            step={(sxMax - sxMin)/STEP_DIVISOR}
                             onChange={(_, val) => {
                                 runInAction(() => {
-                                    seedbox_config.size[0] = val as number;
+                                    seedboxConfig.size[0] = val as number;
                                 });
                             }}
                             valueLabelDisplay="auto"
                             valueLabelFormat={format6}
-                            disabled={disable_sx_slider}
+                            disabled={disableSxSlider}
                         />
                     </Grid>
                 </Grid>
-                
+
                 <Grid size={12} sx={{ mt: 2, display: 'flex', flexDirection: 'row', justifyContent: "left" }}>
                     <Grid size={6}>
                         <LazyTextField
                             label="Size Y"
                             type="text"
-                            defaultValue={format6(seedbox_config.size[1])}
-                            key={'seedbox_size_y_field' + seedbox_config.size[1] + ''}
+                            defaultValue={format6(seedboxConfig.size[1])}
+                            key={'seedbox_size_y_field' + seedboxConfig.size[1] + ''}
                             onBlur={e => {
                                 const val = parseFloat(e.target.value);
-                                if (!isNaN(val) && val >= sy_min && val <= sy_max) {
+                                if (!isNaN(val) && val >= syMin && val <= syMax) {
                                     runInAction(() => {
-                                        seedbox_config.size[1] = val;
+                                        seedboxConfig.size[1] = val;
                                     });
                                 }
                             }}
@@ -221,34 +221,34 @@ const SeedboxConfigPanel = observer(() => {
                     </Grid>
                     <Grid size={6} sx={{px:'20px', mt:1}}>
                         <Slider
-                            value={seedbox_config.size[1]}
-                            min={sy_min}
-                            max={sy_max}
-                            step={(sy_max - sy_min)/STEP_DIVISOR}
+                            value={seedboxConfig.size[1]}
+                            min={syMin}
+                            max={syMax}
+                            step={(syMax - syMin)/STEP_DIVISOR}
                             onChange={(_, val) => {
                                 runInAction(() => {
-                                    seedbox_config.size[1] = val as number;
+                                    seedboxConfig.size[1] = val as number;
                                 });
                             }}
                             valueLabelDisplay="auto"
                             valueLabelFormat={format6}
-                            disabled={disable_sy_slider}
+                            disabled={disableSySlider}
                         />
                     </Grid>
                 </Grid>
-                
+
                 <Grid size={12} sx={{ mt: 2, display: 'flex', flexDirection: 'row', justifyContent: "left" }}>
                     <Grid size={6}>
                         <LazyTextField
                             label="Size Z"
                             type="text"
-                            defaultValue={format6(seedbox_config.size[2])}
-                            key={'seedbox_size_z_field' + seedbox_config.size[2] + ''}
+                            defaultValue={format6(seedboxConfig.size[2])}
+                            key={'seedbox_size_z_field' + seedboxConfig.size[2] + ''}
                             onBlur={e => {
                                 const val = parseFloat(e.target.value);
-                                if (!isNaN(val) && val >= sz_min && val <= sz_max) {
+                                if (!isNaN(val) && val >= szMin && val <= szMax) {
                                     runInAction(() => {
-                                        seedbox_config.size[2] = val;
+                                        seedboxConfig.size[2] = val;
                                     });
                                 }
                             }}
@@ -256,18 +256,18 @@ const SeedboxConfigPanel = observer(() => {
                     </Grid>
                     <Grid size={6} sx={{px:'20px', mt:1}}>
                         <Slider
-                            value={seedbox_config.size[2]}
-                            min={sz_min}
-                            max={sz_max}
-                            step={(sz_max - sz_min)/STEP_DIVISOR}
+                            value={seedboxConfig.size[2]}
+                            min={szMin}
+                            max={szMax}
+                            step={(szMax - szMin)/STEP_DIVISOR}
                             onChange={(_, val) => {
                                 runInAction(() => {
-                                    seedbox_config.size[2] = val as number;
+                                    seedboxConfig.size[2] = val as number;
                                 });
                             }}
                             valueLabelDisplay="auto"
                             valueLabelFormat={format6}
-                            disabled={disable_sz_slider}
+                            disabled={disableSzSlider}
                         />
                     </Grid>
                 </Grid>
