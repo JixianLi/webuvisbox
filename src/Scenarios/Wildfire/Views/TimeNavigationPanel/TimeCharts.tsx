@@ -6,8 +6,8 @@ import TimeLineChart from "./TimeLineChart";
 
 const TimeCharts = observer(() => {
     const scenario = useScenario();
-    const global_data = scenario.globalContext as WildfireGlobalContext;
-    const line_charts = global_data.time_diff_data?.data_names.map((name) => {
+    const globalData = scenario.globalContext as WildfireGlobalContext;
+    const lineCharts = globalData.timeDiffData?.dataNames.map((name) => {
         return (
             <Box key={name} sx={{ flexGrow: 1, w: 1, m: 0.1 }} minHeight={200}>
                 <TimeLineChart name={name} />
@@ -16,7 +16,7 @@ const TimeCharts = observer(() => {
     });
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, width: '100%' }}>
-            {line_charts}
+            {lineCharts}
         </Box>
     );
 });

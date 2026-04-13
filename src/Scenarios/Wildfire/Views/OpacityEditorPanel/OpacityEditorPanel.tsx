@@ -8,8 +8,8 @@ import { Box, FormControl, InputLabel, Select, MenuItem, Typography, Divider } f
 import OpacityPlot from "./OpacityPlot";
 
 export const OpacityEditorPanel = observer(() => {
-    const global_context = useScenario().globalContext as WildfireGlobalContext;
-    if (!global_context) {
+    const globalContext = useScenario().globalContext as WildfireGlobalContext;
+    if (!globalContext) {
         return (
             <Panel panelName="Opacity Editor">
                 <Box p={2}>
@@ -18,10 +18,10 @@ export const OpacityEditorPanel = observer(() => {
             </Panel>
         );
     }
-    const scalar_names = global_context.scalars.scalar_names;
-    const [current_scalar_name, setCurrentScalarName] = useState(scalar_names[0] || "NFUEL_CAT");
+    const scalarNames = globalContext.scalars.scalarNames;
+    const [currentScalarName, setCurrentScalarName] = useState(scalarNames[0] || "NFUEL_CAT");
 
-    if (!scalar_names || scalar_names.length === 0) {
+    if (!scalarNames || scalarNames.length === 0) {
         return (
             <Panel panelName="Opacity Editor">
                 <Box p={2}>
@@ -31,14 +31,14 @@ export const OpacityEditorPanel = observer(() => {
         );
     }
 
-    const texture_manager = global_context.texture_manager;
-    const opacityMap = texture_manager.getOpacityMap(current_scalar_name) as OpacityMap;
+    const textureManager = globalContext.textureManager;
+    const opacityMap = textureManager.getOpacityMap(currentScalarName) as OpacityMap;
 
     if (!opacityMap) {
         return (
             <Panel panelName="Opacity Editor">
                 <Box p={2}>
-                    <Typography color="warning">Loading opacity map... ({current_scalar_name})</Typography>
+                    <Typography color="warning">Loading opacity map... ({currentScalarName})</Typography>
                 </Box>
             </Panel>
         );
@@ -50,17 +50,17 @@ export const OpacityEditorPanel = observer(() => {
                 <Typography variant="h6" gutterBottom>
                     Opacity Editor
                 </Typography>
-                
+
                 <FormControl fullWidth sx={{ mb: 2 }}>
                     <InputLabel id="scalar-select-label">Scalar Field</InputLabel>
                     <Select
                         labelId="scalar-select-label"
                         id="scalar-select"
-                        value={current_scalar_name}
+                        value={currentScalarName}
                         label="Scalar Field"
                         onChange={(e) => setCurrentScalarName(e.target.value)}
                     >
-                        {scalar_names.map(name => (
+                        {scalarNames.map(name => (
                             <MenuItem key={name} value={name}>{name}</MenuItem>
                         ))}
                     </Select>
@@ -69,16 +69,16 @@ export const OpacityEditorPanel = observer(() => {
                 <Divider sx={{ mb: 2 }} />
 
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Current opacity map: <strong>{current_scalar_name}</strong>
+                    Current opacity map: <strong>{currentScalarName}</strong>
                 </Typography>
-                
+
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Control points: {opacityMap.opacity_control_points.length}
+                    Control points: {opacityMap.opacityControlPoints.length}
                 </Typography>
 
                 <Divider sx={{ my: 2 }} />
 
-                <OpacityPlot scalar_name={current_scalar_name} />
+                <OpacityPlot scalarName={currentScalarName} />
             </Box>
         </Panel>
     );

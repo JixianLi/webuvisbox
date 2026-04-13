@@ -17,34 +17,34 @@ interface TimeLineChartProps {
     name: string;
 }
 
-function create_y_scale_options(name: string, data: any, configs: any, edx: number = 0, label_font_size: number = 18, theme: any = null) {
-    let display_name = name
-    if (display_name === 'area') {
-        display_name = 'Δ Area'
-    } else if (display_name === 'fire_area') {
-        display_name = 'Total Area'
+function createYScaleOptions(name: string, data: any, configs: any, edx: number = 0, labelFontSize: number = 18, theme: any = null) {
+    let displayName = name
+    if (displayName === 'area') {
+        displayName = 'Δ Area'
+    } else if (displayName === 'fire_area') {
+        displayName = 'Total Area'
     }
     const ys = {
         ticks: { display: false },
         grid: { color: theme.palette.divider },
         border: { color: theme.palette.text.primary, width: 2 },
         title: {
-            text: display_name, display: true, font: { size: label_font_size },
+            text: displayName, display: true, font: { size: labelFontSize },
             color: theme.palette.text.primary,
         }
     }
-    if (name !== 'area' && name !== "fire_area" && configs.share_y_scale) {
-        let min_y, max_y
-        if (configs.show_ensemble) {
-            min_y = data.min
-            max_y = data.max
+    if (name !== 'area' && name !== "fire_area" && configs.shareYScale) {
+        let minY, maxY
+        if (configs.showEnsemble) {
+            minY = data.min
+            maxY = data.max
         } else {
-            min_y = data.ensemble_min[edx]
-            max_y = data.ensemble_max[edx]
+            minY = data.ensembleMin[edx]
+            maxY = data.ensembleMax[edx]
         }
-        const margin_y = (max_y - min_y) / 20
-        ys["min"] = min_y - margin_y
-        ys["max"] = max_y + margin_y
+        const marginY = (maxY - minY) / 20
+        ys["min"] = minY - marginY
+        ys["max"] = maxY + marginY
     }
     return ys
 }
@@ -52,46 +52,46 @@ function create_y_scale_options(name: string, data: any, configs: any, edx: numb
 const TimeLineChart = observer((props: TimeLineChartProps) => {
     const chartRef = useRef<Chart<'line'>>(null);
     const scenario = useScenario();
-    const global_data = scenario.globalContext as WildfireGlobalContext;
-    const time_diff_data = global_data.time_diff_data;
-    const configs = global_data.time_diff_config;
-    const time_in_seconds = global_data.time_in_seconds;
-    const ensemble_colors = global_data.ensemble_colors;
-    const [mouse_down, setMouseDown] = useState(false);
-    const [mouse_down_x, setMouseDownX] = useState(0);
+    const globalData = scenario.globalContext as WildfireGlobalContext;
+    const timeDiffData = globalData.timeDiffData;
+    const configs = globalData.timeDiffConfig;
+    const timeInSeconds = globalData.timeInSeconds;
+    const ensembleColors = globalData.ensembleColors;
+    const [mouseDown, setMouseDown] = useState(false);
+    const [mouseDownX, setMouseDownX] = useState(0);
     const theme = useTheme();
 
     const name = props.name;
-    const edx = global_data.current_ensemble_index;
-    const data = [...toJS(time_diff_data.datasets[name].datasets)];
-    const show_ensemble = configs.show_ensemble;
+    const edx = globalData.currentEnsembleIndex;
+    const data = [...toJS(timeDiffData.datasets[name].datasets)];
+    const showEnsemble = configs.showEnsemble;
 
 
     for (let i = 0; i < data.length; i++) {
-        data[i].hidden = show_ensemble ? false : i !== edx;
-        data[i].borderColor = i === edx ? ensemble_colors.primary : ensemble_colors.secondary;
+        data[i].hidden = showEnsemble ? false : i !== edx;
+        data[i].borderColor = i === edx ? ensembleColors.primary : ensembleColors.secondary;
         data[i].borderWidth = i === edx ? 5 : 1;
         data[i].order = i === edx ? 0 : 1;
     }
 
-    const x_scale_options = {
+    const xScaleOptions = {
         type: 'linear' as 'linear',
-        min: configs.x_display_range[0],
-        max: configs.x_display_range[1],
+        min: configs.xDisplayRange[0],
+        max: configs.xDisplayRange[1],
         tick: { display: true, color: theme.palette.text.secondary },
         grid: { color: theme.palette.divider },
         border: { color: theme.palette.text.primary, width: 2 }
     }
-    const y_scale_options = create_y_scale_options(name, time_diff_data, configs, edx, global_data.ui_configs.plot_label_size, theme);
+    const yScaleOptions = createYScaleOptions(name, timeDiffData, configs, edx, globalData.uiConfigs.plotLabelSize, theme);
 
-    const time = global_data.current_time_index;
-    const seconds = (time) => { return timeInSecondsToString(time_in_seconds[time], "HH:MM"); }
-    const hover_time = configs.hover_time;
-    const show_hover_time = configs.show_hover_time;
-    const zoom_range = configs.zoom_box_range ? configs.zoom_box_range : [0, 0];
-    const show_zoom_box = configs.show_zoom_box;
+    const time = globalData.currentTimeIndex;
+    const seconds = (time) => { return timeInSecondsToString(timeInSeconds[time], "HH:MM"); }
+    const hoverTime = configs.hoverTime;
+    const showHoverTime = configs.showHoverTime;
+    const zoomRange = configs.zoomBoxRange ? configs.zoomBoxRange : [0, 0];
+    const showZoomBox = configs.showZoomBox;
 
-    const current_time_annotation = {
+    const currentTimeAnnotation = {
         type: 'line',
         display: true,
         value: time,
@@ -102,29 +102,29 @@ const TimeLineChart = observer((props: TimeLineChartProps) => {
             display: true,
             content: "Time:" + time + "(" + seconds(time) + ")",
             position: 'start'
-            , font: { size: global_data.ui_configs.plot_label_size * 0.8 }
-        }, 
-    }
-
-    const hover_time_annotation = {
-        type: 'line',
-        display: show_hover_time,
-        value: hover_time,
-        scaleID: 'x', borderColor: theme.palette.text.secondary, borderWidth: 1,
-        label: {
-            display: true,
-            content: "Time:" + hover_time + "(" + seconds(hover_time) + ")", position: 'start',
-            font: { size: global_data.ui_configs.plot_label_size * 0.8 }
+            , font: { size: globalData.uiConfigs.plotLabelSize * 0.8 }
         },
     }
 
-    const zoom_box_annotation = {
+    const hoverTimeAnnotation = {
+        type: 'line',
+        display: showHoverTime,
+        value: hoverTime,
+        scaleID: 'x', borderColor: theme.palette.text.secondary, borderWidth: 1,
+        label: {
+            display: true,
+            content: "Time:" + hoverTime + "(" + seconds(hoverTime) + ")", position: 'start',
+            font: { size: globalData.uiConfigs.plotLabelSize * 0.8 }
+        },
+    }
+
+    const zoomBoxAnnotation = {
         type: 'box' as 'box',
-        display: show_zoom_box,
+        display: showZoomBox,
         backgroundColor: 'rgba(150,150,150,0.2)',
         borderWidth: 0,
-        xMin: zoom_range[0],
-        xMax: zoom_range[1],
+        xMin: zoomRange[0],
+        xMax: zoomRange[1],
     }
 
     const options = {
@@ -132,8 +132,8 @@ const TimeLineChart = observer((props: TimeLineChartProps) => {
         animation: false as false,
         events: [],
         scales: {
-            x: x_scale_options,
-            y: y_scale_options,
+            x: xScaleOptions,
+            y: yScaleOptions,
         },
         plugins: {
             legend: {
@@ -141,9 +141,9 @@ const TimeLineChart = observer((props: TimeLineChartProps) => {
             },
             annotation: {
                 annotations: {
-                    query_time: current_time_annotation,
-                    hover_time: hover_time_annotation,
-                    zoom_box: zoom_box_annotation,
+                    query_time: currentTimeAnnotation,
+                    hover_time: hoverTimeAnnotation,
+                    zoom_box: zoomBoxAnnotation,
                 }
             }
         }
@@ -151,7 +151,7 @@ const TimeLineChart = observer((props: TimeLineChartProps) => {
 
     const onMouseEnter = (event) => {
         const [x] = getDataPosition(chartRef, event);
-        configs.setHoverTime(x, time_diff_data.x_range);
+        configs.setHoverTime(x, timeDiffData.xRange);
         configs.setShowHoverTime(true);
     }
 
@@ -164,33 +164,33 @@ const TimeLineChart = observer((props: TimeLineChartProps) => {
     }
 
     const onMouseUp = (event) => {
-        if (mouse_down) {
+        if (mouseDown) {
             const [x] = getDataPosition(chartRef, event);
             setMouseDown(false);
             configs.setShowZoomBox(false);
             configs.setZoomBoxRange(null);
-            if (x !== mouse_down_x) {
-                const x_min = Math.min(x, mouse_down_x);
-                const x_max = Math.max(x, mouse_down_x);
-                configs.setXDisplayRange([x_min, x_max]);
+            if (x !== mouseDownX) {
+                const xMin = Math.min(x, mouseDownX);
+                const xMax = Math.max(x, mouseDownX);
+                configs.setXDisplayRange([xMin, xMax]);
                 configs.setShowZoomBox(false);
             } else {
-                global_data.setTimeIndex(Math.round(x));
+                globalData.setTimeIndex(Math.round(x));
             }
         }
     }
 
     const onMouseMove = (event) => {
         const [x] = getDataPosition(chartRef, event);
-        if (mouse_down) {
-            if (x !== mouse_down_x) {
+        if (mouseDown) {
+            if (x !== mouseDownX) {
                 configs.setShowZoomBox(true);
-                configs.setZoomBoxRange(x < mouse_down_x ? [x, mouse_down_x] : [mouse_down_x, x]);
+                configs.setZoomBoxRange(x < mouseDownX ? [x, mouseDownX] : [mouseDownX, x]);
             } else {
                 configs.setShowZoomBox(false);
             }
         }
-        configs.setHoverTime(x, time_diff_data.x_range);
+        configs.setHoverTime(x, timeDiffData.xRange);
     }
 
     const onMouseDown = (event) => {
@@ -206,20 +206,20 @@ const TimeLineChart = observer((props: TimeLineChartProps) => {
         event.preventDefault();
         const [x, y] = getDataPosition(chartRef, event);
         // find the nearest edx
-        let nearest_edx = -1;
-        let min_dist = Infinity;
+        let nearestEdx = -1;
+        let minDist = Infinity;
         console.log("data:", data);
         data.forEach((dataset, edx) => {
-            const data_array = dataset.data;
+            const dataArray = dataset.data;
             const tdx = Math.round(x);
-            const dist = Math.abs(data_array[tdx].y - y);
-            if (dist < min_dist) {
-                min_dist = dist;
-                nearest_edx = edx;
+            const dist = Math.abs(dataArray[tdx].y - y);
+            if (dist < minDist) {
+                minDist = dist;
+                nearestEdx = edx;
             }
         })
 
-        global_data.setEnsembleIndex(nearest_edx);
+        globalData.setEnsembleIndex(nearestEdx);
     }
 
     return (

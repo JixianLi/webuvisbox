@@ -47,13 +47,13 @@ export function computeHistogram(
     // Count values in each bin
     for (let i = 0; i < data.length; i++) {
         const value = data[i];
-        
+
         // Skip values outside range
         if (value < min || value > max) continue;
 
         // Find bin index
         let binIndex = Math.floor((value - min) / binWidth);
-        
+
         // Handle edge case: value exactly equals max
         if (binIndex >= numBins) {
             binIndex = numBins - 1;
@@ -63,7 +63,7 @@ export function computeHistogram(
     }
 
     // Calculate bin centers
-    const binCenters = binEdges.slice(0, -1).map((edge) => 
+    const binCenters = binEdges.slice(0, -1).map((edge) =>
         edge + binWidth / 2
     );
 
@@ -87,10 +87,10 @@ export function generateBarColors(
     return binCenters.map(center => {
         // Normalize to [0, 1] range
         const normalized = max === min ? 0.5 : (center - min) / (max - min);
-        
+
         // Get color from colormap
         const color = colormap.getColor(normalized);
-        
+
         // Return as CSS rgb string
         return `rgb(${color.r}, ${color.g}, ${color.b})`;
     });
@@ -113,13 +113,13 @@ export function createControlPointAnnotations(
     // Position in the middle of histogram height, accounting for the +1 offset for log scale
     const yPosition = Math.log10(maxCount + 1 * 0.5);
 
-    return colormap.color_control_points.map((cp, index) => {
+    return colormap.colorControlPoints.map((cp, index) => {
         // Convert normalized control point [0,1] to bin index
         // cp is in [0, 1], we need to map to bin index [0, numBins-1]
         const xValue = cp * (numBins - 1);
-        
+
         // Get color for this control point
-        const [r, g, b] = colormap.color_points[index];
+        const [r, g, b] = colormap.colorPoints[index];
         const bgColor = `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
 
         return {

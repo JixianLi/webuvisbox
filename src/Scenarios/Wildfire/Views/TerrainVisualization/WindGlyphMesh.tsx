@@ -5,19 +5,19 @@ import InstancedConeMesh from "@/Renderers/Mesh/InstancedConeMesh";
 
 export const WindGlyphMesh = observer(() => {
     const scenario = useScenario();
-    const global_data = scenario.globalContext as WildfireGlobalContext;
-    const wind_glyphs_config = global_data.wind_glyphs_config;
+    const globalData = scenario.globalContext as WildfireGlobalContext;
+    const windGlyphsConfig = globalData.windGlyphsConfig;
 
-    if (!global_data || !wind_glyphs_config.display || wind_glyphs_config.instances.length === 0) {
+    if (!globalData || !windGlyphsConfig.display || windGlyphsConfig.instances.length === 0) {
         return null;
     }
 
-    const base_scale = global_data.terrain.base_scale;
+    const baseScale = globalData.terrain.baseScale;
 
-    const mesh = wind_glyphs_config.display ? <InstancedConeMesh
-        instances={wind_glyphs_config.instances}
-        radius={wind_glyphs_config.radius * base_scale}
-        length_scale={wind_glyphs_config.length_scale * base_scale}
+    const mesh = windGlyphsConfig.display ? <InstancedConeMesh
+        instances={windGlyphsConfig.instances}
+        radius={windGlyphsConfig.radius * baseScale}
+        lengthScale={windGlyphsConfig.lengthScale * baseScale}
     /> : null;
 
     return mesh;

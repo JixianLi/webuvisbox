@@ -20,8 +20,8 @@ import { LazyTextField } from "@/Panels/Lazyfields";
 
 const TimeNavigationPanel = observer(() => {
 
-    const global_context = useScenario().globalContext as WildfireGlobalContext;
-    const config = global_context.time_diff_config;
+    const globalContext = useScenario().globalContext as WildfireGlobalContext;
+    const config = globalContext.timeDiffConfig;
 
     const [anchor, setAnchor] = useState(null);
 
@@ -49,12 +49,12 @@ const TimeNavigationPanel = observer(() => {
     }
 
     const play = () => {
-        global_context.play();
+        globalContext.play();
         onMenuClose();
     }
 
     const stop = () => {
-        global_context.stop();
+        globalContext.stop();
         onMenuClose();
     }
 
@@ -73,11 +73,11 @@ const TimeNavigationPanel = observer(() => {
         <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={onMenuClose}>
             <MenuList dense>
                 <MenuItem onClick={toggleShowEnsemble}>
-                    <ListItemIcon>{config.show_ensemble ? <Check /> : null}</ListItemIcon>
+                    <ListItemIcon>{config.showEnsemble ? <Check /> : null}</ListItemIcon>
                     <ListItemText>Show Ensemble</ListItemText>
                 </MenuItem>
                 <MenuItem onClick={toggleShareYScale}>
-                    <ListItemIcon>{config.share_y_scale ? <Check /> : null}</ListItemIcon>
+                    <ListItemIcon>{config.shareYScale ? <Check /> : null}</ListItemIcon>
                     <ListItemText>Share Y Scale</ListItemText>
                 </MenuItem>
                 <MenuItem onClick={resetZoom}>
@@ -95,8 +95,8 @@ const TimeNavigationPanel = observer(() => {
                 <MenuItem>
                     <LazyTextField
                         label="Play Steps"
-                        defaultValue={config.play_steps}
-                        key={"play_steps_field" + config.play_steps}
+                        defaultValue={config.playSteps}
+                        key={"play_steps_field" + config.playSteps}
                         type="number"
                         onBlur={(e) => {
                             const val = parseInt(e.target.value);

@@ -15,41 +15,41 @@ import { computeHistogram } from "../ColorEditorPanel/HistogramHelpers";
 Chart.register(annotationPlugin);
 
 interface OpacityPlotProps {
-    scalar_name: string;
+    scalarName: string;
 }
 
 export const OpacityPlot = observer((props: OpacityPlotProps) => {
-    const global_context = useScenario().globalContext as WildfireGlobalContext;
+    const globalContext = useScenario().globalContext as WildfireGlobalContext;
     const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
     const chartRef = useRef<any>(null);
 
-    const ui_configs = global_context.ui_configs;
+    const uiConfigs = globalContext.uiConfigs;
     const theme = useTheme();
 
     // Get scalar data
-    const scalar_data = global_context.scalars.scalar_data[props.scalar_name];
-    const scalar_tag = global_context.scalars.scalar_tags[props.scalar_name];
-    
-    if (!scalar_data || !scalar_tag) {
+    const scalarData = globalContext.scalars.scalarData[props.scalarName];
+    const scalarTag = globalContext.scalars.scalarTags[props.scalarName];
+
+    if (!scalarData || !scalarTag) {
         return <div style={{ padding: '20px', color: 'red' }}>
-            No data available for {props.scalar_name}
+            No data available for {props.scalarName}
         </div>;
     }
 
-    const { min, max } = scalar_tag;
-    const opacityMap = global_context.texture_manager.getOpacityMap(props.scalar_name) as OpacityMap;
+    const { min, max } = scalarTag;
+    const opacityMap = globalContext.textureManager.getOpacityMap(props.scalarName) as OpacityMap;
     if (!opacityMap) {
         return <div style={{ padding: '20px', color: 'red' }}>
-            No opacity map available for {props.scalar_name}
+            No opacity map available for {props.scalarName}
         </div>;
     }
 
     // Access observable properties directly to ensure MobX tracking
-    const controlPoints = opacityMap.opacity_control_points;
-    const opacityValues = opacityMap.opacity_values;
+    const controlPoints = opacityMap.opacityControlPoints;
+    const opacityValues = opacityMap.opacityValues;
 
     // Compute histogram
-    const { binEdges, binCounts, binCenters } = computeHistogram(scalar_data, 14, min, max);
+    const { binEdges, binCounts, binCenters } = computeHistogram(scalarData, 14, min, max);
 
     // Generate light gray bars
     const barColors = binCenters.map(() => 'rgba(200, 200, 200, 0.7)');
@@ -62,10 +62,10 @@ export const OpacityPlot = observer((props: OpacityPlotProps) => {
     controlPoints.forEach((cp, index) => {
         const binIndex = cp * (binCenters.length - 1);
         const opacity = opacityValues[index];
-        
+
         // Map opacity (0-1) to y-axis value (log scale, 1 to maxCount+1)
         const yValue = 1 + opacity * maxCount;
-        
+
         annotations[`point-${index}`] = {
             type: 'point',
             xValue: binIndex,
@@ -130,7 +130,7 @@ export const OpacityPlot = observer((props: OpacityPlotProps) => {
         // dataX is the bin index (0 to numBins-1)
         const binIndex = Math.floor(dataX);
         if (binIndex < 0 || binIndex >= binCenters.length) return;
-        
+
         // Convert bin index to normalized value [0, 1]
         const normalizedValue = binIndex / (binCenters.length - 1);
 
@@ -142,7 +142,7 @@ export const OpacityPlot = observer((props: OpacityPlotProps) => {
         let nearestPoint = -1;
         let nearestDistance = Infinity;
         const tolerance = 2.0;
-        
+
         controlPoints.forEach((cp, index) => {
             const cpBinIndex = cp * (binCenters.length - 1);
             const distance = Math.abs(binIndex - cpBinIndex);
@@ -156,7 +156,7 @@ export const OpacityPlot = observer((props: OpacityPlotProps) => {
             // Select the control point and update its opacity
             setSelectedPointIndex(nearestPoint);
             // Update opacity value of existing control point
-            opacityMap.opacity_values[nearestPoint] = opacity;
+            opacityMap.opacityValues[nearestPoint] = opacity;
         } else {
             // Add new control point with normalized value and opacity
             opacityMap.addOpacityControlPoint(normalizedValue, opacity);
@@ -180,7 +180,7 @@ export const OpacityPlot = observer((props: OpacityPlotProps) => {
         let pointIndex = -1;
         let nearestDistance = Infinity;
         const tolerance = 2.0;
-        
+
         controlPoints.forEach((cp, index) => {
             const cpBinIndex = cp * (binCenters.length - 1);
             const distance = Math.abs(binIndex - cpBinIndex);
@@ -210,8 +210,8 @@ export const OpacityPlot = observer((props: OpacityPlotProps) => {
                 },
                 title: {
                     display: true,
-                    text: `${props.scalar_name} (${scalar_tag.units || ''})`,
-                    font: { size: ui_configs.plot_label_size },
+                    text: `${props.scalarName} (${scalarTag.units || ''})`,
+                    font: { size: uiConfigs.plotLabelSize },
                     color: theme.palette.text.primary
                 },
                 ticks: {
@@ -230,7 +230,7 @@ export const OpacityPlot = observer((props: OpacityPlotProps) => {
                 title: {
                     display: true,
                     text: 'Count (log scale)',
-                    font: { size: ui_configs.plot_label_size },
+                    font: { size: uiConfigs.plotLabelSize },
                     color: theme.palette.text.primary
                 },
                 ticks: {
@@ -266,7 +266,7 @@ export const OpacityPlot = observer((props: OpacityPlotProps) => {
     // Add context menu listener to the chart container
     const handleContainerContextMenu = (e: React.MouseEvent) => {
         e.preventDefault();
-        
+
         const chart = chartRef.current;
         if (!chart) return;
 

@@ -9,38 +9,38 @@ import { Html } from "@react-three/drei";
 
 export const ContourMesh = observer(() => {
     const scenario = useScenario();
-    const global_data = scenario.globalContext as WildfireGlobalContext;
-    const ensemble_index = global_data.current_ensemble_index;
-    const contour_config = global_data.contour_config;
-    const base_scale = global_data.terrain.base_scale;  
+    const globalData = scenario.globalContext as WildfireGlobalContext;
+    const ensembleIndex = globalData.currentEnsembleIndex;
+    const contourConfig = globalData.contourConfig;
+    const baseScale = globalData.terrain.baseScale;
 
-    if (!global_data || !global_data.contours) {
+    if (!globalData || !globalData.contours) {
         return <Html><div>No contours available</div></Html>;
     }
 
-    const primary_contour = [global_data.contours[ensemble_index]];
-    const primary_mesh = (contour_config.display_primary) ? <LinearTubeMesh
-        paths={primary_contour}
-        radius={base_scale * contour_config.primary_scale}
-        radialSegments={contour_config.radial_segments}
-        color={global_data.ensemble_colors["primary"]}
+    const primaryContour = [globalData.contours[ensembleIndex]];
+    const primaryMesh = (contourConfig.displayPrimary) ? <LinearTubeMesh
+        paths={primaryContour}
+        radius={baseScale * contourConfig.primaryScale}
+        radialSegments={contourConfig.radialSegments}
+        color={globalData.ensembleColors["primary"]}
         shininess={0}
     /> : null;
 
-    const secondary_contours = global_data.contours.filter((_, index) => index !== ensemble_index);
-    const secondary_mesh = (contour_config.display_secondary) ? <LinearTubeMesh
-        paths={secondary_contours}
-        radius={base_scale * contour_config.secondary_scale}
-        radialSegments={contour_config.radial_segments}
-        color={global_data.ensemble_colors["secondary"]}
+    const secondaryContours = globalData.contours.filter((_, index) => index !== ensembleIndex);
+    const secondaryMesh = (contourConfig.displaySecondary) ? <LinearTubeMesh
+        paths={secondaryContours}
+        radius={baseScale * contourConfig.secondaryScale}
+        radialSegments={contourConfig.radialSegments}
+        color={globalData.ensembleColors["secondary"]}
         shininess={0}
     /> : null;
 
 
     return (
         <group>
-            {secondary_mesh}
-            {primary_mesh}
+            {secondaryMesh}
+            {primaryMesh}
         </group>
     );
 });

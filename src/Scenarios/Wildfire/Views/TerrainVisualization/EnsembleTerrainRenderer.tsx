@@ -9,60 +9,60 @@ import EnsembleTerrainScene from "./EnsembleTerrainScene";
 import SharedTrackballControl from "@/Renderers/SharedCameraControl/SharedTrackballControl";
 
 export const EnsembleTerrainRenderer = observer(() => {
-    const control_ref = useRef(null);
-    const canvas_ref = useRef(null);
-    const last_tap_time = useRef<number>(0);
+    const controlRef = useRef(null);
+    const canvasRef = useRef(null);
+    const lastTapTime = useRef<number>(0);
 
     const scenario = useScenario();
-    const global_data = scenario.globalContext as WildfireGlobalContext;
-    const terrain_view_config = global_data.terrain_view_config;
+    const globalData = scenario.globalContext as WildfireGlobalContext;
+    const terrainViewConfig = globalData.terrainViewConfig;
 
-    if (!terrain_view_config) {
+    if (!terrainViewConfig) {
         return <div>No terrain view configuration available</div>;
     }
-    let gizmo_scale = 1.0;
+    let gizmoScale = 1.0;
 
-    switch (scenario.panelLayouts.current_breakpoint) {
+    switch (scenario.panelLayouts.currentBreakpoint) {
         case "xl": case "lg":
-            gizmo_scale = 1.0;
+            gizmoScale = 1.0;
             break;
         case "md":
-            gizmo_scale = 0.75;
+            gizmoScale = 0.75;
             break;
         case "sm": case "xs":
-            gizmo_scale = 0.5;
+            gizmoScale = 0.5;
             break;
     }
 
     // Camera setup
-    const center = global_data.terrain.center;
-    const diag = global_data.terrain.diag;
+    const center = globalData.terrain.center;
+    const diag = globalData.terrain.diag;
     const near = 0.01;
     const far = diag * 3;
-    const camera_pos = new THREE.Vector3(center[0], center[1], center[2] + diag);
+    const cameraPos = new THREE.Vector3(center[0], center[1], center[2] + diag);
 
     return (
-        <Canvas ref={canvas_ref}
+        <Canvas ref={canvasRef}
             onPointerDown={(_e) => {
                 const now = Date.now();
-                const time_diff = now - last_tap_time.current;
-                if (time_diff < 300 && time_diff > 0) {
-                    control_ref.current?.reset();
-                    last_tap_time.current = 0;
+                const timeDiff = now - lastTapTime.current;
+                if (timeDiff < 300 && timeDiff > 0) {
+                    controlRef.current?.reset();
+                    lastTapTime.current = 0;
                 }
-                last_tap_time.current = now;
+                lastTapTime.current = now;
             }}
             linear flat>
             <EnsembleTerrainScene />
             <PerspectiveCamera makeDefault
-                position={camera_pos} near={near} far={far} fov={35}>
+                position={cameraPos} near={near} far={far} fov={35}>
                 <directionalLight position={[0, 0, 0]} intensity={1} />
             </PerspectiveCamera>
             <SharedTrackballControl
-                ref={control_ref}
+                ref={controlRef}
                 makeDefault
-                global_data={global_data}
-                position0={camera_pos}
+                globalData={globalData}
+                position0={cameraPos}
                 target={new THREE.Vector3(center[0], center[1], center[2])}
                 target0={new THREE.Vector3(center[0], center[1], center[2])}
                 maxDistance={far / 2}
@@ -70,8 +70,8 @@ export const EnsembleTerrainRenderer = observer(() => {
             />
             <ambientLight intensity={2.0} />
 
-            <GizmoHelper alignment="bottom-right" margin={[80 * gizmo_scale, 80 * gizmo_scale]}>
-                <mesh scale={new THREE.Vector3(gizmo_scale, gizmo_scale, gizmo_scale)}>
+            <GizmoHelper alignment="bottom-right" margin={[80 * gizmoScale, 80 * gizmoScale]}>
+                <mesh scale={new THREE.Vector3(gizmoScale, gizmoScale, gizmoScale)}>
                     <GizmoViewport labels={['E', 'N', 'U']} />
                 </mesh>
             </GizmoHelper>

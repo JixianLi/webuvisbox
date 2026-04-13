@@ -19,42 +19,42 @@ import {
 Chart.register(annotationPlugin);
 
 interface ColormapPlotProps {
-    scalar_name: string;
+    scalarName: string;
 }
 
 export const ColormapPlot = observer((props: ColormapPlotProps) => {
-    const global_context = useScenario().globalContext as WildfireGlobalContext;
+    const globalContext = useScenario().globalContext as WildfireGlobalContext;
     const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
     const chartRef = useRef<any>(null);
 
-    const ui_configs = global_context.ui_configs;
+    const uiConfigs = globalContext.uiConfigs;
     const theme = useTheme();
 
     // Get scalar data
-    const scalar_data = global_context.scalars.scalar_data[props.scalar_name];
-    const scalar_tag = global_context.scalars.scalar_tags[props.scalar_name];
-    
-    if (!scalar_data || !scalar_tag) {
+    const scalarData = globalContext.scalars.scalarData[props.scalarName];
+    const scalarTag = globalContext.scalars.scalarTags[props.scalarName];
+
+    if (!scalarData || !scalarTag) {
         return <div style={{ padding: '20px', color: 'red' }}>
-            No data available for {props.scalar_name}
+            No data available for {props.scalarName}
         </div>;
     }
 
-    const { min, max } = scalar_tag;
-    const colormap = global_context.texture_manager.getColormap(props.scalar_name) as PresetLinearColormap;
+    const { min, max } = scalarTag;
+    const colormap = globalContext.textureManager.getColormap(props.scalarName) as PresetLinearColormap;
     if (!colormap) {
         return <div style={{ padding: '20px', color: 'red' }}>
-            No colormap available for {props.scalar_name}
+            No colormap available for {props.scalarName}
         </div>;
     }
 
     // Access observable properties directly to ensure MobX tracking
-    const controlPoints = colormap.color_control_points;
-    // Also access color_points to ensure MobX tracks it
-    colormap.color_points;
+    const controlPoints = colormap.colorControlPoints;
+    // Also access colorPoints to ensure MobX tracks it
+    colormap.colorPoints;
 
     // Compute histogram
-    const { binEdges, binCounts, binCenters } = computeHistogram(scalar_data, 14, min, max);
+    const { binEdges, binCounts, binCenters } = computeHistogram(scalarData, 14, min, max);
 
     // Generate colored bars - MobX will track changes to controlPoints/colorPoints
     const barColors = generateBarColors(binCenters, colormap, min, max);
@@ -91,11 +91,11 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
         // dataX is the bin index (0 to numBins-1)
         const binIndex = Math.floor(dataX);
         if (binIndex < 0 || binIndex >= binCenters.length) return;
-        
+
         // Convert bin index to normalized value [0, 1]
         const normalizedValue = binIndex / (binCenters.length - 1);
 
-        console.log('Single click - binIndex:', binIndex, 'normalized:', normalizedValue, 
+        console.log('Single click - binIndex:', binIndex, 'normalized:', normalizedValue,
             'control points in bins:', controlPoints.map(cp => cp * (binCenters.length - 1)));
 
         // Check if clicking near a control point (compare in bin index space)
@@ -103,7 +103,7 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
         let nearestPoint = -1;
         let nearestDistance = Infinity;
         const tolerance = 2.0;
-        
+
         controlPoints.forEach((cp, index) => {
             const cpBinIndex = cp * (binCenters.length - 1);
             const distance = Math.abs(binIndex - cpBinIndex);
@@ -122,7 +122,7 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
         } else {
             // Add new control point with normalized value
             console.log('Adding new control point at', normalizedValue);
-            colormap.addColorConntrolPoint(normalizedValue);
+            colormap.addColorControlPoint(normalizedValue);
             setSelectedPointIndex(null);
         }
     };
@@ -139,14 +139,14 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
         const binIndex = Math.floor(dataX);
         if (binIndex < 0 || binIndex >= binCenters.length) return;
 
-        console.log('Right-click - binIndex:', binIndex, 'control points in bins:', 
+        console.log('Right-click - binIndex:', binIndex, 'control points in bins:',
             controlPoints.map(cp => cp * (binCenters.length - 1)));
 
         // Find control point to remove manually
         let pointIndex = -1;
         let nearestDistance = Infinity;
         const tolerance = 2.0;
-        
+
         controlPoints.forEach((cp, index) => {
             const cpBinIndex = cp * (binCenters.length - 1);
             const distance = Math.abs(binIndex - cpBinIndex);
@@ -178,8 +178,8 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
                 },
                 title: {
                     display: true,
-                    text: `${props.scalar_name} (${scalar_tag.units || ''})`,
-                    font: { size: ui_configs.plot_label_size },
+                    text: `${props.scalarName} (${scalarTag.units || ''})`,
+                    font: { size: uiConfigs.plotLabelSize },
                     color: theme.palette.text.primary
                 },
                 ticks: {
@@ -198,7 +198,7 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
                 title: {
                     display: true,
                     text: 'Count (log scale)',
-                    font: { size: ui_configs.plot_label_size },
+                    font: { size: uiConfigs.plotLabelSize },
                     color: theme.palette.text.primary
                 },
                 ticks: {
@@ -234,7 +234,7 @@ export const ColormapPlot = observer((props: ColormapPlotProps) => {
     // Add context menu listener to the chart container
     const handleContainerContextMenu = (e: React.MouseEvent) => {
         e.preventDefault();
-        
+
         const chart = chartRef.current;
         if (!chart) return;
 

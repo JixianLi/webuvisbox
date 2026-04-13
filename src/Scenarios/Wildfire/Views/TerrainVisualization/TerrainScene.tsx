@@ -7,32 +7,32 @@ import { WindGlyphMesh } from "./WindGlyphMesh";
 import { Html } from "@react-three/drei";
 
 interface TerrainSceneProps {
-    use_opacity?: boolean;
-    ctf_name?: string;
-    otf_name?: string;
+    useOpacity?: boolean;
+    ctfName?: string;
+    otfName?: string;
 }
 
 export const TerrainScene = observer((props: TerrainSceneProps) => {
-    const global_data = useScenario().globalContext as WildfireGlobalContext;
-    const terrain_view_config = global_data.terrain_view_config;
+    const globalData = useScenario().globalContext as WildfireGlobalContext;
+    const terrainViewConfig = globalData.terrainViewConfig;
 
     // Terrain data
-    const vertices = global_data.terrain.positions;
-    const indices = global_data.terrain.indices;
-    const scalars = global_data.scalars.rescaled;
+    const vertices = globalData.terrain.positions;
+    const indices = globalData.terrain.indices;
+    const scalars = globalData.scalars.rescaled;
 
-    const use_opacity = props.use_opacity === undefined ? true : props.use_opacity;
-    const ctf_name = props.ctf_name || terrain_view_config.current_ctf_name;
-    const otf_name = use_opacity ? props.otf_name || terrain_view_config.current_otf_name : undefined;
+    const useOpacity = props.useOpacity === undefined ? true : props.useOpacity;
+    const ctfName = props.ctfName || terrainViewConfig.currentCtfName;
+    const otfName = useOpacity ? props.otfName || terrainViewConfig.currentOtfName : undefined;
 
 
-    const texture = global_data.texture_manager.getTexture(ctf_name, otf_name);
+    const texture = globalData.textureManager.getTexture(ctfName, otfName);
     if (!texture) {
         return <Html><div>Loading colormap...</div></Html>;
     }
 
-    const cIndex = global_data.scalars.scalar_names.indexOf(ctf_name);
-    const oIndex = global_data.scalars.scalar_names.indexOf(otf_name);
+    const cIndex = globalData.scalars.scalarNames.indexOf(ctfName);
+    const oIndex = globalData.scalars.scalarNames.indexOf(otfName);
 
 
     return <group>

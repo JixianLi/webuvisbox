@@ -4,7 +4,7 @@ import TerrainRenderer from "./TerrainRenderer";
 
 const ContourBoxplotPanel = observer(() => {
     return <Panel panelName="Contour Boxplot" >
-        <TerrainRenderer use_opacity={false} ctf_name="boxplot"/>
+        <TerrainRenderer useOpacity={false} ctfName="boxplot"/>
     </Panel>
 });
 

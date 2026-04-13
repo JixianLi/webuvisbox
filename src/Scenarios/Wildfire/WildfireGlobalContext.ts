@@ -25,97 +25,97 @@ import { TimeDiffData } from "./GlobalDataContainers/TimeDiffData";
 export class WildfireGlobalContext implements GlobalContext {
     name: string;
     description?: string
-    data_server_address?: string
-    data_fetcher: WildfireDataFetcher;
+    dataServerAddress?: string
+    dataFetcher: WildfireDataFetcher;
 
-    ensemble_names: string[];
-    time_in_seconds: number[];
-    current_time_index: number;
+    ensembleNames: string[];
+    timeInSeconds: number[];
+    currentTimeIndex: number;
 
-    current_ensemble_index: number;
-    texture_manager = getTextureManager();
+    currentEnsembleIndex: number;
+    textureManager = getTextureManager();
 
     scalars: ScalarFields;
     terrain: TerrainData;
-    wind_glyphs_config: SingleInstanceWindGlyphsConfig;
-    squid_glyphs: SquidsGlyphs;
-    contour_config: ContourConfig;
-    time_diff_config: TimeDiffConfig;
-    time_diff_data: TimeDiffData;
+    windGlyphsConfig: SingleInstanceWindGlyphsConfig;
+    squidGlyphs: SquidsGlyphs;
+    contourConfig: ContourConfig;
+    timeDiffConfig: TimeDiffConfig;
+    timeDiffData: TimeDiffData;
 
-    ensemble_colors: {
+    ensembleColors: {
         "primary": string;
         "secondary": string;
     }
 
-    ui_configs: {
-        plot_label_size: number;
+    uiConfigs: {
+        plotLabelSize: number;
     }
 
-    terrain_view_config: {
-        current_ctf: PresetLinearColormap | null;
-        current_otf: OpacityMap | null;
-        current_ctf_name: string;
-        current_otf_name: string;
+    terrainViewConfig: {
+        currentCtf: PresetLinearColormap | null;
+        currentOtf: OpacityMap | null;
+        currentCtfName: string;
+        currentOtfName: string;
     }
 
     contours: Float32Array[];
 
     _play: any
 
-    _shared_camera?: SharedTrackballPerspectiveCamera;
+    _sharedCamera?: SharedTrackballPerspectiveCamera;
 
     constructor() {
         this.name = "Wildfire";
         this.description = "A scenario for visualizing wildfire spread data.";
-        this.data_server_address = "http://localhost:8000";
-        this.data_fetcher = WildfireDataFetcher.getInstance(this.data_server_address);
+        this.dataServerAddress = "http://localhost:8000";
+        this.dataFetcher = WildfireDataFetcher.getInstance(this.dataServerAddress);
 
-        this._shared_camera = new SharedTrackballPerspectiveCamera();
+        this._sharedCamera = new SharedTrackballPerspectiveCamera();
 
-        this.ensemble_names = [];
-        this.time_in_seconds = [];
-        this.current_time_index = 60;
-        this.current_ensemble_index = 15;
+        this.ensembleNames = [];
+        this.timeInSeconds = [];
+        this.currentTimeIndex = 60;
+        this.currentEnsembleIndex = 15;
 
         this.terrain = new TerrainData();
         this.scalars = new ScalarFields();
 
-        this.ensemble_colors = {
+        this.ensembleColors = {
             primary: "#EA0000",
             secondary: "#CDCDCD"
         };
 
-        this.ui_configs = {
-            plot_label_size: 22
+        this.uiConfigs = {
+            plotLabelSize: 22
         };
 
-        this.contour_config = new ContourConfig();
-        this.time_diff_config = new TimeDiffConfig();
-        this.time_diff_data = new TimeDiffData();
+        this.contourConfig = new ContourConfig();
+        this.timeDiffConfig = new TimeDiffConfig();
+        this.timeDiffData = new TimeDiffData();
 
-        this.wind_glyphs_config = new SingleInstanceWindGlyphsConfig();
-        this.wind_glyphs_config.setOnChanged(() => this.recomputeWindGlyphs());
+        this.windGlyphsConfig = new SingleInstanceWindGlyphsConfig();
+        this.windGlyphsConfig.setOnChanged(() => this.recomputeWindGlyphs());
 
-        this.squid_glyphs = new SquidsGlyphs();
-        this.squid_glyphs.setOnChanged(() => this.querySquidGlyphs());
+        this.squidGlyphs = new SquidsGlyphs();
+        this.squidGlyphs.setOnChanged(() => this.querySquidGlyphs());
 
         makeAutoObservable(this);
     }
 
-    get shared_trackball_perspective_camera(): SharedTrackballPerspectiveCamera {
-        return this._shared_camera!;
+    get sharedTrackballPerspectiveCamera(): SharedTrackballPerspectiveCamera {
+        return this._sharedCamera!;
     }
 
     play() {
         if (this._play) return;
 
         const step = async () => {
-            let next_time = this.current_time_index + this.time_diff_config.play_steps;
-            if (next_time > this.time_in_seconds.length - 1) {
-                next_time = 1;
+            let nextTime = this.currentTimeIndex + this.timeDiffConfig.playSteps;
+            if (nextTime > this.timeInSeconds.length - 1) {
+                nextTime = 1;
             }
-            await this.setTimeIndex(next_time);
+            await this.setTimeIndex(nextTime);
 
             if (this._play) {
                 this._play = setTimeout(step, 1000);
@@ -132,33 +132,33 @@ export class WildfireGlobalContext implements GlobalContext {
         }
     }
 
-    initialize(global_data_object: any): void {
-        this.name = global_data_object.name || this.name;
-        this.description = global_data_object.description || this.description;
-        this.data_server_address = global_data_object.data_server_address || this.data_server_address;
-        this.ensemble_names = global_data_object.ensemble_names || this.ensemble_names;
-        this.time_in_seconds = global_data_object.time_index_to_seconds || this.time_in_seconds;
-        this.current_time_index = global_data_object.current_time_index || this.current_time_index;
-        this.current_ensemble_index = global_data_object.current_ensemble_index || this.current_ensemble_index;
-        this.ensemble_colors = global_data_object.ensemble_colors || this.ensemble_colors;
-        this.ui_configs = global_data_object.ui_configs || this.ui_configs;
+    initialize(globalDataObject: any): void {
+        this.name = globalDataObject.name || this.name;
+        this.description = globalDataObject.description || this.description;
+        this.dataServerAddress = globalDataObject.data_server_address || this.dataServerAddress;
+        this.ensembleNames = globalDataObject.ensemble_names || this.ensembleNames;
+        this.timeInSeconds = globalDataObject.time_index_to_seconds || this.timeInSeconds;
+        this.currentTimeIndex = globalDataObject.current_time_index || this.currentTimeIndex;
+        this.currentEnsembleIndex = globalDataObject.current_ensemble_index || this.currentEnsembleIndex;
+        this.ensembleColors = globalDataObject.ensemble_colors || this.ensembleColors;
+        this.uiConfigs = globalDataObject.ui_configs || this.uiConfigs;
 
-        this.data_fetcher.setDataServerAddress(this.data_server_address!);
-        this.terrain.loadFromObject(global_data_object.terrain || {});
-        this.wind_glyphs_config.loadFromObject(global_data_object.wind_glyphs_config || {});
-        this.squid_glyphs.loadFromObject(global_data_object.squid_glyphs || {});
-        this.contour_config.loadFromObject(global_data_object.contour_configs || {});
-        this.time_diff_config.loadFromObject(global_data_object.time_diff_configs || {});
+        this.dataFetcher.setDataServerAddress(this.dataServerAddress!);
+        this.terrain.loadFromObject(globalDataObject.terrain || {});
+        this.windGlyphsConfig.loadFromObject(globalDataObject.wind_glyphs_config || {});
+        this.squidGlyphs.loadFromObject(globalDataObject.squid_glyphs || {});
+        this.contourConfig.loadFromObject(globalDataObject.contour_configs || {});
+        this.timeDiffConfig.loadFromObject(globalDataObject.time_diff_configs || {});
     }
 
     async asyncInitialize(): Promise<void> {
         runInAction(async () => {
             await trackPromise(this.queryTerrainData());
             await trackPromise(this.queryTimeMap());
-            await trackPromise(this.queryScalarData(this.current_ensemble_index, this.current_time_index));
+            await trackPromise(this.queryScalarData(this.currentEnsembleIndex, this.currentTimeIndex));
             await trackPromise(this.queryContourData());
             await trackPromise(this.queryTimeDiffData());
-            if (this.squid_glyphs.display) {
+            if (this.squidGlyphs.display) {
                 await trackPromise(this.querySquidGlyphs());
             }
 
@@ -173,57 +173,57 @@ export class WildfireGlobalContext implements GlobalContext {
         return {
             name: this.name,
             description: this.description,
-            data_server_address: this.data_server_address,
-            ensemble_names: this.ensemble_names,
-            time_index_to_seconds: this.time_in_seconds,
-            current_time_index: this.current_time_index,
-            current_ensemble_index: this.current_ensemble_index,
-            ensemble_colors: this.ensemble_colors,
-            ui_configs: this.ui_configs,
-            contour_configs: this.contour_config.toObject(),
-            time_diff_configs: this.time_diff_config.toObject(),
+            data_server_address: this.dataServerAddress,
+            ensemble_names: this.ensembleNames,
+            time_index_to_seconds: this.timeInSeconds,
+            current_time_index: this.currentTimeIndex,
+            current_ensemble_index: this.currentEnsembleIndex,
+            ensemble_colors: this.ensembleColors,
+            ui_configs: this.uiConfigs,
+            contour_configs: this.contourConfig.toObject(),
+            time_diff_configs: this.timeDiffConfig.toObject(),
 
             terrain: this.terrain.toObject(),
-            wind_glyphs_config: this.wind_glyphs_config.toObject(),
-            squid_glyphs: this.squid_glyphs.toObject()
+            wind_glyphs_config: this.windGlyphsConfig.toObject(),
+            squid_glyphs: this.squidGlyphs.toObject()
         };
     }
 
     updateTerrainViewConfig() {
-        if (this.terrain_view_config === undefined) {
-            this.terrain_view_config = {
-                current_ctf: null,
-                current_otf: null,
-                current_ctf_name: "",
-                current_otf_name: ""
+        if (this.terrainViewConfig === undefined) {
+            this.terrainViewConfig = {
+                currentCtf: null,
+                currentOtf: null,
+                currentCtfName: "",
+                currentOtfName: ""
             };
         }
-        if (this.terrain_view_config.current_ctf === null) {
-            this.terrain_view_config.current_ctf_name = "NFUEL_CAT";
-            this.terrain_view_config.current_ctf = this.scalars.tfs["NFUEL_CAT"].ctf;
+        if (this.terrainViewConfig.currentCtf === null) {
+            this.terrainViewConfig.currentCtfName = "NFUEL_CAT";
+            this.terrainViewConfig.currentCtf = this.scalars.tfs["NFUEL_CAT"].ctf;
         }
-        if (this.terrain_view_config.current_otf === null) {
-            this.terrain_view_config.current_otf_name = "FUEL_FRAC";
-            this.terrain_view_config.current_otf = this.scalars.tfs["FUEL_FRAC"].otf;
+        if (this.terrainViewConfig.currentOtf === null) {
+            this.terrainViewConfig.currentOtfName = "FUEL_FRAC";
+            this.terrainViewConfig.currentOtf = this.scalars.tfs["FUEL_FRAC"].otf;
         }
     }
 
     private async queryScalarData(ensembleIndex: number, timeIndex: number): Promise<void> {
-        const scalarResult = await this.data_fetcher.fetchScalarData({ idx: ensembleIndex, time: timeIndex });
+        const scalarResult = await this.dataFetcher.fetchScalarData({ idx: ensembleIndex, time: timeIndex });
         this.scalars.processReceivedScalarData(scalarResult);
         return Promise.resolve();
     }
 
     private async queryTerrainData() {
-        const terrainResult = await this.data_fetcher.fetchTerrainData();
+        const terrainResult = await this.dataFetcher.fetchTerrainData();
         runInAction(() => {
-            this.ensemble_names = terrainResult.names;
+            this.ensembleNames = terrainResult.names;
             this.terrain.loadFromObject(terrainResult.terrain);
 
             const center = this.terrain.center;
             const diag = this.terrain.diag;
 
-            this.shared_trackball_perspective_camera.setCamera(
+            this.sharedTrackballPerspectiveCamera.setCamera(
                 new THREE.Vector3(center[0], center[1], center[2] + diag),
                 new THREE.Vector3(center[0], center[1], center[2]),
                 new THREE.Vector3(0, 1, 0),
@@ -235,39 +235,39 @@ export class WildfireGlobalContext implements GlobalContext {
     }
 
     private async queryTimeDiffData() {
-        const timeDiffResult = await this.data_fetcher.fetchTimeDiffData();
+        const timeDiffResult = await this.dataFetcher.fetchTimeDiffData();
         runInAction(() => {
-            this.time_diff_data.loadFromQueryResult(timeDiffResult, this.ensemble_colors.secondary);
-            this.time_diff_config.setXRange(this.time_diff_data.x_range);
-            this.time_diff_config.setXDisplayRange([this.time_diff_data.x_range[0], this.time_diff_data.x_range[1]]);
+            this.timeDiffData.loadFromQueryResult(timeDiffResult, this.ensembleColors.secondary);
+            this.timeDiffConfig.setXRange(this.timeDiffData.xRange);
+            this.timeDiffConfig.setXDisplayRange([this.timeDiffData.xRange[0], this.timeDiffData.xRange[1]]);
         });
         return Promise.resolve();
     }
 
     private async queryTimeMap() {
-        const time_map = await this.data_fetcher.fetchTimeMapData();
+        const timeMap = await this.dataFetcher.fetchTimeMapData();
         runInAction(() => {
-            this.time_in_seconds = time_map.time_in_seconds;
+            this.timeInSeconds = timeMap.time_in_seconds;
         });
         return Promise.resolve();
     }
 
     public async querySquidGlyphs() {
-        const squidResult = await this.data_fetcher.fetchSquidData({
-            time: this.current_time_index,
-            scale: this.squid_glyphs.scale,
-            sampling_stride: this.wind_glyphs_config.sampling_stride
+        const squidResult = await this.dataFetcher.fetchSquidData({
+            time: this.currentTimeIndex,
+            scale: this.squidGlyphs.scale,
+            sampling_stride: this.windGlyphsConfig.samplingStride
         });
         runInAction(() => {
             console.log("Fetched squid glyph data:", squidResult);
-            this.squid_glyphs.setVertices(squidResult.vertices);
-            this.squid_glyphs.setFaces(squidResult.faces);
+            this.squidGlyphs.setVertices(squidResult.vertices);
+            this.squidGlyphs.setFaces(squidResult.faces);
         });
         return Promise.resolve();
     }
 
     private async queryContourData() {
-        const contourResults = await this.data_fetcher.fetchContourData({ time: this.current_time_index });
+        const contourResults = await this.dataFetcher.fetchContourData({ time: this.currentTimeIndex });
         runInAction(() => {
             this.contours = contourResults.contours;
         });
@@ -275,31 +275,31 @@ export class WildfireGlobalContext implements GlobalContext {
     }
 
     public async setEnsembleIndex(index: number): Promise<void> {
-        const query_index = clip(index, 0, this.ensemble_names.length - 1);
+        const queryIndex = clip(index, 0, this.ensembleNames.length - 1);
 
-        if (this.current_ensemble_index === query_index) {
+        if (this.currentEnsembleIndex === queryIndex) {
             return Promise.resolve();
         }
         runInAction(async () => {
-            this.current_ensemble_index = query_index;
-            this.queryScalarData(query_index, this.current_time_index);
+            this.currentEnsembleIndex = queryIndex;
+            this.queryScalarData(queryIndex, this.currentTimeIndex);
             this.recomputeWindGlyphs();
         });
         return Promise.resolve();
     }
 
     public async setTimeIndex(index: number): Promise<void> {
-        const clipped_index = Math.round(clip(index, 0, this.time_in_seconds.length - 1));
-        if (this.current_time_index === clipped_index) {
+        const clippedIndex = Math.round(clip(index, 0, this.timeInSeconds.length - 1));
+        if (this.currentTimeIndex === clippedIndex) {
             return Promise.resolve();
         }
 
         runInAction(() => {
-            this.current_time_index = clipped_index;
+            this.currentTimeIndex = clippedIndex;
         });
 
         await Promise.all([
-            this.queryScalarData(this.current_ensemble_index, clipped_index),
+            this.queryScalarData(this.currentEnsembleIndex, clippedIndex),
             this.queryContourData(),
             this.querySquidGlyphs()
         ]);
@@ -311,25 +311,25 @@ export class WildfireGlobalContext implements GlobalContext {
 
     private recomputeWindGlyphs() {
         runInAction(() => {
-            this.wind_glyphs_config.resetInstances();
-            if (this.wind_glyphs_config.display) {
-                const colormap = this.texture_manager.getColormap("WIND_MAG");
-                const color_getter = colormap ? (magnitude: number, max_magnitude: number) => {
-                    const t = magnitude / max_magnitude;
+            this.windGlyphsConfig.resetInstances();
+            if (this.windGlyphsConfig.display) {
+                const colormap = this.textureManager.getColormap("WIND_MAG");
+                const colorGetter = colormap ? (magnitude: number, maxMagnitude: number) => {
+                    const t = magnitude / maxMagnitude;
                     return colormap.getColor(t);
-                } : (_magnitude: number, _max_magnitude: number) => d3.rgb(0, 0, 255);
-                this.wind_glyphs_config.updateInstances(
+                } : (_magnitude: number, _maxMagnitude: number) => d3.rgb(0, 0, 255);
+                this.windGlyphsConfig.updateInstances(
                     {
-                        u: this.scalars.scalar_data["UF"],
-                        v: this.scalars.scalar_data["VF"],
-                        mag: this.scalars.scalar_data["WIND_MAG"],
-                        mag_max: this.scalars.scalar_tags["WIND_MAG"].max
+                        u: this.scalars.scalarData["UF"],
+                        v: this.scalars.scalarData["VF"],
+                        mag: this.scalars.scalarData["WIND_MAG"],
+                        magMax: this.scalars.scalarTags["WIND_MAG"].max
                     },
                     {
                         positions: this.terrain.positions,
-                        base_scale: this.terrain.base_scale
+                        baseScale: this.terrain.baseScale
                     },
-                    color_getter
+                    colorGetter
                 );
             }
         });

@@ -14,47 +14,47 @@ interface BubbleProps {
 }
 
 export const ContourBanddepthPlot = observer(() => {
-    const chart_ref = useRef(null);
+    const chartRef = useRef(null);
 
     const scenario = useScenario();
-    const global_context = scenario?.globalContext as WildfireGlobalContext;
-    const ensemble_names = global_context?.ensemble_names;
-    const depths = global_context?.scalars?.depths;
-    const ordering = global_context?.scalars?.ordering;
-    const [point_size, setPointSize] = useState(4);
+    const globalContext = scenario?.globalContext as WildfireGlobalContext;
+    const ensembleNames = globalContext?.ensembleNames;
+    const depths = globalContext?.scalars?.depths;
+    const ordering = globalContext?.scalars?.ordering;
+    const [pointSize, setPointSize] = useState(4);
     const theme = useTheme();
 
-    if (!global_context || !global_context.scalars || !depths || !ensemble_names || !ordering) {
+    if (!globalContext || !globalContext.scalars || !depths || !ensembleNames || !ordering) {
         return <div>Loading...</div>;
     }
 
-    const current_ensemble_index = global_context.current_ensemble_index;
-    const ui_configs = global_context.ui_configs;
+    const currentEnsembleIndex = globalContext.currentEnsembleIndex;
+    const uiConfigs = globalContext.uiConfigs;
 
 
-    const point_location = new Array(depths.length);
-    const point_radius = new Array(depths.length);
-    const point_colors = new Array(depths.length);
+    const pointLocation = new Array(depths.length);
+    const pointRadius = new Array(depths.length);
+    const pointColors = new Array(depths.length);
 
     for (let i = 0; i < depths.length; i++) {
-        point_location[i] = { x: i, y: depths[i] };
-        if (i === current_ensemble_index) {
-            point_radius[i] = point_size * 1.25;
-            point_colors[i] = global_context!.ensemble_colors["primary"];
+        pointLocation[i] = { x: i, y: depths[i] };
+        if (i === currentEnsembleIndex) {
+            pointRadius[i] = pointSize * 1.25;
+            pointColors[i] = globalContext!.ensembleColors["primary"];
         } else {
-            point_radius[i] = point_size;
-            point_colors[i] = global_context!.ensemble_colors["secondary"];
+            pointRadius[i] = pointSize;
+            pointColors[i] = globalContext!.ensembleColors["secondary"];
         }
     }
 
-    const plot_data = {
+    const plotData = {
         datasets: [
             {
                 label: "Contour Banddepth",
-                data: point_location,
-                backgroundColor: point_colors,
-                pointRadius: point_radius,
-                pointBackgroundColor: point_colors,
+                data: pointLocation,
+                backgroundColor: pointColors,
+                pointRadius: pointRadius,
+                pointBackgroundColor: pointColors,
             }
         ]
     }
@@ -62,8 +62,8 @@ export const ContourBanddepthPlot = observer(() => {
     const onChartResize = (e) => {
         const w = e.width;
         const h = e.height;
-        const new_point_size = Math.max(2, Math.min(6, Math.min(w, h) / 80));
-        setPointSize(new_point_size);
+        const newPointSize = Math.max(2, Math.min(6, Math.min(w, h) / 80));
+        setPointSize(newPointSize);
     }
 
     const options = {
@@ -72,11 +72,11 @@ export const ContourBanddepthPlot = observer(() => {
         scales: {
             x: {
                 type: "linear",
-                min: -1, max: ensemble_names.length,
+                min: -1, max: ensembleNames.length,
                 title: {
                     display: true,
                     text: "Ensemble Member",
-                    font: { size: ui_configs.plot_label_size },
+                    font: { size: uiConfigs.plotLabelSize },
                     color: theme.palette.text.primary
                 },
                 ticks: {
@@ -99,7 +99,7 @@ export const ContourBanddepthPlot = observer(() => {
                 title: {
                     display: true,
                     text: "Banddepth",
-                    font: { size: ui_configs.plot_label_size },
+                    font: { size: uiConfigs.plotLabelSize },
                     color: theme.palette.text.primary
                 },
                 ticks: { color: theme.palette.text.secondary },
@@ -111,8 +111,8 @@ export const ContourBanddepthPlot = observer(() => {
         interaction: { mode: 'point' },
         events: ['click', 'mousemove'],
         onClick: (e) => {
-            const [data_x] = getDataPosition(chart_ref, e);
-            global_context.setEnsembleIndex(Math.round(data_x));
+            const [dataX] = getDataPosition(chartRef, e);
+            globalContext.setEnsembleIndex(Math.round(dataX));
         },
         onResize: onChartResize,
         plugins: {
@@ -121,23 +121,23 @@ export const ContourBanddepthPlot = observer(() => {
                 callbacks: {
                     label: (context) => {
                         const datapoint = context.dataset.data[context.dataIndex]
-                        return ensemble_names[datapoint.x] + " order:" + ordering[context.dataIndex]
+                        return ensembleNames[datapoint.x] + " order:" + ordering[context.dataIndex]
                     }
                 },
-                bodyFont: { size: ui_configs.plot_label_size }
+                bodyFont: { size: uiConfigs.plotLabelSize }
             },
             legend: { display: false }
         }
     }
 
-    const bubble_props: BubbleProps = {
-        data: plot_data,
+    const bubbleProps: BubbleProps = {
+        data: plotData,
         // @ts-expect-error
         options: options,
     }
 
     return (
-        <Bubble ref={chart_ref} {...bubble_props} />
+        <Bubble ref={chartRef} {...bubbleProps} />
     );
 });
 

@@ -18,44 +18,44 @@ export interface DepthTerrainRendererHandle {
 }
 
 export const DepthTerrainRenderer = observer(forwardRef<DepthTerrainRendererHandle>((_, ref) => {
-    const control_ref = useRef(null);
-    const gl_ref = useRef<THREE.WebGLRenderer | null>(null);
-    const last_tap_time = useRef<number>(0);
+    const controlRef = useRef(null);
+    const glRef = useRef<THREE.WebGLRenderer | null>(null);
+    const lastTapTime = useRef<number>(0);
 
     useImperativeHandle(ref, () => ({
         saveImage: () => {
-            if (gl_ref.current) {
-                saveGrayscalePng(gl_ref.current, `depth_${Date.now()}.png`);
+            if (glRef.current) {
+                saveGrayscalePng(glRef.current, `depth_${Date.now()}.png`);
             }
         }
     }));
 
     const scenario = useScenario();
-    const global_data = scenario.globalContext as WildfireGlobalContext;
-    const terrain_view_config = global_data.terrain_view_config;
+    const globalData = scenario.globalContext as WildfireGlobalContext;
+    const terrainViewConfig = globalData.terrainViewConfig;
 
-    if (!terrain_view_config) {
+    if (!terrainViewConfig) {
         return <div>No terrain view configuration available</div>;
     }
 
-    const center = global_data.terrain.center;
-    const diag = global_data.terrain.diag;
+    const center = globalData.terrain.center;
+    const diag = globalData.terrain.diag;
     const near = 0.01;
     const far = diag * 3;
-    const camera_pos = new THREE.Vector3(center[0], center[1], center[2] + diag);
+    const cameraPos = new THREE.Vector3(center[0], center[1], center[2] + diag);
 
     return (
         <Canvas
             gl={{ preserveDrawingBuffer: true, alpha: true }}
-            onCreated={({ gl }) => { gl_ref.current = gl; }}
+            onCreated={({ gl }) => { glRef.current = gl; }}
             onPointerDown={(_e) => {
                 const now = Date.now();
-                const time_diff = now - last_tap_time.current;
-                if (time_diff < 300 && time_diff > 0) {
-                    control_ref.current?.reset();
-                    last_tap_time.current = 0;
+                const timeDiff = now - lastTapTime.current;
+                if (timeDiff < 300 && timeDiff > 0) {
+                    controlRef.current?.reset();
+                    lastTapTime.current = 0;
                 }
-                last_tap_time.current = now;
+                lastTapTime.current = now;
             }}
             linear
             flat
@@ -64,16 +64,16 @@ export const DepthTerrainRenderer = observer(forwardRef<DepthTerrainRendererHand
             <TerrainScene />
             <PerspectiveCamera
                 makeDefault
-                position={camera_pos}
+                position={cameraPos}
                 near={near}
                 far={far}
                 fov={35}
             />
             <SharedTrackballControl
-                ref={control_ref}
+                ref={controlRef}
                 makeDefault
-                global_data={global_data}
-                position0={camera_pos}
+                globalData={globalData}
+                position0={cameraPos}
                 target={new THREE.Vector3(center[0], center[1], center[2])}
                 target0={new THREE.Vector3(center[0], center[1], center[2])}
                 maxDistance={far / 2}

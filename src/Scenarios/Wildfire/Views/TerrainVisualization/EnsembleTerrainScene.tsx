@@ -8,24 +8,24 @@ import { Html } from "@react-three/drei";
 
 
 export const EnsembleTerrainScene = observer(() => {
-    const global_data = useScenario().globalContext as WildfireGlobalContext;
+    const globalData = useScenario().globalContext as WildfireGlobalContext;
 
     // Terrain data
-    const vertices = global_data.terrain.positions;
-    const indices = global_data.terrain.indices;
-    const scalars = global_data.scalars.rescaled;
+    const vertices = globalData.terrain.positions;
+    const indices = globalData.terrain.indices;
+    const scalars = globalData.scalars.rescaled;
 
-    const ctf_name = 'boxplot';
-    const otf_name = undefined;
+    const ctfName = 'boxplot';
+    const otfName = undefined;
 
 
-    const texture = global_data.texture_manager.getTexture(ctf_name, otf_name);
+    const texture = globalData.textureManager.getTexture(ctfName, otfName);
     if (!texture) {
         return <Html><div>Loading colormap...</div></Html>;
     }
 
-    const cIndex = global_data.scalars.scalar_names.indexOf(ctf_name);
-    const oIndex = global_data.scalars.scalar_names.indexOf(otf_name);
+    const cIndex = globalData.scalars.scalarNames.indexOf(ctfName);
+    const oIndex = globalData.scalars.scalarNames.indexOf(otfName);
 
 
     return <group>

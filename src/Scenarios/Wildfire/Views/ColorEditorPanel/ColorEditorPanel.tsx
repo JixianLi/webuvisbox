@@ -8,8 +8,8 @@ import { Box, FormControl, InputLabel, Select, MenuItem, Typography, Divider } f
 import ColormapPlot from "./ColormapPlot";
 
 export const ColorEditorPanel = observer(() => {
-    const global_context = useScenario().globalContext as WildfireGlobalContext;
-    if (!global_context) {
+    const globalContext = useScenario().globalContext as WildfireGlobalContext;
+    if (!globalContext) {
         return (
             <Panel panelName="Color Editor">
                 <Box p={2}>
@@ -18,10 +18,10 @@ export const ColorEditorPanel = observer(() => {
             </Panel>
         );
     }
-    const scalar_names = global_context.scalars.scalar_names;
-    const [current_scalar_name, setCurrentScalarName] = useState(scalar_names[0] || "NFUEL_CAT");
+    const scalarNames = globalContext.scalars.scalarNames;
+    const [currentScalarName, setCurrentScalarName] = useState(scalarNames[0] || "NFUEL_CAT");
 
-    if (!scalar_names || scalar_names.length === 0) {
+    if (!scalarNames || scalarNames.length === 0) {
         return (
             <Panel panelName="Color Editor">
                 <Box p={2}>
@@ -32,16 +32,16 @@ export const ColorEditorPanel = observer(() => {
     }
 
     // Both should be the same singleton instance
-    const texture_manager = global_context.texture_manager;
-    const colormap = texture_manager.getColormap(current_scalar_name) as PresetLinearColormap;
+    const textureManager = globalContext.textureManager;
+    const colormap = textureManager.getColormap(currentScalarName) as PresetLinearColormap;
 
     if (!colormap) {
         return (
             <Panel panelName="Color Editor">
                 <Box p={2}>
-                    <Typography color="warning">Loading colormap... ({current_scalar_name})</Typography>
+                    <Typography color="warning">Loading colormap... ({currentScalarName})</Typography>
                     <Typography variant="caption" display="block">
-                        Available: {Array.from(Object.keys(global_context.scalars.tfs || {})).join(', ')}
+                        Available: {Array.from(Object.keys(globalContext.scalars.tfs || {})).join(', ')}
                     </Typography>
                 </Box>
             </Panel>
@@ -54,17 +54,17 @@ export const ColorEditorPanel = observer(() => {
                 <Typography variant="h6" gutterBottom>
                     Colormap Editor
                 </Typography>
-                
+
                 <FormControl fullWidth sx={{ mb: 2 }}>
                     <InputLabel id="scalar-select-label">Scalar Field</InputLabel>
                     <Select
                         labelId="scalar-select-label"
                         id="scalar-select"
-                        value={current_scalar_name}
+                        value={currentScalarName}
                         label="Scalar Field"
                         onChange={(e) => setCurrentScalarName(e.target.value)}
                     >
-                        {scalar_names.map(name => (
+                        {scalarNames.map(name => (
                             <MenuItem key={name} value={name}>{name}</MenuItem>
                         ))}
                     </Select>
@@ -73,16 +73,16 @@ export const ColorEditorPanel = observer(() => {
                 <Divider sx={{ mb: 2 }} />
 
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Current colormap: <strong>{current_scalar_name}</strong>
+                    Current colormap: <strong>{currentScalarName}</strong>
                 </Typography>
-                
+
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Control points: {colormap.color_control_points.length}
+                    Control points: {colormap.colorControlPoints.length}
                 </Typography>
 
                 <Divider sx={{ my: 2 }} />
 
-                <ColormapPlot scalar_name={current_scalar_name} />
+                <ColormapPlot scalarName={currentScalarName} />
             </Box>
         </Panel>
     );

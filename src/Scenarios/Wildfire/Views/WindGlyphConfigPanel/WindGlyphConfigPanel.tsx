@@ -10,8 +10,8 @@ import FormGrid from "@/Panels/FormGrid";
 import { LazyTextField } from "@/Panels/Lazyfields";
 
 export const WindGlyphConfigPanel = observer(() => {
-    const global_data = useScenario().globalContext as WildfireGlobalContext;
-    const config = global_data.wind_glyphs_config;
+    const globalData = useScenario().globalContext as WildfireGlobalContext;
+    const config = globalData.windGlyphsConfig;
 
     const content = (<>
         <FormGrid>
@@ -25,7 +25,7 @@ export const WindGlyphConfigPanel = observer(() => {
                 <LazyTextField
                     label="Sampling Stride"
                     type="number"
-                    defaultValue={config.sampling_stride}
+                    defaultValue={config.samplingStride}
                     onBlur={(event) => {
                         const v = parseInt(event.target.value);
                         if (!isNaN(v) && v > 0) {
@@ -35,17 +35,17 @@ export const WindGlyphConfigPanel = observer(() => {
                 />
             </Grid>
             <Grid size={{ xl: 6, lg: 12 }} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-                <Switch checked={config.scale_by_magnitude} onChange={(e) => {
+                <Switch checked={config.scaleByMagnitude} onChange={(e) => {
                     config.setScaleByMagnitude(e.target.checked);
                 }} />
-                <Typography color={config.scale_by_magnitude ? "primary" : "textSecondary"}>Scale by Magnitude</Typography>
+                <Typography color={config.scaleByMagnitude ? "primary" : "textSecondary"}>Scale by Magnitude</Typography>
             </Grid>
 
             <Grid size={{ xl: 6, lg: 12 }} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                 <LazyTextField
                     label="Length Scale"
                     type="number"
-                    defaultValue={config.length_scale}
+                    defaultValue={config.lengthScale}
                     onBlur={(event) => {
                         const v = parseFloat(event.target.value);
                         if (!isNaN(v) && v > 0) {
@@ -71,7 +71,7 @@ export const WindGlyphConfigPanel = observer(() => {
                 <LazyTextField
                     label="Size Scale"
                     type="number"
-                    defaultValue={config.size_scale}
+                    defaultValue={config.sizeScale}
                     onBlur={(event) => {
                         const v = parseFloat(event.target.value);
                         if (!isNaN(v) && v > 0) {
@@ -82,10 +82,10 @@ export const WindGlyphConfigPanel = observer(() => {
             </Grid>
 
             <Grid size={{ xl: 6, lg: 12 }} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-                <Switch checked={config.color_by_magnitude} onChange={(e) => {
+                <Switch checked={config.colorByMagnitude} onChange={(e) => {
                     config.setColorByMagnitude(e.target.checked);
                 }} />
-                <Typography color={config.color_by_magnitude ? "primary" : "textSecondary"}>Color by Magnitude</Typography>
+                <Typography color={config.colorByMagnitude ? "primary" : "textSecondary"}>Color by Magnitude</Typography>
             </Grid>
             <Grid size={{ xl: 6, lg: 12 }} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                 <LazyTextField sx={{ width: '80%' }}
