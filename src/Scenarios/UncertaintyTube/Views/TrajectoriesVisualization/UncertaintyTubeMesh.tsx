@@ -10,7 +10,7 @@ interface UncertaintyTubeMeshProps {
 
 const UncertaintyTubeMesh = observer((props: UncertaintyTubeMeshProps) => {
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
+    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
     const texture_height = global_context.colormap_config.texture_height;
     const texuter_width = global_context.colormap_config.texture_width;
     const texture = global_context.texture_manager.getTexture("uncertainty_tube_colormap", undefined, texuter_width, texture_height);

@@ -6,7 +6,7 @@ import { BoxOutlineMesh } from "@/Renderers/Mesh/BoxOutlineMesh";
 
 const SeedBoxMesh = observer(() => {
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
+    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
 
     if (!global_context.seedbox.visible) {
         return null;

@@ -24,11 +24,11 @@ const TrajectoriesVisualizationPanel = observer(() => {
 
     const scenario = useScenario();
     if (!scenario.initialized) {
-        return <Panel panel_name="Trajectories Visualization">
+        return <Panel panelName="Trajectories Visualization">
             <div>Loading...</div>
         </Panel>;
     }
-    const global_data = scenario.global_context as UncertaintyTubeGlobalContext;
+    const global_data = scenario.globalContext as UncertaintyTubeGlobalContext;
 
     const trajectory_visualization_config = global_data.trajectory_visualization;
 
@@ -98,7 +98,7 @@ const TrajectoriesVisualizationPanel = observer(() => {
     </>
     
     return (
-        <Panel panel_name="Trajectories Visualization" appbar_content={appbar_content}>
+        <Panel panelName="Trajectories Visualization" appbarContent={appbar_content}>
             <TrajectoriesRenderer />
         </Panel>
     );

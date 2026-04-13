@@ -11,10 +11,10 @@ import { FormGrid } from "@/Panels/FormGrid";
 
 const ContourConfigPanel = observer(() => {
     const scenario = useScenario();
-    const global_data = scenario.global_context as WildfireGlobalContext;
+    const global_data = scenario.globalContext as WildfireGlobalContext;
     const contour_config = global_data.contour_config;
     if (!scenario.initialized) {
-        return <Panel panel_name={"Contour Configuration"}>
+        return <Panel panelName={"Contour Configuration"}>
             <div>Loading...</div>
         </Panel>;
     }
@@ -58,6 +58,6 @@ const ContourConfigPanel = observer(() => {
             </Grid>
         </FormGrid>
     )
-    return <Panel panel_name="Contour Configuration">{content}</Panel>
+    return <Panel panelName="Contour Configuration">{content}</Panel>
 })
 export default ContourConfigPanel;

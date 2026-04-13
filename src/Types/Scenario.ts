@@ -4,8 +4,8 @@ import type { PanelLayouts } from "./PanelLayouts";
 export interface Scenario {
     name: string;
     description?: string;
-    global_context: GlobalContext;
-    panel_layouts: PanelLayouts;
+    globalContext: GlobalContext;
+    panelLayouts: PanelLayouts;
     views: string[]; // List of view names
 
     // Methods

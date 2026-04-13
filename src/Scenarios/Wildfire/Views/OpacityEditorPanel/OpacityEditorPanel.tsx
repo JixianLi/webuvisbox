@@ -8,10 +8,10 @@ import { Box, FormControl, InputLabel, Select, MenuItem, Typography, Divider } f
 import OpacityPlot from "./OpacityPlot";
 
 export const OpacityEditorPanel = observer(() => {
-    const global_context = useScenario().global_context as WildfireGlobalContext;
+    const global_context = useScenario().globalContext as WildfireGlobalContext;
     if (!global_context) {
         return (
-            <Panel panel_name="Opacity Editor">
+            <Panel panelName="Opacity Editor">
                 <Box p={2}>
                     <Typography color="warning">Loading</Typography>
                 </Box>
@@ -23,7 +23,7 @@ export const OpacityEditorPanel = observer(() => {
 
     if (!scalar_names || scalar_names.length === 0) {
         return (
-            <Panel panel_name="Opacity Editor">
+            <Panel panelName="Opacity Editor">
                 <Box p={2}>
                     <Typography color="error">No scalar fields available</Typography>
                 </Box>
@@ -36,7 +36,7 @@ export const OpacityEditorPanel = observer(() => {
 
     if (!opacityMap) {
         return (
-            <Panel panel_name="Opacity Editor">
+            <Panel panelName="Opacity Editor">
                 <Box p={2}>
                     <Typography color="warning">Loading opacity map... ({current_scalar_name})</Typography>
                 </Box>
@@ -45,7 +45,7 @@ export const OpacityEditorPanel = observer(() => {
     }
 
     return (
-        <Panel panel_name="Opacity Editor">
+        <Panel panelName="Opacity Editor">
             <Box p={2}>
                 <Typography variant="h6" gutterBottom>
                     Opacity Editor

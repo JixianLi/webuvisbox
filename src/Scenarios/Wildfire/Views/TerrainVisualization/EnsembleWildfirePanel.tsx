@@ -3,7 +3,7 @@ import { Panel } from "@/Panels/Panel";
 import EnsembleTerrainRenderer from "./EnsembleTerrainRenderer";
 
 const EnsembleWildfirePanel = observer(() => {
-    return <Panel panel_name="Ensemble Wildfire" >
+    return <Panel panelName="Ensemble Wildfire" >
         <EnsembleTerrainRenderer />
     </Panel>
 });

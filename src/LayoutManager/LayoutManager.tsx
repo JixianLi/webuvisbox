@@ -34,28 +34,28 @@ const LoadingIndicator = observer(function LoadingIndicator() {
 
 const LayoutManager: React.FC = observer(() => {
     const scenario = useScenario();
-    const panel_layouts: PanelLayouts = scenario.panel_layouts!;
+    const panelLayouts: PanelLayouts = scenario.panelLayouts!;
     const theme = useTheme();
 
-    if (!scenario.fully_loaded) {
+    if (!scenario.fullyLoaded) {
         return <div style={{ width: '100vw', height: '100vh', backgroundColor: theme.palette.background.default }}>
             <HeaderBar />
         </div>;
     }
-    const current_layouts = panel_layouts.current_layouts;
+    const currentLayouts = panelLayouts.currentLayouts;
 
-    const onLayoutChange = (_: AppLayout[], all_layouts: AppLayouts) => {
-        panel_layouts.setCurrentLayout(all_layouts);
+    const onLayoutChange = (_: AppLayout[], allLayouts: AppLayouts) => {
+        panelLayouts.setCurrentLayout(allLayouts);
     };
 
     const onBreakpointChange = (newBreakpoint: string) => {
-        panel_layouts.setCurrentBreakpoint(newBreakpoint);
+        panelLayouts.setCurrentBreakpoint(newBreakpoint);
     };
 
     const layoutPanels = () => {
         const panelMapping = scenarioRegistry.get(scenario.name).panelMapping;
-        const breakpoint = panel_layouts.current_breakpoint;
-        const layout = panel_layouts.current_layouts[breakpoint];
+        const breakpoint = panelLayouts.currentBreakpoint;
+        const layout = panelLayouts.currentLayouts[breakpoint];
         return layout.map((panel) => {
             return panel.visible ? (
                 <div key={panel.i}>
@@ -69,9 +69,9 @@ const LayoutManager: React.FC = observer(() => {
         <HeaderBar />
         <ResponsiveGridLayout
             className="layout"
-            layouts={current_layouts}
-            breakpoints={panel_layouts.breakpoints}
-            cols={panel_layouts.cols}
+            layouts={currentLayouts}
+            breakpoints={panelLayouts.breakpoints}
+            cols={panelLayouts.cols}
             rowHeight={50}
             onBreakpointChange={onBreakpointChange}
             onLayoutChange={onLayoutChange}

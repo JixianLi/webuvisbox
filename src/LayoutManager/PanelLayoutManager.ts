@@ -5,122 +5,122 @@ import _ from 'lodash';
 
 
 export class PanelLayoutManager implements PanelLayouts {
-    current_layouts: AppLayouts;
-    default_layouts: AppLayouts;
-    cache_layouts: AppLayouts;
+    currentLayouts: AppLayouts;
+    defaultLayouts: AppLayouts;
+    cacheLayouts: AppLayouts;
     breakpoints: RGLBreakpoints;
     cols: RGLCols;
-    current_breakpoint: string = 'xl';
+    currentBreakpoint: string = 'xl';
 
     constructor(
-        default_layouts: AppLayouts,
+        defaultLayouts: AppLayouts,
         breakpoints: RGLBreakpoints,
         cols?: RGLCols
     ) {
-        this.default_layouts = _.cloneDeep(default_layouts);
-        this.current_layouts = _.cloneDeep(default_layouts);
-        this.cache_layouts = _.cloneDeep(default_layouts);
+        this.defaultLayouts = _.cloneDeep(defaultLayouts);
+        this.currentLayouts = _.cloneDeep(defaultLayouts);
+        this.cacheLayouts = _.cloneDeep(defaultLayouts);
         this.breakpoints = _.cloneDeep(breakpoints);
         this.cols = cols ? _.cloneDeep(cols) : Object.keys(this.breakpoints).reduce((acc, key) => {
             acc[key] = 12;
             return acc;
         }, {} as RGLCols);
-        
+
         // Initialize panels with visible: false
-        // Move their full layout to cache and set them to zero-size in current_layouts
-        Object.keys(this.current_layouts).forEach(breakpoint => {
-            this.current_layouts[breakpoint].forEach((panel, index) => {
+        // Move their full layout to cache and set them to zero-size in currentLayouts
+        Object.keys(this.currentLayouts).forEach(breakpoint => {
+            this.currentLayouts[breakpoint].forEach((panel, index) => {
                 if (panel.visible === false) {
                     // Store the full layout in cache
-                    this.cache_layouts[breakpoint][index] = _.cloneDeep(panel);
-                    // Set to zero-size in current_layouts
-                    this.current_layouts[breakpoint][index] = { 
-                        i: panel.i, 
-                        x: 0, 
-                        y: 0, 
-                        w: 0, 
-                        h: 0, 
-                        minH: 0, 
-                        minW: 0, 
-                        maxH: 0, 
-                        maxW: 0, 
-                        visible: false, 
-                        isResizable: false, 
-                        isDraggable: false, 
-                        static: true 
+                    this.cacheLayouts[breakpoint][index] = _.cloneDeep(panel);
+                    // Set to zero-size in currentLayouts
+                    this.currentLayouts[breakpoint][index] = {
+                        i: panel.i,
+                        x: 0,
+                        y: 0,
+                        w: 0,
+                        h: 0,
+                        minH: 0,
+                        minW: 0,
+                        maxH: 0,
+                        maxW: 0,
+                        visible: false,
+                        isResizable: false,
+                        isDraggable: false,
+                        static: true
                     };
                 }
             });
         });
-        console.log('Initialized PanelLayoutManager:', toJS(this.current_layouts), toJS(this.cache_layouts));
+        console.log('Initialized PanelLayoutManager:', toJS(this.currentLayouts), toJS(this.cacheLayouts));
         makeAutoObservable(this);
     }
 
-    reinitializeLayouts(new_layouts: AppLayouts) {
+    reinitializeLayouts(newLayouts: AppLayouts) {
         runInAction(() => {
-            this.default_layouts = _.cloneDeep(new_layouts);
-            this.current_layouts = _.cloneDeep(new_layouts);
-            this.cache_layouts = _.cloneDeep(new_layouts);
+            this.defaultLayouts = _.cloneDeep(newLayouts);
+            this.currentLayouts = _.cloneDeep(newLayouts);
+            this.cacheLayouts = _.cloneDeep(newLayouts);
         });
     }
 
-    restore_panel(panel_id: string): void {
+    restorePanel(panelId: string): void {
         runInAction(() => {
-            this.current_layouts = _.cloneDeep(this.current_layouts);
-            const breakpoint = this.current_breakpoint;
-            const selected_panel_index = _.findIndex(this.current_layouts[breakpoint], { i: panel_id });
-            const selected_cached = _.findIndex(this.cache_layouts[breakpoint], { i: panel_id });
-            this.current_layouts[breakpoint][selected_panel_index] = _.cloneDeep(this.cache_layouts[breakpoint][selected_cached]);
-            this.current_layouts[breakpoint][selected_panel_index].visible = true;
-            delete this.cache_layouts[panel_id];
+            this.currentLayouts = _.cloneDeep(this.currentLayouts);
+            const breakpoint = this.currentBreakpoint;
+            const selectedPanelIndex = _.findIndex(this.currentLayouts[breakpoint], { i: panelId });
+            const selectedCached = _.findIndex(this.cacheLayouts[breakpoint], { i: panelId });
+            this.currentLayouts[breakpoint][selectedPanelIndex] = _.cloneDeep(this.cacheLayouts[breakpoint][selectedCached]);
+            this.currentLayouts[breakpoint][selectedPanelIndex].visible = true;
+            delete this.cacheLayouts[panelId];
         });
     }
 
-    close_panel(panel_id: string): void {
+    closePanel(panelId: string): void {
         runInAction(() => {
-            this.current_layouts = _.cloneDeep(this.current_layouts);
-            const breakpoint = this.current_breakpoint;
-            const selected_panel_index = _.findIndex(this.current_layouts[breakpoint], { i: panel_id });
-            const selected_panel = this.current_layouts[breakpoint][selected_panel_index];
-            const selected_cached = _.findIndex(this.cache_layouts[breakpoint], { i: panel_id });
-            this.cache_layouts[breakpoint][selected_cached] = _.cloneDeep(selected_panel);
-            this.current_layouts[breakpoint][selected_panel_index] = { i: panel_id, x: 0, y: 0, w: 0, h: 0, minH: 0, minW: 0, maxH: 0, maxW: 0, visible: false, isResizable: false, isDraggable: false, static: true };
+            this.currentLayouts = _.cloneDeep(this.currentLayouts);
+            const breakpoint = this.currentBreakpoint;
+            const selectedPanelIndex = _.findIndex(this.currentLayouts[breakpoint], { i: panelId });
+            const selectedPanel = this.currentLayouts[breakpoint][selectedPanelIndex];
+            const selectedCached = _.findIndex(this.cacheLayouts[breakpoint], { i: panelId });
+            this.cacheLayouts[breakpoint][selectedCached] = _.cloneDeep(selectedPanel);
+            this.currentLayouts[breakpoint][selectedPanelIndex] = { i: panelId, x: 0, y: 0, w: 0, h: 0, minH: 0, minW: 0, maxH: 0, maxW: 0, visible: false, isResizable: false, isDraggable: false, static: true };
         });
     }
 
-    toggle_visibility(panel_index: number): void {
-        const visible = this.current_layouts[this.current_breakpoint][panel_index]?.visible;
-        const panel_id = this.current_layouts[this.current_breakpoint][panel_index]?.i;
+    toggleVisibility(panelIndex: number): void {
+        const visible = this.currentLayouts[this.currentBreakpoint][panelIndex]?.visible;
+        const panelId = this.currentLayouts[this.currentBreakpoint][panelIndex]?.i;
         if (visible) {
-            this.close_panel(panel_id);
+            this.closePanel(panelId);
         } else {
-            this.restore_panel(panel_id);
+            this.restorePanel(panelId);
         }
     }
 
     setCurrentLayout(layout: AppLayouts) {
-        const breakpoint = this.current_breakpoint;
-        const new_layouts = layout[breakpoint];
-        const current_layout = this.current_layouts[breakpoint];
+        const breakpoint = this.currentBreakpoint;
+        const newLayouts = layout[breakpoint];
+        const currentLayout = this.currentLayouts[breakpoint];
 
-        new_layouts.forEach((new_panel, index) => {
-            _.merge(current_layout[index], new_panel);
+        newLayouts.forEach((newPanel, index) => {
+            _.merge(currentLayout[index], newPanel);
         });
     }
 
     saveDefaultLayouts() {
         runInAction(() => {
-            this.default_layouts = _.cloneDeep(this.current_layouts);
+            this.defaultLayouts = _.cloneDeep(this.currentLayouts);
 
             // Iterate through all breakpoints
-            Object.keys(this.default_layouts).forEach(breakpoint => {
-                this.default_layouts[breakpoint].forEach((panel, index) => {
+            Object.keys(this.defaultLayouts).forEach(breakpoint => {
+                this.defaultLayouts[breakpoint].forEach((panel, index) => {
                     // If panel is not visible, use cached layout but keep visible as false
                     if (!panel.visible) {
-                        const cached_panel_index = _.findIndex(this.cache_layouts[breakpoint], { i: panel.i });
-                        if (cached_panel_index !== -1) {
-                            this.default_layouts[breakpoint][index] = _.cloneDeep(this.cache_layouts[breakpoint][cached_panel_index]);
-                            this.default_layouts[breakpoint][index].visible = false;
+                        const cachedPanelIndex = _.findIndex(this.cacheLayouts[breakpoint], { i: panel.i });
+                        if (cachedPanelIndex !== -1) {
+                            this.defaultLayouts[breakpoint][index] = _.cloneDeep(this.cacheLayouts[breakpoint][cachedPanelIndex]);
+                            this.defaultLayouts[breakpoint][index].visible = false;
                         }
                     }
                 });
@@ -130,13 +130,13 @@ export class PanelLayoutManager implements PanelLayouts {
 
     resetToDefault() {
         runInAction(() => {
-            this.current_layouts = _.cloneDeep(this.default_layouts);
+            this.currentLayouts = _.cloneDeep(this.defaultLayouts);
         });
     }
 
     setCurrentBreakpoint(breakpoint: string) {
         runInAction(() => {
-            this.current_breakpoint = breakpoint;
+            this.currentBreakpoint = breakpoint;
         });
     }
 }

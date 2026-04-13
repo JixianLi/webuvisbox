@@ -14,7 +14,7 @@ export const EnsembleTerrainRenderer = observer(() => {
     const last_tap_time = useRef<number>(0);
 
     const scenario = useScenario();
-    const global_data = scenario.global_context as WildfireGlobalContext;
+    const global_data = scenario.globalContext as WildfireGlobalContext;
     const terrain_view_config = global_data.terrain_view_config;
 
     if (!terrain_view_config) {
@@ -22,7 +22,7 @@ export const EnsembleTerrainRenderer = observer(() => {
     }
     let gizmo_scale = 1.0;
 
-    switch (scenario.panel_layouts.current_breakpoint) {
+    switch (scenario.panelLayouts.current_breakpoint) {
         case "xl": case "lg":
             gizmo_scale = 1.0;
             break;

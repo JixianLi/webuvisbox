@@ -3,7 +3,7 @@ import ContourBanddepthPlot from "./ContourBanddepthPlot";
 
 export const ContourBanddepthPanel = () => {
     return (
-        <Panel panel_name="Contour Banddepths">
+        <Panel panelName="Contour Banddepths">
             <ContourBanddepthPlot />
         </Panel>
     );

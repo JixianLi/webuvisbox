@@ -9,7 +9,7 @@ interface SeedsMeshProps {
 
 const SeedsMesh = observer((props: SeedsMeshProps) => {
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
+    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
     const seeds = global_context.seeds;
     const render_config = global_context.render_config;
 

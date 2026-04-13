@@ -22,7 +22,7 @@ export const SharedCameraRenderer = observer((props: SharedCameraRendererProps) 
     const last_tap_time = useRef<number>(0);
 
     const scenario = useScenario();
-    const global_data = scenario.global_context as UncertaintyTubeGlobalContext;
+    const global_data = scenario.globalContext as UncertaintyTubeGlobalContext;
 
     const center = global_data.center;
     const diag = global_data.diag;

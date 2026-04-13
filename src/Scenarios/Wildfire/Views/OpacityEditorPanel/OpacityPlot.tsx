@@ -19,7 +19,7 @@ interface OpacityPlotProps {
 }
 
 export const OpacityPlot = observer((props: OpacityPlotProps) => {
-    const global_context = useScenario().global_context as WildfireGlobalContext;
+    const global_context = useScenario().globalContext as WildfireGlobalContext;
     const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
     const chartRef = useRef<any>(null);
 

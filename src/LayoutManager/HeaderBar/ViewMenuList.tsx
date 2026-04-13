@@ -13,19 +13,19 @@ export const ViewMenuList = observer(() => {
                 <ListItemText>Loading...</ListItemText>
             </MenuItem>;
     }
-    const panel_layouts = scenario?.panel_layouts!;
-    const togglePanel = (panel_index: number) => {
-        panel_layouts.toggle_visibility(panel_index);
+    const panelLayouts = scenario?.panelLayouts!;
+    const togglePanel = (panelIndex: number) => {
+        panelLayouts.toggleVisibility(panelIndex);
     };
 
-    const breakpoint = panel_layouts.current_breakpoint;
-    const layout = panel_layouts.current_layouts[breakpoint];
+    const breakpoint = panelLayouts.currentBreakpoint;
+    const layout = panelLayouts.currentLayouts[breakpoint];
 
     return layout.map((panel, idx) => {
         const onClick = () => togglePanel(idx);
         const visible = panel.visible;
 
-        const displayed_item = (
+        const displayedItem = (
             <>
                 <ListItemIcon>{visible ? <Check /> : null}</ListItemIcon>
                 <ListItemText>{panel.i}</ListItemText>
@@ -34,7 +34,7 @@ export const ViewMenuList = observer(() => {
 
         return (
             <MenuItem key={"menu_item_key_" + panel.i} onClick={onClick}>
-                {displayed_item}
+                {displayedItem}
             </MenuItem>
         );
     });

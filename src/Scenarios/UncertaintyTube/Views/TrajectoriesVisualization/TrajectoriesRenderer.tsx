@@ -16,7 +16,7 @@ const TrajectoriesRenderer = observer(() => {
     const canvas_ref = useRef(null);
     const control_ref = useRef(null);
     const scenario = useScenario();
-    const global_data = scenario.global_context as UncertaintyTubeGlobalContext;
+    const global_data = scenario.globalContext as UncertaintyTubeGlobalContext;
 
     const center = global_data.center;
     const diag = global_data.diag;

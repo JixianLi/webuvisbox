@@ -20,7 +20,7 @@ import { LazyTextField } from "@/Panels/Lazyfields";
 
 const TimeNavigationPanel = observer(() => {
 
-    const global_context = useScenario().global_context as WildfireGlobalContext;
+    const global_context = useScenario().globalContext as WildfireGlobalContext;
     const config = global_context.time_diff_config;
 
     const [anchor, setAnchor] = useState(null);
@@ -112,7 +112,7 @@ const TimeNavigationPanel = observer(() => {
     )
 
     return (
-        <Panel panel_name="Time Navigation" appbar_content={appBarContent} >
+        <Panel panelName="Time Navigation" appbarContent={appBarContent} >
             <TimeCharts />
         </Panel>
     );

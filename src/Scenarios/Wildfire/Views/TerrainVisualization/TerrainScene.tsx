@@ -13,7 +13,7 @@ interface TerrainSceneProps {
 }
 
 export const TerrainScene = observer((props: TerrainSceneProps) => {
-    const global_data = useScenario().global_context as WildfireGlobalContext;
+    const global_data = useScenario().globalContext as WildfireGlobalContext;
     const terrain_view_config = global_data.terrain_view_config;
 
     // Terrain data

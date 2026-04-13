@@ -55,7 +55,7 @@ const DepthVisualizationPanel = observer(() => {
     );
 
     return (
-        <Panel panel_name="Depth Visualization" appbar_content={appBarContent}>
+        <Panel panelName="Depth Visualization" appbarContent={appBarContent}>
             <DepthTerrainRenderer ref={rendererRef} />
         </Panel>
     );

@@ -10,7 +10,7 @@ import FormGrid from "@/Panels/FormGrid";
 import { LazyTextField } from "@/Panels/Lazyfields";
 
 export const WindGlyphConfigPanel = observer(() => {
-    const global_data = useScenario().global_context as WildfireGlobalContext;
+    const global_data = useScenario().globalContext as WildfireGlobalContext;
     const config = global_data.wind_glyphs_config;
 
     const content = (<>
@@ -101,7 +101,7 @@ export const WindGlyphConfigPanel = observer(() => {
 
         </FormGrid>
     </>)
-    return <Panel panel_name="Wind Glyph Configuration">{content}</Panel>;
+    return <Panel panelName="Wind Glyph Configuration">{content}</Panel>;
 });
 
 export default WindGlyphConfigPanel;

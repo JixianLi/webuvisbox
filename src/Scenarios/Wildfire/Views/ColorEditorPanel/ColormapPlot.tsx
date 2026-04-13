@@ -23,7 +23,7 @@ interface ColormapPlotProps {
 }
 
 export const ColormapPlot = observer((props: ColormapPlotProps) => {
-    const global_context = useScenario().global_context as WildfireGlobalContext;
+    const global_context = useScenario().globalContext as WildfireGlobalContext;
     const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
     const chartRef = useRef<any>(null);
 

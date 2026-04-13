@@ -3,7 +3,7 @@ import { Panel } from "@/Panels/Panel";
 import TerrainRenderer from "./TerrainRenderer";
 
 const ContourBoxplotPanel = observer(() => {
-    return <Panel panel_name="Contour Boxplot" >
+    return <Panel panelName="Contour Boxplot" >
         <TerrainRenderer use_opacity={false} ctf_name="boxplot"/>
     </Panel>
 });

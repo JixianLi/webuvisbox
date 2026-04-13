@@ -11,22 +11,22 @@ import { useState } from "react";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
 
 interface PanelProps {
-    panel_name: string;
+    panelName: string;
     children?: React.ReactNode;
-    appbar_content?: React.ReactNode;
-    help_content?: React.ReactNode;
+    appbarContent?: React.ReactNode;
+    helpContent?: React.ReactNode;
     sx?: object;
 }
 
-const content_style = { display: 'flex', flexDirection: 'column', flex: 1, m: 2, overflow: 'auto', justifyContent: 'flex-start', alignItems: 'center' };
-const container_style = { width: 1, height: 1, padding: 0, margin: 0, display: 'flex', flexDirection: 'column' };
-const paper_style = { width: 1, height: 1, flexGrow: 1};
+const contentStyle = { display: 'flex', flexDirection: 'column', flex: 1, m: 2, overflow: 'auto', justifyContent: 'flex-start', alignItems: 'center' };
+const containerStyle = { width: 1, height: 1, padding: 0, margin: 0, display: 'flex', flexDirection: 'column' };
+const paperStyle = { width: 1, height: 1, flexGrow: 1};
 
 export function Panel(props: PanelProps) {
     const scenario = useScenario();
-    const panel_name = props.panel_name;
+    const panelName = props.panelName;
 
-    const [help_anchor, setHelpAnchor] = useState(null);
+    const [helpAnchor, setHelpAnchor] = useState(null);
 
     const onHelpClick = (event: React.MouseEvent<HTMLElement>) => {
         setHelpAnchor(event.currentTarget);
@@ -37,17 +37,17 @@ export function Panel(props: PanelProps) {
     };
 
     const hidePanel = () => {
-        scenario.panel_layouts.close_panel(panel_name);
+        scenario.panelLayouts.closePanel(panelName);
     };
 
-    return <Paper elevation={5} key={"paper_" + panel_name} sx={paper_style}>
-        <Container disableGutters maxWidth={false} sx={container_style}>
+    return <Paper elevation={5} key={"paper_" + panelName} sx={paperStyle}>
+        <Container disableGutters maxWidth={false} sx={containerStyle}>
             <Box sx={{ flexShrink: 1 }}>
                 <AppBar position={'static'} color={'primary'} sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
                     <Typography variant={'h6'} component="div" sx={{ flexGrow: 1, ml: 1 }} className={"drag-handle"}>
-                        {panel_name}
+                        {panelName}
                     </Typography>
-                    {props.appbar_content}
+                    {props.appbarContent}
                     <IconButton
                         size="small"
                         edge="start"
@@ -58,11 +58,11 @@ export function Panel(props: PanelProps) {
                     >
                         <HelpOutline />
                     </IconButton>
-                    <Menu anchorEl={help_anchor}
-                        open={Boolean(help_anchor)}
+                    <Menu anchorEl={helpAnchor}
+                        open={Boolean(helpAnchor)}
                         onClose={onHelpClose}
                     >
-                        {props.help_content}
+                        {props.helpContent}
                     </Menu>
 
                     <IconButton
@@ -77,7 +77,7 @@ export function Panel(props: PanelProps) {
                     </IconButton>
                 </AppBar>
             </Box>
-            <Box sx={content_style} minHeight={0}>
+            <Box sx={contentStyle} minHeight={0}>
                 {props.children}
             </Box>
         </Container>

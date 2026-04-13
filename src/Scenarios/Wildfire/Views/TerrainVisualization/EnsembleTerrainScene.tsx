@@ -8,7 +8,7 @@ import { Html } from "@react-three/drei";
 
 
 export const EnsembleTerrainScene = observer(() => {
-    const global_data = useScenario().global_context as WildfireGlobalContext;
+    const global_data = useScenario().globalContext as WildfireGlobalContext;
 
     // Terrain data
     const vertices = global_data.terrain.positions;

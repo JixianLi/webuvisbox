@@ -26,21 +26,21 @@ export interface AppLayout {
 }
 
 export interface PanelLayouts {
-  current_layouts: AppLayouts;
-  default_layouts: AppLayouts;
-  cache_layouts: AppLayouts;
+  currentLayouts: AppLayouts;
+  defaultLayouts: AppLayouts;
+  cacheLayouts: AppLayouts;
   breakpoints: RGLBreakpoints;
   cols: RGLCols;
-  current_breakpoint: string;
+  currentBreakpoint: string;
 
   // Methods
-  reinitializeLayouts(new_layouts: AppLayouts): void;
-  
-  toggle_visibility(panel_index: number): void;
+  reinitializeLayouts(newLayouts: AppLayouts): void;
 
-  close_panel(panel_id: string): void;
+  toggleVisibility(panelIndex: number): void;
 
-  restore_panel(panel_id: string): void;
+  closePanel(panelId: string): void;
+
+  restorePanel(panelId: string): void;
 
   setCurrentLayout(layout: AppLayouts): void;
 

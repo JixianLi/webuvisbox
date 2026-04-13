@@ -31,7 +31,7 @@ export const DepthTerrainRenderer = observer(forwardRef<DepthTerrainRendererHand
     }));
 
     const scenario = useScenario();
-    const global_data = scenario.global_context as WildfireGlobalContext;
+    const global_data = scenario.globalContext as WildfireGlobalContext;
     const terrain_view_config = global_data.terrain_view_config;
 
     if (!terrain_view_config) {

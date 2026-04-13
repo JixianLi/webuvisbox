@@ -5,7 +5,7 @@ import InstancedConeMesh from "@/Renderers/Mesh/InstancedConeMesh";
 
 export const WindGlyphMesh = observer(() => {
     const scenario = useScenario();
-    const global_data = scenario.global_context as WildfireGlobalContext;
+    const global_data = scenario.globalContext as WildfireGlobalContext;
     const wind_glyphs_config = global_data.wind_glyphs_config;
 
     if (!global_data || !wind_glyphs_config.display || wind_glyphs_config.instances.length === 0) {

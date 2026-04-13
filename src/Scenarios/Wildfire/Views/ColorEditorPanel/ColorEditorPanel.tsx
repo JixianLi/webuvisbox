@@ -8,10 +8,10 @@ import { Box, FormControl, InputLabel, Select, MenuItem, Typography, Divider } f
 import ColormapPlot from "./ColormapPlot";
 
 export const ColorEditorPanel = observer(() => {
-    const global_context = useScenario().global_context as WildfireGlobalContext;
+    const global_context = useScenario().globalContext as WildfireGlobalContext;
     if (!global_context) {
         return (
-            <Panel panel_name="Color Editor">
+            <Panel panelName="Color Editor">
                 <Box p={2}>
                     <Typography color="warning">Loading</Typography>
                 </Box>
@@ -23,7 +23,7 @@ export const ColorEditorPanel = observer(() => {
 
     if (!scalar_names || scalar_names.length === 0) {
         return (
-            <Panel panel_name="Color Editor">
+            <Panel panelName="Color Editor">
                 <Box p={2}>
                     <Typography color="error">No scalar fields available</Typography>
                 </Box>
@@ -37,7 +37,7 @@ export const ColorEditorPanel = observer(() => {
 
     if (!colormap) {
         return (
-            <Panel panel_name="Color Editor">
+            <Panel panelName="Color Editor">
                 <Box p={2}>
                     <Typography color="warning">Loading colormap... ({current_scalar_name})</Typography>
                     <Typography variant="caption" display="block">
@@ -49,7 +49,7 @@ export const ColorEditorPanel = observer(() => {
     }
 
     return (
-        <Panel panel_name="Color Editor">
+        <Panel panelName="Color Editor">
             <Box p={2}>
                 <Typography variant="h6" gutterBottom>
                     Colormap Editor

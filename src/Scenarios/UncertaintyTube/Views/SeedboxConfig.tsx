@@ -12,7 +12,7 @@ import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/Uncer
 
 const SeedboxConfigPanel = observer(() => {
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
+    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
     const seedbox_config = global_context.seedbox;
 
     // Number of steps for sliders (higher value = finer control)
@@ -46,7 +46,7 @@ const SeedboxConfigPanel = observer(() => {
     const format6 = (num: number) => num.toFixed(6);
 
     return (
-        <Panel panel_name="Seedbox Config">
+        <Panel panelName="Seedbox Config">
             <Grid container spacing={0} sx={{ p: "10px" }}>
                 <Grid size={12} sx={{ display: 'flex', flexDirection: 'row', justifyContent: "center" }}>
                     <FormControlLabel control={<Switch checked={seedbox_config.visible} onChange={(e) => {

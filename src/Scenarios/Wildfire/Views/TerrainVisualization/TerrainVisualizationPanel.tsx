@@ -52,7 +52,7 @@ const TerrainVisualizationPanel = observer(() => {
     );
 
     return (
-        <Panel panel_name="Terrain Visualization" appbar_content={appBarContent}>
+        <Panel panelName="Terrain Visualization" appbarContent={appBarContent}>
             <TerrainRenderer ref={rendererRef} />
         </Panel>
     );

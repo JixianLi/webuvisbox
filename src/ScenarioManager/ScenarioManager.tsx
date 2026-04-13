@@ -9,11 +9,11 @@ import { getGlobalContext } from "@/Scenarios";
 class ScenarioManager implements Scenario {
     name: string;
     description?: string;
-    global_context: GlobalContext;
+    globalContext: GlobalContext;
     views: string[];
-    panel_layouts: PanelLayouts;
+    panelLayouts: PanelLayouts;
     initialized: boolean = false;
-    fully_loaded: boolean = false;
+    fullyLoaded: boolean = false;
 
     constructor(config?: any) {
         if (config) {
@@ -27,7 +27,7 @@ class ScenarioManager implements Scenario {
     }
 
     async asyncInitialization(): Promise<void> {
-        return this.global_context.asyncInitialize();
+        return this.globalContext.asyncInitialize();
     }
 
     loadFromObject(config: any): void {
@@ -35,10 +35,10 @@ class ScenarioManager implements Scenario {
             this.name = config.name || this.name || "UVisBox";
             this.description = config.description || this.description || "A default scenario";
             this.views = config.views || this.views || [];
-            const panel_layouts = config.panel_layouts
-            this.panel_layouts = new PanelLayoutManager(panel_layouts.default_layouts, panel_layouts.breakpoints, panel_layouts.cols);
-            this.global_context = getGlobalContext(this.name);
-            this.global_context.initialize(config.global_data);
+            const panelLayoutsConfig = config.panel_layouts;
+            this.panelLayouts = new PanelLayoutManager(panelLayoutsConfig.default_layouts, panelLayoutsConfig.breakpoints, panelLayoutsConfig.cols);
+            this.globalContext = getGlobalContext(this.name);
+            this.globalContext.initialize(config.global_data);
         });
     }
 
@@ -53,11 +53,11 @@ class ScenarioManager implements Scenario {
             description: this.description,
             views: this.views,
             panel_layouts: {
-                default_layouts: this.panel_layouts.default_layouts,
-                breakpoints: this.panel_layouts.breakpoints,
-                cols: this.panel_layouts.cols
+                default_layouts: this.panelLayouts.defaultLayouts,
+                breakpoints: this.panelLayouts.breakpoints,
+                cols: this.panelLayouts.cols
             },
-            global_data: this.global_context.toObject(),
+            global_data: this.globalContext.toObject(),
         };
     }
 
@@ -67,18 +67,18 @@ class ScenarioManager implements Scenario {
             description: this.description,
             views: this.views,
             panel_layouts: {
-                default_layouts: this.panel_layouts.default_layouts,
-                breakpoints: this.panel_layouts.breakpoints,
-                cols: this.panel_layouts.cols
+                default_layouts: this.panelLayouts.defaultLayouts,
+                breakpoints: this.panelLayouts.breakpoints,
+                cols: this.panelLayouts.cols
             },
-            global_data: this.global_context.toObject(),
+            global_data: this.globalContext.toObject(),
         }, null, 2);
     }
 
     invalidate(): void {
         runInAction(() => {
             this.initialized = false;
-            this.fully_loaded = false;
+            this.fullyLoaded = false;
         });
     }
 
@@ -96,13 +96,13 @@ class ScenarioManager implements Scenario {
         // NOTE: Commented out to fix visible:false panel initialization
         // This was originally added to solve a race condition in built mode
         // Needs additional testing before re-enabling
-        // if (this.panel_layouts && config.panel_layouts) {
-        //     this.panel_layouts.reinitializeLayouts(config.panel_layouts.default_layouts);
+        // if (this.panelLayouts && config.panel_layouts) {
+        //     this.panelLayouts.reinitializeLayouts(config.panel_layouts.default_layouts);
         // }
 
         runInAction(() => {
             this.initialized = true;
-            this.fully_loaded = true;
+            this.fullyLoaded = true;
         });
     }
 }

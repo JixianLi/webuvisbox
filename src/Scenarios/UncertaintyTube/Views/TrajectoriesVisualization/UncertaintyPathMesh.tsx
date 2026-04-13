@@ -10,7 +10,7 @@ interface UncertaintyPathMeshProps {
 
 const UncertaintyPathMesh = observer((props: UncertaintyPathMeshProps) => {
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
+    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
     const primary_paths = global_context.primary_trajectories;
     const diag = global_context.diag;
 

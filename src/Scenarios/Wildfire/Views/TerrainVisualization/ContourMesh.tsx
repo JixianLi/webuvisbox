@@ -9,7 +9,7 @@ import { Html } from "@react-three/drei";
 
 export const ContourMesh = observer(() => {
     const scenario = useScenario();
-    const global_data = scenario.global_context as WildfireGlobalContext;
+    const global_data = scenario.globalContext as WildfireGlobalContext;
     const ensemble_index = global_data.current_ensemble_index;
     const contour_config = global_data.contour_config;
     const base_scale = global_data.terrain.base_scale;  

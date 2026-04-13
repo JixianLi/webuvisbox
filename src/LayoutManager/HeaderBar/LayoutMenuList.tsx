@@ -13,15 +13,15 @@ interface LayoutMenuListProps {
 
 export const LayoutMenuList: React.FC<LayoutMenuListProps> = observer(({ handleClose }) => {
     const scenario = useScenario();
-    const panel_layouts = scenario.panel_layouts!;
+    const panelLayouts = scenario.panelLayouts!;
 
     const saveDefaultLayout = () => {
-        panel_layouts.saveDefaultLayouts();
+        panelLayouts.saveDefaultLayouts();
         handleClose();
     }
 
     const resetLayout = () => {
-        panel_layouts.resetToDefault();
+        panelLayouts.resetToDefault();
         handleClose();
     }
 

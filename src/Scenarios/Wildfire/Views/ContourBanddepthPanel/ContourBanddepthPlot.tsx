@@ -17,7 +17,7 @@ export const ContourBanddepthPlot = observer(() => {
     const chart_ref = useRef(null);
 
     const scenario = useScenario();
-    const global_context = scenario?.global_context as WildfireGlobalContext;
+    const global_context = scenario?.globalContext as WildfireGlobalContext;
     const ensemble_names = global_context?.ensemble_names;
     const depths = global_context?.scalars?.depths;
     const ordering = global_context?.scalars?.ordering;

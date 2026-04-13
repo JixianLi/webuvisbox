@@ -20,10 +20,10 @@ import { trackPromise } from "react-promise-tracker";
 const QueryConfigPanel = observer(() => {
 
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
+    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
 
     if (!scenario.initialized) {
-        return <Panel panel_name={"Query Config"}>
+        return <Panel panelName={"Query Config"}>
             <div>Loading...</div>
         </Panel>;
     }
@@ -95,7 +95,7 @@ const QueryConfigPanel = observer(() => {
     };
 
     return (
-        <Panel panel_name={"Query Config"}>
+        <Panel panelName={"Query Config"}>
             {create_content()}
         </Panel>
     );

@@ -5,7 +5,7 @@ import SingleColorBufferedMesh from "@/Renderers/Mesh/SingleColorBufferedMesh";
 
 export const SquidGlyphMesh = observer(() => {
     const scenario = useScenario();
-    const global_data = scenario.global_context as WildfireGlobalContext;
+    const global_data = scenario.globalContext as WildfireGlobalContext;
     const squid_glyphs = global_data.squid_glyphs;
 
     if (!global_data || !squid_glyphs.display) {

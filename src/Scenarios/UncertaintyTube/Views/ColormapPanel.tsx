@@ -18,7 +18,7 @@ import VSUP from "@/Renderers/Colormaps/VSUP";
 const ColormapRenderer = observer(() => {
     const scenario = useScenario();
     const planeRef = useRef(null);
-    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
+    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
     const texture_height = global_context.colormap_config.texture_height;
     const texture_width = global_context.colormap_config.texture_width;
     const texture = global_context.texture_manager.getTexture("uncertainty_tube_colormap", undefined, texture_width, texture_height);
@@ -45,12 +45,12 @@ const ColormapRenderer = observer(() => {
 const ColormapPanel = observer(() => {
     const scenario = useScenario();
     if (!scenario.initialized) {
-        return <Panel panel_name="Colormap">
+        return <Panel panelName="Colormap">
             <div>Loading...</div>
         </Panel>;
     }
 
-    const global_data = scenario.global_context as UncertaintyTubeGlobalContext;
+    const global_data = scenario.globalContext as UncertaintyTubeGlobalContext;
     const type = global_data.colormap.type;
     let colormap;
     switch (type) {
@@ -66,7 +66,7 @@ const ColormapPanel = observer(() => {
     }
 
     return (
-        <Panel panel_name="Colormap Config">
+        <Panel panelName="Colormap Config">
             <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" sx={{ marginBottom: '10px' }}>
                 <Typography variant="h6">Colormap:</Typography>
                 <Select

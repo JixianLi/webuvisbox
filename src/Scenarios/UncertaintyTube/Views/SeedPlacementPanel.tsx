@@ -16,13 +16,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 const SeedPlacementPanel = observer(() => {
     const scenario = useScenario();
-    const global_context = scenario.global_context as UncertaintyTubeGlobalContext;
+    const global_context = scenario.globalContext as UncertaintyTubeGlobalContext;
 
     const seed_placement_config = global_context.seed_placement;
     const [min_x, max_x, min_y, max_y, min_z, max_z] = global_context.sb_bounds;
 
     return (
-        <Panel panel_name="Seed Placement">
+        <Panel panelName="Seed Placement">
             <Box sx={{ flexGrow: 1 }}>
                 <Grid container spacing={0} style={{ padding: '10px' }}>
                     <Grid size={12}>
