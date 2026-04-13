@@ -5,12 +5,12 @@ import type { ScalarQueryResult } from "../DataFetcher";
 import { getTextureManager } from "@/Renderers/Colormaps/TextureManager";
 
 export class ScalarFields {
-    private _scalar_names: string[] = [];
-    texture_manager = getTextureManager();
-    private _scalar_data: {
+    private _scalarNames: string[] = [];
+    textureManager = getTextureManager();
+    private _scalarData: {
         [key: string]: Float32Array  // key is scalar name
     } = {};
-    private _scalar_tags: {
+    private _scalarTags: {
         [key: string]: {
             name: string;
             min: number;
@@ -30,16 +30,16 @@ export class ScalarFields {
     }
 
     // Getters return copies / readonly views so callers cannot modify internals
-    get scalar_names(): ReadonlyArray<string> {
-        return this._scalar_names;
+    get scalarNames(): ReadonlyArray<string> {
+        return this._scalarNames;
     }
 
-    get scalar_data(): { [key: string]: Float32Array } {
-        return this._scalar_data;
+    get scalarData(): { [key: string]: Float32Array } {
+        return this._scalarData;
     }
 
-    get scalar_tags(): { [key: string]: { name: string; min: number; max: number; units: string; description: string } } {
-        return this._scalar_tags;
+    get scalarTags(): { [key: string]: { name: string; min: number; max: number; units: string; description: string } } {
+        return this._scalarTags;
     }
 
     get rescaled(): Float32Array[] | undefined {
@@ -63,7 +63,7 @@ export class ScalarFields {
             if (this._tfs === undefined) {
                 this._tfs = {};
             }
-            this._scalar_names.forEach(name => {
+            this._scalarNames.forEach(name => {
                 if (this._tfs[name] === undefined || this._tfs[name] === null) {
                     if (name === "NFUEL_CAT") {
                         const colormap = new PresetLinearColormap("Greens");
@@ -75,7 +75,7 @@ export class ScalarFields {
                         };
                     } else if (name === "boxplot") {
                         const colormap = new PresetLinearColormap("X Ray");
-                        colormap.color_points[0] = [0.95,1.0,0.95]
+                        colormap.colorPoints[0] = [0.95,1.0,0.95]
                         this._tfs[name] = {
                             ctf: colormap,
                             otf: new OpacityMap([0, 1], [1, 1])
@@ -89,23 +89,23 @@ export class ScalarFields {
                         };
                     }
                 }
-                this.texture_manager.registerColormap(name, this._tfs[name].ctf);
-                this.texture_manager.registerOpacityMap(name, this._tfs[name].otf);
+                this.textureManager.registerColormap(name, this._tfs[name].ctf);
+                this.textureManager.registerOpacityMap(name, this._tfs[name].otf);
             });
         });
     }
 
     private rescaleScalarData() {
         const rescaled = [];
-        this._scalar_names.forEach(name => {
-            const raw = this._scalar_data[name];
-            const min = this._scalar_tags[name].min;
-            const max = this._scalar_tags[name].max;
-            const rescaled_sf = new Float32Array(raw.length);
+        this._scalarNames.forEach(name => {
+            const raw = this._scalarData[name];
+            const min = this._scalarTags[name].min;
+            const max = this._scalarTags[name].max;
+            const rescaledSf = new Float32Array(raw.length);
             for (let i = 0; i < raw.length; i++) {
-                rescaled_sf[i] = (raw[i] - min) / (max - min);
+                rescaledSf[i] = (raw[i] - min) / (max - min);
             }
-            rescaled.push(rescaled_sf);
+            rescaled.push(rescaledSf);
         });
         runInAction(() => {
             this._rescaled = rescaled;
@@ -115,9 +115,9 @@ export class ScalarFields {
 
     public processReceivedScalarData(scalars: ScalarQueryResult): void {
         runInAction(() => {
-            this._scalar_names = scalars.scalar_names;
-            this._scalar_data = scalars.scalar_data;
-            this._scalar_tags = scalars.scalar_tags;
+            this._scalarNames = scalars.scalar_names;
+            this._scalarData = scalars.scalar_data;
+            this._scalarTags = scalars.scalar_tags;
             this._depths = scalars.depths;
             this._ordering = scalars.ordering;
             this.updateTFs();
@@ -152,10 +152,10 @@ export class ScalarFields {
 
             // Store in our tfs object
             this._tfs[key] = { ctf, otf };
-            
+
             // Register with texture manager
-            this.texture_manager.registerColormap(key, ctf);
-            this.texture_manager.registerOpacityMap(key, otf);
+            this.textureManager.registerColormap(key, ctf);
+            this.textureManager.registerOpacityMap(key, otf);
         });
     });
 

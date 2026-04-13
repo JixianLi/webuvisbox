@@ -6,73 +6,73 @@ import { makeAutoObservable, runInAction } from "mobx";
 
 export class ContourConfig {
 
-    private _display_primary: boolean;
-    private _display_secondary: boolean;
+    private _displayPrimary: boolean;
+    private _displaySecondary: boolean;
     private _radius: number;
-    private _primary_scale: number;
-    private _secondary_scale: number;
-    private _radial_segments: number;
+    private _primaryScale: number;
+    private _secondaryScale: number;
+    private _radialSegments: number;
 
     constructor() {
-        this._display_primary = true;
-        this._display_secondary = true;
+        this._displayPrimary = true;
+        this._displaySecondary = true;
         this._radius = 0.001;
-        this._primary_scale = 2;
-        this._secondary_scale = 1;
-        this._radial_segments = 6;
+        this._primaryScale = 2;
+        this._secondaryScale = 1;
+        this._radialSegments = 6;
         makeAutoObservable(this);
     }
 
-    get display_primary(): boolean { return this._display_primary; }
-    get display_secondary(): boolean { return this._display_secondary; }
+    get displayPrimary(): boolean { return this._displayPrimary; }
+    get displaySecondary(): boolean { return this._displaySecondary; }
     get radius(): number { return this._radius; }
-    get primary_scale(): number { return this._primary_scale; }
-    get secondary_scale(): number { return this._secondary_scale; }
-    get radial_segments(): number { return this._radial_segments; }
+    get primaryScale(): number { return this._primaryScale; }
+    get secondaryScale(): number { return this._secondaryScale; }
+    get radialSegments(): number { return this._radialSegments; }
 
     setDisplayPrimary(display: boolean): void {
         runInAction(() => {
-            this._display_primary = display;
+            this._displayPrimary = display;
         });
     }
 
     setDisplaySecondary(display: boolean): void {
         runInAction(() => {
-            this._display_secondary = display;
+            this._displaySecondary = display;
         });
     }
 
     setPrimaryScale(scale: number): void {
-        const clipped_scale = clip(scale, 1, 100);
+        const clippedScale = clip(scale, 1, 100);
         runInAction(() => {
-            this._primary_scale = clipped_scale;
+            this._primaryScale = clippedScale;
         });
     }
 
     setSecondaryScale(scale: number): void {
-        const clipped_scale = clip(scale, 1, 100);
+        const clippedScale = clip(scale, 1, 100);
         runInAction(() => {
-            this._secondary_scale = clipped_scale;
+            this._secondaryScale = clippedScale;
         });
     }
 
     loadFromObject(obj: any): void {
-        this._display_primary = obj.display_primary ?? this._display_primary;
-        this._display_secondary = obj.display_secondary ?? this._display_secondary;
+        this._displayPrimary = obj.display_primary ?? this._displayPrimary;
+        this._displaySecondary = obj.display_secondary ?? this._displaySecondary;
         this._radius = obj.radius ?? this._radius;
-        this._primary_scale = obj.primary_scale ?? this._primary_scale;
-        this._secondary_scale = obj.secondary_scale ?? this._secondary_scale;
-        this._radial_segments = obj.radial_segments ?? this._radial_segments;
+        this._primaryScale = obj.primary_scale ?? this._primaryScale;
+        this._secondaryScale = obj.secondary_scale ?? this._secondaryScale;
+        this._radialSegments = obj.radial_segments ?? this._radialSegments;
     }
 
     toObject() {
         return {
-            display_primary: this._display_primary,
-            display_secondary: this._display_secondary,
+            display_primary: this._displayPrimary,
+            display_secondary: this._displaySecondary,
             radius: this._radius,
-            primary_scale: this._primary_scale,
-            secondary_scale: this._secondary_scale,
-            radial_segments: this._radial_segments,
+            primary_scale: this._primaryScale,
+            secondary_scale: this._secondaryScale,
+            radial_segments: this._radialSegments,
         };
     }
 }

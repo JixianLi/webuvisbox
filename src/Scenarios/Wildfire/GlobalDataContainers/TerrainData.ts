@@ -9,7 +9,7 @@ class TerrainData {
     private _bounds: [number, number, number, number, number, number];
     private _center: [number, number, number];
     private _diag: number;
-    private _base_scale: number;
+    private _baseScale: number;
 
     constructor() {
         this._positions = new Float32Array();
@@ -18,7 +18,7 @@ class TerrainData {
         this._bounds = [0, 0, 0, 0, 0, 0];
         this._center = [0, 0, 0];
         this._diag = 0;
-        this._base_scale = 1.0;
+        this._baseScale = 1.0;
         makeAutoObservable(this);
     }
 
@@ -29,7 +29,7 @@ class TerrainData {
     get bounds(): [number, number, number, number, number, number] { return this._bounds; }
     get center(): [number, number, number] { return this._center; }
     get diag(): number { return this._diag; }
-    get base_scale(): number { return this._base_scale; }
+    get baseScale(): number { return this._baseScale; }
 
     loadFromJson(json: string): void {
         const obj = JSON.parse(json);
@@ -57,7 +57,7 @@ class TerrainData {
         this._bounds = Array.isArray(obj.bounds) ? obj.bounds : [0, 0, 0, 0, 0, 0];
         this._center = Array.isArray(obj.center) ? obj.center : [0, 0, 0];
         this._diag = typeof obj.diag === "number" ? obj.diag : 0;
-        this._base_scale = typeof obj.base_scale === "number" ? obj.base_scale : 1.0;
+        this._baseScale = typeof obj.base_scale === "number" ? obj.base_scale : 1.0;
     }
 
     toObject() {
@@ -66,7 +66,7 @@ class TerrainData {
             bounds: this._bounds,
             center: this._center,
             diag: this._diag,
-            base_scale: this._base_scale,
+            base_scale: this._baseScale,
         };
     }
 

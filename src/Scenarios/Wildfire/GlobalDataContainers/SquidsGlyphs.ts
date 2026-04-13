@@ -58,10 +58,10 @@ export class SquidsGlyphs {
     }
 
     public setScale(scale: number): void {
-        const clipped_scale = clip(scale, 1e-10, undefined);
-        if (clipped_scale === this._scale) return;
+        const clippedScale = clip(scale, 1e-10, undefined);
+        if (clippedScale === this._scale) return;
         runInAction(() => {
-            this._scale = clipped_scale;
+            this._scale = clippedScale;
         });
         if (this._display && this._onChanged) {
             this._onChanged();
