@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import '../examples/Wildfire'
-import './Scenarios/UncertaintyTube'
+import '../examples/UncertaintyTube'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -5,7 +5,7 @@ import Grid from "@mui/material/Grid";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalContext";
+import type UncertaintyTubeGlobalContext from "../UncertaintyTubeGlobalContext";
 import { LazyTextField } from "@/Panels/Lazyfields";
 import Stack from "@mui/material/Stack";
 import { runInAction } from "mobx";

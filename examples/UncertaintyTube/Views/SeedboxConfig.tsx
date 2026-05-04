@@ -8,7 +8,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Panel from "@/Panels/Panel";
 import { LazyTextField } from "@/Panels/Lazyfields";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type UncertaintyTubeGlobalContext from "@/Scenarios/UncertaintyTube/UncertaintyTubeGlobalContext";
+import type UncertaintyTubeGlobalContext from "../UncertaintyTubeGlobalContext";
 
 const SeedboxConfigPanel = observer(() => {
     const scenario = useScenario();
