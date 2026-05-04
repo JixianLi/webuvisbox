@@ -1,19 +1,13 @@
-// ABOUTME: Scenario discovery entry point.
-// ABOUTME: Imports all scenarios to trigger their self-registration.
+// ABOUTME: Public registry surface for the scenario plugin system.
+// ABOUTME: Re-exports the registry and provides convenience accessors; does not register any scenarios.
 
 import type { GlobalContext } from "@/Types/GlobalContext";
 import type { ReactNode } from "react";
 import { scenarioRegistry } from "./ScenarioRegistry";
 
-// Import scenarios to trigger registration
-import "./Wildfire";
-import "./UncertaintyTube";
-
-// Re-export registry for external use
 export { scenarioRegistry } from "./ScenarioRegistry";
 export type { ScenarioDefinition } from "./ScenarioRegistry";
 
-// Convenience functions for backward compatibility
 export function getGlobalContext(scenarioName: string): GlobalContext {
   return scenarioRegistry.get(scenarioName).createGlobalContext();
 }
