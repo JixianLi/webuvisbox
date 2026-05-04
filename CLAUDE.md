@@ -17,32 +17,60 @@ npm run preview  # Preview production build
 
 ## Architecture
 
-### Scenario-Based Design
+### Library / Examples Split
 
-Scenarios self-register via a registry pattern in `src/Scenarios/ScenarioRegistry.ts`:
+The repo is split into a reusable library (`src/`) and a dev app that exercises it (`examples/`):
 
 ```
-src/Scenarios/
-├── index.ts                # Imports all scenarios to trigger registration
-├── ScenarioRegistry.ts     # Registry singleton
-└── {ScenarioName}/
-    ├── index.ts            # Self-registration entry point
-    ├── {ScenarioName}GlobalContext.ts  # MobX state management
-    ├── {scenarioName}PanelMappingFunction.tsx  # Maps panel IDs to components
-    └── Views/              # Panel components
+src/                      # Library — no scenario-specific code
+├── App.tsx               # Top-level app component (takes initialConfig prop)
+├── ScenarioManager/      # Loads config, drives scenario lifecycle
+├── LayoutManager/        # Responsive grid layout
+├── Panels/               # Base Panel component + grid container
+├── Renderers/            # Shared 3D meshes, colormaps, chart helpers
+├── Scenarios/
+│   ├── ScenarioRegistry.ts   # Registry singleton + ScenarioDefinition type
+│   └── index.ts              # Re-exports registry; registers no scenarios
+├── Types/                # GlobalContext, Scenario, PanelLayouts interfaces
+└── Helpers/
+
+examples/                 # Dev app + example scenarios (Vite root)
+├── index.html            # Entry HTML, loads main.tsx
+├── main.tsx              # Imports each example to register, mounts <App>
+├── public/
+│   └── ScenarioConfigs/  # JSON configs served at URL root
+├── Wildfire/             # Example scenario
+└── UncertaintyTube/      # Example scenario
 ```
 
-To add a new scenario:
-1. Create scenario folder `src/Scenarios/YourScenario/`
-2. Implement `GlobalContext` interface (`initialize()`, `asyncInitialize()`, `toObject()`)
-3. Create panel mapping function
-4. Create `index.ts` that calls `scenarioRegistry.register({...})`
-5. Add JSON config in `public/ScenarioConfigs/`
-6. Add import to `src/Scenarios/index.ts`
+Vite's `root` is set to `examples/`, so `npm run dev` boots from there. Build output stays at project root (`dist/`) via `build.outDir`.
+
+### Scenario Registration
+
+Scenarios self-register at import time. `src/Scenarios/ScenarioRegistry.ts` is a singleton; importing a scenario's `index.ts` triggers its `scenarioRegistry.register(...)` call. The registry is consumed by the library; registration is owned by whoever runs the app (currently `examples/main.tsx`).
+
+A scenario folder looks like:
+
+```
+{ScenarioName}/
+├── index.ts                              # Calls scenarioRegistry.register({...})
+├── {ScenarioName}GlobalContext.ts        # MobX state, implements GlobalContext
+├── {scenarioName}PanelMappingFunction.tsx  # Maps panel IDs to JSX
+└── Views/                                # Panel components
+```
+
+To add a new example scenario:
+1. Create `examples/YourScenario/` matching the layout above
+2. In `index.ts`, call `scenarioRegistry.register({...})` — import the registry from `@/Scenarios/ScenarioRegistry`
+3. Implement the `GlobalContext` interface (`initialize()`, `asyncInitialize()`, `toObject()`)
+4. Add `examples/public/ScenarioConfigs/YourScenario.json`
+5. Add `import "./YourScenario"` to `examples/main.tsx`
+
+Within a scenario folder, prefer **relative imports** for files inside the same scenario. Use `@/` only to reach library code in `src/`. This keeps each scenario self-contained and ready to extract into its own repo.
 
 ### Core Flow
 
-`App.tsx` → `ScenarioProvider` (context) → `LayoutManager` → `ResponsiveGridLayout` → Panel components
+`main.tsx` → `<App initialConfig="...">` → `ScenarioProvider` fetches the config → `LayoutManager` → `ResponsiveGridLayout` → Panel components.
 
 - **ScenarioManager**: Loads JSON config, creates GlobalContext via `getGlobalContext()`, manages init lifecycle
 - **PanelLayoutManager**: Handles responsive grid layouts with breakpoints
@@ -52,22 +80,8 @@ To add a new scenario:
 
 - **MobX everywhere**: All state is reactive. Use `observer()` wrapper for components, `makeAutoObservable()` in stores
 - **Panel mapping**: Each scenario has `{name}PanelMappingFunction.tsx` that maps string IDs to JSX
-- **Path alias**: `@/` maps to `src/` (configured in vite.config.ts and tsconfig.app.json)
-- **Config-driven layouts**: Panel positions/sizes defined in `public/ScenarioConfigs/*.json`
-
-### Shared Components
-
-```
-src/Renderers/
-├── Colormaps/         # Transfer function textures and editors
-├── Mesh/              # Reusable Three.js mesh components
-├── Chartjs/           # Chart.js utilities
-└── SharedCameraControl/  # Synchronized camera across 3D views
-
-src/Panels/
-├── Panel.tsx          # Base panel wrapper with drag handle
-└── GridLayoutContainer.tsx
-```
+- **Path alias**: `@/` maps to `src/` (configured in `vite.config.ts` and `tsconfig.app.json`). Examples consume library code through this alias.
+- **Config-driven layouts**: Panel positions/sizes defined in `examples/public/ScenarioConfigs/*.json`
 
 ### 3D Rendering Stack
 
@@ -77,7 +91,7 @@ src/Panels/
 
 ### Configuration Files
 
-Scenario configs in `public/ScenarioConfigs/*.json` define:
+Scenario configs in `examples/public/ScenarioConfigs/*.json` define:
 - `name`: Must match the name used in `scenarioRegistry.register()`
 - `panel_layouts`: Responsive grid layouts per breakpoint (xl, lg, sm)
 - `global_data`: Scenario-specific initial state passed to GlobalContext

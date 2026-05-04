@@ -67,32 +67,32 @@ npm run preview
 
 ## Project Structure
 
+The repository is split into a reusable library and a dev app that exercises it:
+
 ```
 webuvisbox/
-├── src/
-│   ├── Scenarios/              # Scenario plugin system
-│   │   ├── index.ts            # Scenario discovery (imports all scenarios)
-│   │   ├── ScenarioRegistry.ts # Registry singleton
-│   │   ├── Wildfire/           # Wildfire simulation visualization
-│   │   │   ├── index.ts        # Self-registration entry point
-│   │   │   ├── WildfireGlobalContext.ts
-│   │   │   └── Views/          # Panel components
-│   │   └── UncertaintyTube/    # Flow uncertainty visualization
-│   │       ├── index.ts        # Self-registration entry point
-│   │       ├── UncertaintyTubeGlobalData.ts
-│   │       └── Views/          # Panel components
-│   ├── Renderers/              # Shared rendering components
-│   │   ├── Colormaps/          # Color and opacity mapping
-│   │   ├── Mesh/               # 3D mesh components
-│   │   └── Chartjs/            # Chart utilities
-│   ├── LayoutManager/          # Panel layout management
-│   ├── Panels/                 # Reusable panel components
-│   ├── Types/                  # TypeScript type definitions
-│   └── Helpers/                # Utility functions
-├── public/
-│   └── ScenarioConfigs/        # Scenario configuration files
+├── src/                         # Library (no scenario-specific code)
+│   ├── App.tsx                  # Top-level component, accepts initialConfig prop
+│   ├── ScenarioManager/         # Loads scenario config, manages lifecycle
+│   ├── LayoutManager/           # Responsive grid layout
+│   ├── Panels/                  # Base Panel component + grid container
+│   ├── Renderers/               # Shared 3D meshes, colormaps, chart helpers
+│   ├── Scenarios/
+│   │   ├── ScenarioRegistry.ts  # Registry singleton
+│   │   └── index.ts             # Re-exports registry (no built-in scenarios)
+│   ├── Types/                   # GlobalContext, Scenario, PanelLayouts
+│   └── Helpers/
+├── examples/                    # Dev app + example scenarios (Vite root)
+│   ├── index.html
+│   ├── main.tsx                 # Registers examples and mounts <App>
+│   ├── public/
+│   │   └── ScenarioConfigs/     # JSON configs (Wildfire, UncertaintyTube)
+│   ├── Wildfire/                # Example scenario
+│   └── UncertaintyTube/         # Example scenario
 └── package.json
 ```
+
+The library only contains the framework — no scenarios ship with it. The two example scenarios under `examples/` demonstrate how to consume the library and double as the dev playground.
 
 ## Scenarios
 
@@ -112,7 +112,7 @@ Explore flow field uncertainty with:
 
 ## Configuration
 
-Scenarios are configured via JSON files in `public/ScenarioConfigs/`. Each scenario defines:
+Scenarios are configured via JSON files in `examples/public/ScenarioConfigs/`. Each scenario defines:
 - Panel layouts (responsive grid configurations)
 - Data sources and ensemble members
 - Initial visualization parameters
@@ -152,11 +152,11 @@ Example structure:
 
 ### Adding a New Scenario
 
-Scenarios self-register via a registry pattern. To add a new scenario:
+Scenarios self-register via a registry pattern. To add an example scenario:
 
-1. Create your scenario folder:
+1. Create your scenario folder under `examples/`:
 ```
-src/Scenarios/YourScenario/
+examples/YourScenario/
 ├── index.ts                      # Entry point (registers the scenario)
 ├── YourScenarioGlobalContext.ts  # State management (implements GlobalContext)
 ├── yourScenarioPanelMapping.tsx  # Maps panel IDs to components
@@ -167,7 +167,7 @@ src/Scenarios/YourScenario/
 
 2. Create `index.ts` to register your scenario:
 ```typescript
-import { scenarioRegistry } from "../ScenarioRegistry";
+import { scenarioRegistry } from "@/Scenarios/ScenarioRegistry";
 import { YourScenarioGlobalContext } from "./YourScenarioGlobalContext";
 import { yourScenarioPanelMapping } from "./yourScenarioPanelMapping";
 
@@ -180,37 +180,43 @@ scenarioRegistry.register({
 });
 ```
 
-3. Implement `GlobalContext` interface in your GlobalContext class:
+Within the scenario folder, use relative imports for sibling files. Use the `@/` alias only to reach library code in `src/`. This keeps the scenario self-contained.
+
+3. Implement the `GlobalContext` interface in your GlobalContext class:
 ```typescript
 interface GlobalContext {
-  initialize(global_data_object: any): void;
+  initialize(globalDataObject: any): void;
   asyncInitialize(): Promise<void>;
   toObject(): any;
 }
 ```
 
-4. Create configuration JSON in `public/ScenarioConfigs/YourScenario.json`
+4. Create configuration JSON in `examples/public/ScenarioConfigs/YourScenario.json`
 
-5. Add one import to `src/Scenarios/index.ts`:
+5. Add one import to `examples/main.tsx`:
 ```typescript
 import "./YourScenario";
 ```
 
-That's it! Your scenario is now available in the application.
+To boot your scenario by default, also update the `initialConfig` prop:
+```tsx
+<App initialConfig="ScenarioConfigs/YourScenario.json" />
+```
 
 ### Creating Custom Panels
 
 Panels extend the base `Panel` component and integrate with the MobX reactive system:
 
 ```tsx
-import Panel from "@/Panels/Panel";
+import { Panel } from "@/Panels/Panel";
+import { useScenario } from "@/ScenarioManager/ScenarioManager";
 import { observer } from "mobx-react-lite";
 
 export const MyPanel = observer(() => {
-  const global_context = useScenario().global_context;
-  
+  const globalContext = useScenario().globalContext;
+
   return (
-    <Panel panel_name="My Panel">
+    <Panel panelName="My Panel">
       {/* Your content */}
     </Panel>
   );
