@@ -109,17 +109,17 @@ class ScenarioManager implements Scenario {
 
 const scenario = createContext<ScenarioManager | null>(null);
 
-export function ScenarioProvider({ children }: { children: React.ReactNode }) {
+export function ScenarioProvider({ children, initialConfig }: { children: React.ReactNode; initialConfig: string }) {
     const [scenarioManager] = useState<ScenarioManager>(new ScenarioManager());
 
     useEffect(() => {
-        fetch("ScenarioConfigs/Wildfire.json")
+        fetch(initialConfig)
             .then(response => response.json())
             .then(data => scenarioManager.completeInitialization(data))
             .catch(error => {
                 console.error("Failed to initialize scenario:", error);
             });
-    }, [scenarioManager]);
+    }, [scenarioManager, initialConfig]);
 
     return (
         <scenario.Provider value={scenarioManager}>

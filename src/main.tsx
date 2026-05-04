@@ -7,6 +7,6 @@ import './Scenarios/UncertaintyTube'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <App initialConfig="ScenarioConfigs/Wildfire.json" />
   </StrictMode>,
 )

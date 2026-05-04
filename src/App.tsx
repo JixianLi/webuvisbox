@@ -17,7 +17,11 @@ import LayoutManager from './LayoutManager/LayoutManager';
 import { ScenarioProvider } from './ScenarioManager/ScenarioManager';
 import ThemeModeContext from './ThemeModeContext';
 
-function App() {
+interface AppProps {
+    initialConfig: string;
+}
+
+function App({ initialConfig }: AppProps) {
     const systemTheme =
         window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
             ? 'dark'
@@ -47,7 +51,7 @@ function App() {
     const themeModeValue = useMemo(() => ({ mode, toggleMode }), [mode, toggleMode]);
 
     return (
-        <ScenarioProvider>
+        <ScenarioProvider initialConfig={initialConfig}>
             <ThemeModeContext.Provider value={themeModeValue}>
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
