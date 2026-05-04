@@ -1,7 +1,7 @@
 import Panel from "@/Panels/Panel";
 import type OpacityMap from "@/Renderers/Colormaps/OpacityMap";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import type WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalContext";
+import type WildfireGlobalContext from "../../WildfireGlobalContext";
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Box, FormControl, InputLabel, Select, MenuItem, Typography, Divider } from "@mui/material";

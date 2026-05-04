@@ -1,34 +1,17 @@
-// ABOUTME: Renders the Wildfire terrain scene with depth visualization.
-// ABOUTME: Uses DepthOverride to render all objects as inverted linear depth grayscale.
-
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalContext";
+import WildfireGlobalContext from "../../WildfireGlobalContext";
 import { Canvas } from "@react-three/fiber";
-import { PerspectiveCamera } from "@react-three/drei";
+import { PerspectiveCamera, GizmoHelper, GizmoViewport } from "@react-three/drei";
 import * as THREE from "three";
-import { useRef, forwardRef, useImperativeHandle } from "react";
-import TerrainScene from "../TerrainVisualization/TerrainScene";
+import { useRef } from "react";
+import EnsembleTerrainScene from "./EnsembleTerrainScene";
 import SharedTrackballControl from "@/Renderers/SharedCameraControl/SharedTrackballControl";
-import { DepthOverride } from "@/Renderers/DepthRenderer/DepthRenderer";
-import { saveGrayscalePng } from "@/Helpers/saveGrayscalePng";
 
-export interface DepthTerrainRendererHandle {
-    saveImage: () => void;
-}
-
-export const DepthTerrainRenderer = observer(forwardRef<DepthTerrainRendererHandle>((_, ref) => {
+export const EnsembleTerrainRenderer = observer(() => {
     const controlRef = useRef(null);
-    const glRef = useRef<THREE.WebGLRenderer | null>(null);
+    const canvasRef = useRef(null);
     const lastTapTime = useRef<number>(0);
-
-    useImperativeHandle(ref, () => ({
-        saveImage: () => {
-            if (glRef.current) {
-                saveGrayscalePng(glRef.current, `depth_${Date.now()}.png`);
-            }
-        }
-    }));
 
     const scenario = useScenario();
     const globalData = scenario.globalContext as WildfireGlobalContext;
@@ -37,7 +20,21 @@ export const DepthTerrainRenderer = observer(forwardRef<DepthTerrainRendererHand
     if (!terrainViewConfig) {
         return <div>No terrain view configuration available</div>;
     }
+    let gizmoScale = 1.0;
 
+    switch (scenario.panelLayouts.currentBreakpoint) {
+        case "xl": case "lg":
+            gizmoScale = 1.0;
+            break;
+        case "md":
+            gizmoScale = 0.75;
+            break;
+        case "sm": case "xs":
+            gizmoScale = 0.5;
+            break;
+    }
+
+    // Camera setup
     const center = globalData.terrain.center;
     const diag = globalData.terrain.diag;
     const near = 0.01;
@@ -45,9 +42,7 @@ export const DepthTerrainRenderer = observer(forwardRef<DepthTerrainRendererHand
     const cameraPos = new THREE.Vector3(center[0], center[1], center[2] + diag);
 
     return (
-        <Canvas
-            gl={{ preserveDrawingBuffer: true, alpha: true }}
-            onCreated={({ gl }) => { glRef.current = gl; }}
+        <Canvas ref={canvasRef}
             onPointerDown={(_e) => {
                 const now = Date.now();
                 const timeDiff = now - lastTapTime.current;
@@ -57,18 +52,12 @@ export const DepthTerrainRenderer = observer(forwardRef<DepthTerrainRendererHand
                 }
                 lastTapTime.current = now;
             }}
-            linear
-            flat
-        >
-            <DepthOverride />
-            <TerrainScene />
-            <PerspectiveCamera
-                makeDefault
-                position={cameraPos}
-                near={near}
-                far={far}
-                fov={35}
-            />
+            linear flat>
+            <EnsembleTerrainScene />
+            <PerspectiveCamera makeDefault
+                position={cameraPos} near={near} far={far} fov={35}>
+                <directionalLight position={[0, 0, 0]} intensity={1} />
+            </PerspectiveCamera>
             <SharedTrackballControl
                 ref={controlRef}
                 makeDefault
@@ -79,10 +68,15 @@ export const DepthTerrainRenderer = observer(forwardRef<DepthTerrainRendererHand
                 maxDistance={far / 2}
                 minDistance={near < 1 ? near / 100 : near * 100}
             />
+            <ambientLight intensity={2.0} />
+
+            <GizmoHelper alignment="bottom-right" margin={[80 * gizmoScale, 80 * gizmoScale]}>
+                <mesh scale={new THREE.Vector3(gizmoScale, gizmoScale, gizmoScale)}>
+                    <GizmoViewport labels={['E', 'N', 'U']} />
+                </mesh>
+            </GizmoHelper>
         </Canvas>
     );
-}));
+})
 
-DepthTerrainRenderer.displayName = "DepthTerrainRenderer";
-
-export default DepthTerrainRenderer;
+export default EnsembleTerrainRenderer;

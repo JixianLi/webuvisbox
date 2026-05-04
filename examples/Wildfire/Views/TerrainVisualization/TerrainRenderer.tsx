@@ -1,17 +1,41 @@
 import { observer } from "mobx-react-lite";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import WildfireGlobalContext from "@/Scenarios/Wildfire/WildfireGlobalContext";
+import WildfireGlobalContext from "../../WildfireGlobalContext";
 import { Canvas } from "@react-three/fiber";
-import { PerspectiveCamera, GizmoHelper, GizmoViewport } from "@react-three/drei";
+import { PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
-import { useRef } from "react";
-import EnsembleTerrainScene from "./EnsembleTerrainScene";
+import { useRef, forwardRef, useImperativeHandle } from "react";
+import TerrainScene from "./TerrainScene";
 import SharedTrackballControl from "@/Renderers/SharedCameraControl/SharedTrackballControl";
+// @ts-ignore
+import { Perf } from 'r3f-perf';
+export interface TerrainRendererHandle {
+    saveImage: () => void;
+}
 
-export const EnsembleTerrainRenderer = observer(() => {
+interface TerrainRendererProps {
+    useOpacity?: boolean;
+    ctfName?: string;
+    otfName?: string;
+}
+
+export const TerrainRenderer = observer(forwardRef<TerrainRendererHandle, TerrainRendererProps>((props, ref) => {
     const controlRef = useRef(null);
-    const canvasRef = useRef(null);
+    const glRef = useRef<THREE.WebGLRenderer | null>(null);
     const lastTapTime = useRef<number>(0);
+
+    useImperativeHandle(ref, () => ({
+        saveImage: () => {
+            if (glRef.current) {
+                const canvas = glRef.current.domElement;
+                const dataURL = canvas.toDataURL("image/png");
+                const link = document.createElement("a");
+                link.download = `terrain_${Date.now()}.png`;
+                link.href = dataURL;
+                link.click();
+            }
+        }
+    }));
 
     const scenario = useScenario();
     const globalData = scenario.globalContext as WildfireGlobalContext;
@@ -19,19 +43,6 @@ export const EnsembleTerrainRenderer = observer(() => {
 
     if (!terrainViewConfig) {
         return <div>No terrain view configuration available</div>;
-    }
-    let gizmoScale = 1.0;
-
-    switch (scenario.panelLayouts.currentBreakpoint) {
-        case "xl": case "lg":
-            gizmoScale = 1.0;
-            break;
-        case "md":
-            gizmoScale = 0.75;
-            break;
-        case "sm": case "xs":
-            gizmoScale = 0.5;
-            break;
     }
 
     // Camera setup
@@ -42,7 +53,9 @@ export const EnsembleTerrainRenderer = observer(() => {
     const cameraPos = new THREE.Vector3(center[0], center[1], center[2] + diag);
 
     return (
-        <Canvas ref={canvasRef}
+        <Canvas
+            gl={{ preserveDrawingBuffer: true }}
+            onCreated={({ gl }) => { glRef.current = gl; }}
             onPointerDown={(_e) => {
                 const now = Date.now();
                 const timeDiff = now - lastTapTime.current;
@@ -52,8 +65,9 @@ export const EnsembleTerrainRenderer = observer(() => {
                 }
                 lastTapTime.current = now;
             }}
-            linear flat>
-            <EnsembleTerrainScene />
+            linear flat >
+            <TerrainScene {...props} />
+            <ambientLight intensity={2.0} />
             <PerspectiveCamera makeDefault
                 position={cameraPos} near={near} far={far} fov={35}>
                 <directionalLight position={[0, 0, 0]} intensity={1} />
@@ -68,15 +82,11 @@ export const EnsembleTerrainRenderer = observer(() => {
                 maxDistance={far / 2}
                 minDistance={near < 1 ? near / 100 : near * 100}
             />
-            <ambientLight intensity={2.0} />
-
-            <GizmoHelper alignment="bottom-right" margin={[80 * gizmoScale, 80 * gizmoScale]}>
-                <mesh scale={new THREE.Vector3(gizmoScale, gizmoScale, gizmoScale)}>
-                    <GizmoViewport labels={['E', 'N', 'U']} />
-                </mesh>
-            </GizmoHelper>
+            <Perf position="top-left" />
         </Canvas>
     );
-})
+}));
 
-export default EnsembleTerrainRenderer;
+TerrainRenderer.displayName = "TerrainRenderer";
+
+export default TerrainRenderer;

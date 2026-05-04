@@ -1,7 +1,7 @@
 // ABOUTME: Wildfire scenario entry point.
 // ABOUTME: Self-registers with the scenario registry on import.
 
-import { scenarioRegistry } from "../ScenarioRegistry";
+import { scenarioRegistry } from "@/Scenarios/ScenarioRegistry";
 import { WildfireGlobalContext } from "./WildfireGlobalContext";
 import { wildfirePanelMappingFunction } from "./wildfirePanelMappingFunction";
 
