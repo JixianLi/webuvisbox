@@ -7,9 +7,10 @@ import '@/index.css'
 import App from '@/App'
 import './Wildfire'
 import './UncertaintyTube'
+import './UITest'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App initialConfig="ScenarioConfigs/Wildfire.json" />
+    <App initialConfig="ScenarioConfigs/UITest.json" />
   </StrictMode>,
 )
