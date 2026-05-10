@@ -7,10 +7,10 @@ import '@/index.css'
 import App from '@/App'
 import './Wildfire'
 import './UncertaintyTube'
-import './UITest'
+import './ChatUI'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App initialConfig="ScenarioConfigs/UITest.json" />
+    <App initialConfig="ScenarioConfigs/ChatUI.json" />
   </StrictMode>,
 )
