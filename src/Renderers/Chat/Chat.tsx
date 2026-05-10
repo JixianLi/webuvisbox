@@ -9,10 +9,14 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import SendIcon from "@mui/icons-material/Send";
 
+export type TextPart = { type: "text"; text: string };
+export type ImagePart = { type: "image"; url: string; alt?: string };
+export type ContentPart = TextPart | ImagePart;
+
 export type ChatMessage = {
     id: string;
     role: "user" | "assistant" | "system";
-    content: string;
+    content: string | ContentPart[];
     authorName?: string;
 };
 
@@ -22,6 +26,11 @@ export type ChatProps = {
     placeholder?: string;
     busy?: boolean;
 };
+
+function normalizeParts(content: string | ContentPart[]): ContentPart[] {
+    if (typeof content === "string") return [{ type: "text", text: content }];
+    return content;
+}
 
 export function Chat({ messages, onSubmit, placeholder = "Type a message...", busy = false }: ChatProps) {
     const [draft, setDraft] = useState("");
@@ -68,13 +77,17 @@ export function Chat({ messages, onSubmit, placeholder = "Type a message...", bu
 }
 
 function ChatBubble({ message }: { message: ChatMessage }) {
+    const parts = normalizeParts(message.content);
+
     if (message.role === "system") {
+        const text = parts.filter((p): p is TextPart => p.type === "text").map((p) => p.text).join(" ");
         return (
             <Box sx={{ display: "flex", justifyContent: "center", my: 0.5 }}>
-                <Typography variant="caption" color="text.secondary">{message.content}</Typography>
+                <Typography variant="caption" color="text.secondary">{text}</Typography>
             </Box>
         );
     }
+
     const isUser = message.role === "user";
     return (
         <Box sx={{ display: "flex", justifyContent: isUser ? "flex-end" : "flex-start", my: 0.5 }}>
@@ -93,11 +106,34 @@ function ChatBubble({ message }: { message: ChatMessage }) {
                         {message.authorName}
                     </Typography>
                 )}
-                <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-                    {message.content}
-                </Typography>
+                {parts.map((part, idx) => <ContentPartView key={idx} part={part} />)}
             </Paper>
         </Box>
+    );
+}
+
+function ContentPartView({ part }: { part: ContentPart }) {
+    if (part.type === "text") {
+        return (
+            <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+                {part.text}
+            </Typography>
+        );
+    }
+    return (
+        <Box
+            component="img"
+            src={part.url}
+            alt={part.alt ?? ""}
+            sx={{
+                display: "block",
+                maxWidth: "100%",
+                maxHeight: 240,
+                objectFit: "contain",
+                borderRadius: 1,
+                mt: 0.5,
+            }}
+        />
     );
 }
 
