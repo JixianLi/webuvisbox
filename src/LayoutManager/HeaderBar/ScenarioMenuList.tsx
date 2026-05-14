@@ -7,8 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ScenarioUploadDialog from "./ScenarioUploadDialog";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
-import WhatshotIcon from '@mui/icons-material/Whatshot';
-import RouteIcon from '@mui/icons-material/Route';
+import ChatIcon from '@mui/icons-material/Chat';
 import Divider from '@mui/material/Divider';
 import { useScenario } from "../../ScenarioManager/ScenarioManager";
 
@@ -49,13 +48,9 @@ export const ScenarioMenuList: React.FC<{ handleClose: () => void }> = observer(
     return (
         <>
             <Divider>Examples</Divider>
-            <MenuItem onClick={() => server_load("ScenarioConfigs/UncertaintyTube.json")}>
-                <ListItemIcon><RouteIcon /></ListItemIcon>
-                <ListItemText>Uncertainty Tubes</ListItemText>
-            </MenuItem>
-            <MenuItem onClick={() => server_load("ScenarioConfigs/Wildfire.json")}>
-                <ListItemIcon><WhatshotIcon /></ListItemIcon>
-                <ListItemText>Wildfire</ListItemText>
+            <MenuItem onClick={() => server_load("ScenarioConfigs/ChatUI.json")}>
+                <ListItemIcon><ChatIcon /></ListItemIcon>
+                <ListItemText>chatUI</ListItemText>
             </MenuItem>
             
             <Divider>Scenarios</Divider>
