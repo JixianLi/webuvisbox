@@ -27,7 +27,7 @@ src/                      # Library — no scenario-specific code
 ├── ScenarioManager/      # Loads config, drives scenario lifecycle
 ├── LayoutManager/        # Responsive grid layout
 ├── Panels/               # Base Panel component + grid container
-├── Renderers/            # Shared 3D meshes, colormaps, chart helpers
+├── Renderers/            # Reusable renderers: Chat, Trace (swim lanes), Mesh, Colormaps, chart helpers
 ├── Scenarios/
 │   ├── ScenarioRegistry.ts   # Registry singleton + ScenarioDefinition type
 │   └── index.ts              # Re-exports registry; registers no scenarios
@@ -39,8 +39,9 @@ examples/                 # Dev app + example scenarios (Vite root)
 ├── main.tsx              # Imports each example to register, mounts <App>
 ├── public/
 │   └── ScenarioConfigs/  # JSON configs served at URL root
-├── Wildfire/             # Example scenario
-└── UncertaintyTube/      # Example scenario
+├── ChatUI/               # Example scenario (no backend; default in main.tsx)
+├── Wildfire/             # Example scenario (requires data server)
+└── UncertaintyTube/      # Example scenario (requires data server)
 ```
 
 Vite's `root` is set to `examples/`, so `npm run dev` boots from there. Build output stays at project root (`dist/`) via `build.outDir`.
@@ -115,4 +116,4 @@ Scenario configs in `examples/public/ScenarioConfigs/*.json` define:
 
 ## Data Server
 
-The app fetches ensemble data from a backend server. The server URL is configured in scenario JSON (`global_data.data_server_address`). The backend is not included in this repo.
+The `Wildfire` and `UncertaintyTube` example scenarios fetch ensemble data from a backend server, with the URL configured in scenario JSON (`global_data.data_server_address`). The backend is not included in this repo. The `ChatUI` example runs entirely client-side and needs no backend.
