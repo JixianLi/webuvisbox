@@ -128,8 +128,7 @@ function ContentPartView({ part }: { part: ContentPart }) {
             sx={{
                 display: "block",
                 maxWidth: "100%",
-                maxHeight: 240,
-                objectFit: "contain",
+                height: "auto",
                 borderRadius: 1,
                 mt: 0.5,
             }}
