@@ -96,7 +96,7 @@ function ChatBubble({ message }: { message: ChatMessage }) {
                 sx={{
                     p: 1,
                     px: 1.5,
-                    maxWidth: "75%",
+                    maxWidth: "95%",
                     bgcolor: isUser ? "primary.main" : "background.paper",
                     color: isUser ? "primary.contrastText" : "text.primary",
                 }}
