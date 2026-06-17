@@ -26,6 +26,7 @@ export type TraceProps = {
     messages: TraceMessage[];
     selectedId?: string | null;
     onSelect?: (id: string | null) => void;
+    fontSize?: number;
 };
 
 const LANE_WIDTH = 140;
@@ -35,8 +36,9 @@ const TOP_PAD = 16;
 const SELF_LOOP_OFFSET = 30;
 const HIT_STROKE = 24;
 
-export function Trace({ actors, messages, selectedId, onSelect }: TraceProps) {
+export function Trace({ actors, messages, selectedId, onSelect, fontSize = 13 }: TraceProps) {
     const theme = useTheme();
+    const labelSize = Math.max(fontSize - 2, 8);
 
     const indexOf = (id: string) => actors.findIndex((a) => a.id === id);
     const laneX = (id: string) => indexOf(id) * LANE_WIDTH + LANE_WIDTH / 2;
@@ -121,7 +123,7 @@ export function Trace({ actors, messages, selectedId, onSelect }: TraceProps) {
                                 y={HEADER_HEIGHT / 2 + 5}
                                 textAnchor="middle"
                                 fill={theme.palette.text.primary}
-                                fontSize="13"
+                                fontSize={fontSize}
                                 fontWeight="500"
                             >
                                 {actor.label}
@@ -157,7 +159,7 @@ export function Trace({ actors, messages, selectedId, onSelect }: TraceProps) {
                                         <text
                                             x={x + SELF_LOOP_OFFSET + 6}
                                             y={y + 4}
-                                            fontSize="11"
+                                            fontSize={labelSize}
                                             fill={theme.palette.text.secondary}
                                         >
                                             {msg.kind}
@@ -186,7 +188,7 @@ export function Trace({ actors, messages, selectedId, onSelect }: TraceProps) {
                                         x={(x1 + x2) / 2}
                                         y={y - 6}
                                         textAnchor="middle"
-                                        fontSize="11"
+                                        fontSize={labelSize}
                                         fill={theme.palette.text.secondary}
                                     >
                                         {msg.kind}
@@ -205,7 +207,7 @@ export function Trace({ actors, messages, selectedId, onSelect }: TraceProps) {
                     </Typography>
                     <Box
                         component="pre"
-                        sx={{ fontSize: 11, m: 0, whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "monospace" }}
+                        sx={{ fontSize: labelSize, m: 0, whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "monospace" }}
                     >
                         {typeof selected.payload === "string"
                             ? selected.payload

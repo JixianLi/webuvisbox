@@ -25,6 +25,7 @@ export type ChatProps = {
     onSubmit: (text: string) => void;
     placeholder?: string;
     busy?: boolean;
+    fontSize?: number;
 };
 
 function normalizeParts(content: string | ContentPart[]): ContentPart[] {
@@ -32,7 +33,7 @@ function normalizeParts(content: string | ContentPart[]): ContentPart[] {
     return content;
 }
 
-export function Chat({ messages, onSubmit, placeholder = "Type a message...", busy = false }: ChatProps) {
+export function Chat({ messages, onSubmit, placeholder = "Type a message...", busy = false, fontSize = 14 }: ChatProps) {
     const [draft, setDraft] = useState("");
     const transcriptRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +52,7 @@ export function Chat({ messages, onSubmit, placeholder = "Type a message...", bu
     return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%", height: "100%" }}>
             <Box ref={transcriptRef} sx={{ flex: 1, overflowY: "auto", p: 1, minHeight: 0 }}>
-                {messages.map((m) => <ChatBubble key={m.id} message={m} />)}
+                {messages.map((m) => <ChatBubble key={m.id} message={m} fontSize={fontSize} />)}
             </Box>
             <Box sx={{ display: "flex", gap: 1, p: 1, borderTop: 1, borderColor: "divider", flex: "0 0 auto" }}>
                 <TextField
@@ -76,14 +77,15 @@ export function Chat({ messages, onSubmit, placeholder = "Type a message...", bu
     );
 }
 
-function ChatBubble({ message }: { message: ChatMessage }) {
+function ChatBubble({ message, fontSize }: { message: ChatMessage; fontSize: number }) {
     const parts = normalizeParts(message.content);
+    const captionSize = Math.round(fontSize * 0.85);
 
     if (message.role === "system") {
         const text = parts.filter((p): p is TextPart => p.type === "text").map((p) => p.text).join(" ");
         return (
             <Box sx={{ display: "flex", justifyContent: "center", my: 0.5 }}>
-                <Typography variant="caption" color="text.secondary">{text}</Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: captionSize }}>{text}</Typography>
             </Box>
         );
     }
@@ -102,20 +104,20 @@ function ChatBubble({ message }: { message: ChatMessage }) {
                 }}
             >
                 {message.authorName && !isUser && (
-                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", lineHeight: 1.2, mb: 0.25 }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", lineHeight: 1.2, mb: 0.25, fontSize: captionSize }}>
                         {message.authorName}
                     </Typography>
                 )}
-                {parts.map((part, idx) => <ContentPartView key={idx} part={part} />)}
+                {parts.map((part, idx) => <ContentPartView key={idx} part={part} fontSize={fontSize} />)}
             </Paper>
         </Box>
     );
 }
 
-function ContentPartView({ part }: { part: ContentPart }) {
+function ContentPartView({ part, fontSize }: { part: ContentPart; fontSize: number }) {
     if (part.type === "text") {
         return (
-            <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+            <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", fontSize }}>
                 {part.text}
             </Typography>
         );
