@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Menu from "@mui/material/Menu";
 import Clear from "@mui/icons-material/Clear";
-import HelpOutline from "@mui/icons-material/HelpOutline";
+import HelpOutline from "@mui/icons-material/HelpOutlined";
 import { useState } from "react";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
 
@@ -77,7 +77,7 @@ export function Panel(props: PanelProps) {
                     </IconButton>
                 </AppBar>
             </Box>
-            <Box sx={contentStyle} minHeight={0}>
+            <Box sx={{ ...contentStyle, minHeight: 0 }}>
                 {props.children}
             </Box>
         </Container>
