@@ -11,7 +11,7 @@ import HeaderBar from "./HeaderBar/HeaderBar";
 import { useScenario } from "@/ScenarioManager/ScenarioManager";
 import { scenarioRegistry } from "@/Scenarios";
 import { usePromiseTracker } from "react-promise-tracker";
-import PacmanLoader from "react-spinners/PacmanLoader";
+import { PacmanLoader } from "react-spinners";
 // @ts-ignore
 import { toJS } from "mobx";
 

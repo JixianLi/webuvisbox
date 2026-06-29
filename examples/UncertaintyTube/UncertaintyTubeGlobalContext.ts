@@ -200,7 +200,12 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
                 },
                 body: JSON.stringify({
                     seeds: this.seeds,
-                    query_config: this.queryConfig
+                    query_config: {
+                        uncertainty_tube: this.queryConfig.uncertaintyTube,
+                        method: this.queryConfig.method,
+                        eproj: this.queryConfig.eproj,
+                        sym: this.queryConfig.sym
+                    }
                 })
             });
             const data = await response.json();
@@ -226,7 +231,7 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
 
     buildColormap(colormapConfig: any): PresetLinearColormap | null {
         const type = colormapConfig?.type || "linear";
-        const presetName = colormapConfig?.preset_name || "Cool to Warm";
+        const presetName = colormapConfig?.presetName || "Cool to Warm";
 
         switch (type) {
             case "linear":
@@ -234,10 +239,10 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
             case "vsup":
                 const depth = colormapConfig?.depth || 5;
                 const continuous = colormapConfig?.continuous || false;
-                const flipY = colormapConfig?.flip_y || false;
+                const flipY = colormapConfig?.flipY || false;
                 const colormap = new VSUP(depth, continuous, flipY, presetName);
-                if (colormapConfig?.fading_color) {
-                    colormap.setFadingColor(colormapConfig.fading_color);
+                if (colormapConfig?.fadingColor) {
+                    colormap.setFadingColor(colormapConfig.fadingColor);
                 }
                 return colormap;
             default:
@@ -249,17 +254,84 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
     initialize(globalData: any): void {
         this.dataServerAddress = globalData.data_server_address || this.dataServerAddress;
         this.seeds = globalData.seeds || this.seeds;
-        this.seedPlacement = globalData.seed_placement || this.seedPlacement;
+
+        if (globalData.seed_placement) {
+            const sp = globalData.seed_placement;
+            this.seedPlacement = {
+                useRandomSeeding: sp.use_random_seeding,
+                randomSeedCount: sp.random_seed_count,
+                useUniformSeeding: sp.use_uniform_seeding,
+                numUniformSeeds: sp.num_uniform_seeds,
+                useManualSeeding: sp.use_manual_seeding,
+                manualSeedLocation: sp.manual_seed_location,
+            };
+        }
+
         this.seedbox = globalData.seedbox || this.seedbox;
         this.sbBounds = globalData.bounds || this.sbBounds;
-        this.queryConfig = globalData.query_config || this.queryConfig;
-        this.colormapConfig = globalData.colormap_config || this.colormapConfig;
+
+        if (globalData.query_config) {
+            const qc = globalData.query_config;
+            this.queryConfig = {
+                method: qc.method,
+                uncertaintyTube: qc.uncertainty_tube,
+                eproj: qc.eproj,
+                sym: qc.sym,
+            };
+        }
+
+        if (globalData.colormap_config) {
+            const cc = globalData.colormap_config;
+            this.colormapConfig = {
+                type: cc.type,
+                presetName: cc.preset_name,
+                depth: cc.depth,
+                flipY: cc.flip_y,
+                textureHeight: cc.texture_height,
+                textureWidth: cc.texture_width,
+                fadingColor: cc.fading_color,
+                continuous: cc.continuous,
+            };
+        }
         this.colormap = this.buildColormap(this.colormapConfig) || this.colormap;
         this.textureManager.registerColormap("uncertainty_tube_colormap", this.colormap);
-        this.trajectoryVisualization = globalData.trajectory_visualization || this.trajectoryVisualization;
+
+        if (globalData.trajectory_visualization) {
+            const tv = globalData.trajectory_visualization;
+            this.trajectoryVisualization = {
+                showPath: tv.show_path,
+                showUncertaintyPath: tv.show_uncertainty_path,
+                showUncertaintyTube: tv.show_uncertainty_tube,
+                showSeeds: tv.show_seeds,
+                showStats: tv.show_stats,
+            };
+        }
+
+        if (globalData.render_config) {
+            const rc = globalData.render_config;
+            this.renderConfig = {
+                camera: { near: rc.camera.near, farMultiplier: rc.camera.farMultiplier },
+                paths: {
+                    primary: {
+                        color: rc.paths.primary.color,
+                        radiusDivisor: rc.paths.primary.radius_divisor,
+                        radialSegments: rc.paths.primary.radial_segments,
+                    },
+                    secondary: {
+                        color: rc.paths.secondary.color,
+                        radiusDivisor: rc.paths.secondary.radius_divisor,
+                        radialSegments: rc.paths.secondary.radial_segments,
+                    },
+                },
+                seeds: {
+                    color: rc.seeds.color,
+                    radiusDivisor: rc.seeds.radius_divisor,
+                },
+            };
+        }
+
         this.primaryTrajectories = globalData.primary_trajectories ? [decode64(globalData.primary_trajectories) as Float32Array] : this.primaryTrajectories;
         this.secondaryTrajectories = globalData.secondary_trajectories ? [decode64(globalData.secondary_trajectories) as Float32Array] : this.secondaryTrajectories;
-        this.renderConfig = globalData.render_config || this.renderConfig;
 
         if (globalData.uncertainty_tubes) {
             this.uncertaintyTubes.loaded = globalData.uncertainty_tubes.loaded || this.uncertaintyTubes.loaded;
@@ -284,13 +356,58 @@ export class UncertaintyTubeGlobalContext implements GlobalContext {
     toObject(): any {
         return {
             data_server_address: this.dataServerAddress,
-            seed_placement: this.seedPlacement,
+            seed_placement: {
+                use_random_seeding: this.seedPlacement.useRandomSeeding,
+                random_seed_count: this.seedPlacement.randomSeedCount,
+                use_uniform_seeding: this.seedPlacement.useUniformSeeding,
+                num_uniform_seeds: this.seedPlacement.numUniformSeeds,
+                use_manual_seeding: this.seedPlacement.useManualSeeding,
+                manual_seed_location: this.seedPlacement.manualSeedLocation,
+            },
             seedbox: this.seedbox,
             bounds: this.sbBounds,
-            trajectory_visualization: this.trajectoryVisualization,
-            render_config: this.renderConfig,
-            query_config: this.queryConfig,
-            colormap_config: this.colormapConfig,
+            trajectory_visualization: {
+                show_path: this.trajectoryVisualization.showPath,
+                show_uncertainty_path: this.trajectoryVisualization.showUncertaintyPath,
+                show_uncertainty_tube: this.trajectoryVisualization.showUncertaintyTube,
+                show_seeds: this.trajectoryVisualization.showSeeds,
+                show_stats: this.trajectoryVisualization.showStats,
+            },
+            render_config: {
+                camera: { near: this.renderConfig.camera.near, farMultiplier: this.renderConfig.camera.farMultiplier },
+                paths: {
+                    primary: {
+                        color: this.renderConfig.paths.primary.color,
+                        radius_divisor: this.renderConfig.paths.primary.radiusDivisor,
+                        radial_segments: this.renderConfig.paths.primary.radialSegments,
+                    },
+                    secondary: {
+                        color: this.renderConfig.paths.secondary.color,
+                        radius_divisor: this.renderConfig.paths.secondary.radiusDivisor,
+                        radial_segments: this.renderConfig.paths.secondary.radialSegments,
+                    },
+                },
+                seeds: {
+                    color: this.renderConfig.seeds.color,
+                    radius_divisor: this.renderConfig.seeds.radiusDivisor,
+                },
+            },
+            query_config: {
+                uncertainty_tube: this.queryConfig.uncertaintyTube,
+                method: this.queryConfig.method,
+                eproj: this.queryConfig.eproj,
+                sym: this.queryConfig.sym,
+            },
+            colormap_config: {
+                type: this.colormapConfig.type,
+                preset_name: this.colormapConfig.presetName,
+                depth: this.colormapConfig.depth,
+                flip_y: this.colormapConfig.flipY,
+                texture_height: this.colormapConfig.textureHeight,
+                texture_width: this.colormapConfig.textureWidth,
+                fading_color: this.colormapConfig.fadingColor,
+                continuous: this.colormapConfig.continuous,
+            },
             seeds: this.seeds,
 
             uncertainty_tubes: {
