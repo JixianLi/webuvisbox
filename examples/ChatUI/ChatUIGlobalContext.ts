@@ -55,13 +55,22 @@ export class ChatUIGlobalContext implements GlobalContext {
     }
 
     selectTrace(id: string | null) {
-        this.selectedTraceId = id;
+        if (id && id === this.selectedTraceId) {
+            this.selectedTraceId = null;
+        } else {
+            this.selectedTraceId = id;
+        }
     }
 
     async submitUserPrompt(text: string) {
         if (this.busy) return;
         this.appendChat({ role: "user", content: text });
-        this.appendTrace({ from: "user", to: "model", kind: "prompt", payload: text });
+        this.appendTrace({
+            from: "user",
+            to: "model",
+            kind: "prompt",
+            payload: text,
+        });
         this.busy = true;
         try {
             await runFakeAgent(text, {
@@ -85,8 +94,16 @@ export class ChatUIGlobalContext implements GlobalContext {
     }
 
     async asyncInitialize(): Promise<void> {
-        this.appendChat({ role: "user", content: "What's the weather in NYC?" });
-        this.appendTrace({ from: "user", to: "model", kind: "prompt", payload: "What's the weather in NYC?" });
+        this.appendChat({
+            role: "user",
+            content: "What's the weather in NYC?",
+        });
+        this.appendTrace({
+            from: "user",
+            to: "model",
+            kind: "prompt",
+            payload: "What's the weather in NYC?",
+        });
         this.appendTrace({
             from: "model",
             to: "tool1",
@@ -99,7 +116,11 @@ export class ChatUIGlobalContext implements GlobalContext {
             kind: "tool_result",
             payload: { temp: 72, condition: "sunny" },
         });
-        this.appendChat({ role: "assistant", authorName: "Tool 1", content: "Sunny, 72°F in NYC" });
+        this.appendChat({
+            role: "assistant",
+            authorName: "Tool 1",
+            content: "Sunny, 72°F in NYC",
+        });
     }
 
     toObject(): any {

@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
+import { TraceMarker } from "./TraceMarker";
 
 export type Actor = {
     id: string;
@@ -35,6 +36,8 @@ const ROW_HEIGHT = 50;
 const TOP_PAD = 16;
 const SELF_LOOP_OFFSET = 30;
 const HIT_STROKE = 24;
+const SHAFT_WIDTH = 3.5;
+const SELECT_STROKE_BUMP = 3;
 
 export function Trace({ actors, messages, selectedId, onSelect, fontSize = 13 }: TraceProps) {
     const theme = useTheme();
@@ -77,21 +80,13 @@ export function Trace({ actors, messages, selectedId, onSelect, fontSize = 13 }:
                 >
                     <defs>
                         {usedKinds.map((k) => (
-                            <marker
+                            <TraceMarker
                                 key={k}
                                 id={`trace-arrow-${k}`}
-                                viewBox="0 0 10 10"
-                                refX="9"
-                                refY="5"
-                                markerWidth="6"
-                                markerHeight="6"
-                                orient="auto-start-reverse"
-                            >
-                                <path
-                                    d="M 0 0 L 10 5 L 0 10 z"
-                                    fill={colorFor(k === "default" ? undefined : k)}
-                                />
-                            </marker>
+                                length={13}
+                                width={15}
+                                color={colorFor(k === "default" ? undefined : k)}
+                            />
                         ))}
                     </defs>
 
@@ -135,7 +130,7 @@ export function Trace({ actors, messages, selectedId, onSelect, fontSize = 13 }:
                         const y = HEADER_HEIGHT + TOP_PAD + idx * ROW_HEIGHT + ROW_HEIGHT / 2;
                         const color = colorFor(msg.kind);
                         const isSelected = msg.id === selectedId;
-                        const strokeWidth = isSelected ? 3.5 : 2;
+                        const strokeWidth = isSelected ? SHAFT_WIDTH + SELECT_STROKE_BUMP : SHAFT_WIDTH;
                         const markerId = `trace-arrow-${msg.kind || "default"}`;
                         const handleClick = (e: React.MouseEvent) => {
                             e.stopPropagation();
