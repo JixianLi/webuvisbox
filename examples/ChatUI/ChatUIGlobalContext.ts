@@ -13,6 +13,8 @@ export class ChatUIGlobalContext implements GlobalContext {
     chatMessages: ChatMessage[];
     selectedTraceId: string | null;
     busy: boolean;
+    chatFontSize: number;
+    traceFontSize: number;
 
     constructor() {
         this.actors = [
@@ -25,11 +27,23 @@ export class ChatUIGlobalContext implements GlobalContext {
         this.chatMessages = [];
         this.selectedTraceId = null;
         this.busy = false;
+        this.chatFontSize = 14;
+        this.traceFontSize = 13;
 
         makeAutoObservable(this);
 
         this.appendTrace = this.appendTrace.bind(this);
         this.appendChat = this.appendChat.bind(this);
+        this.setChatFontSize = this.setChatFontSize.bind(this);
+        this.setTraceFontSize = this.setTraceFontSize.bind(this);
+    }
+
+    setChatFontSize(px: number) {
+        this.chatFontSize = px;
+    }
+
+    setTraceFontSize(px: number) {
+        this.traceFontSize = px;
     }
 
     appendTrace(msg: Omit<TraceMessage, "id">) {
@@ -61,7 +75,14 @@ export class ChatUIGlobalContext implements GlobalContext {
         }
     }
 
-    initialize(_globalData: any): void {}
+    initialize(globalData: any): void {
+        if (typeof globalData?.chat_font_size === "number") {
+            this.chatFontSize = globalData.chat_font_size;
+        }
+        if (typeof globalData?.trace_font_size === "number") {
+            this.traceFontSize = globalData.trace_font_size;
+        }
+    }
 
     async asyncInitialize(): Promise<void> {
         this.appendChat({ role: "user", content: "What's the weather in NYC?" });
