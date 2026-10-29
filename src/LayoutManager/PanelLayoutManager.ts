@@ -1,6 +1,6 @@
 // @ts-ignore unused import toJS TODO remove
 import { makeAutoObservable, runInAction, toJS } from 'mobx';
-import type { AppLayouts, PanelLayouts, RGLBreakpoints, RGLCols } from '@/Types/PanelLayouts';
+import type { AppLayouts, PanelLayouts, RGLBreakpoints, RGLCols } from '../Types/PanelLayouts';
 import _ from 'lodash';
 
 

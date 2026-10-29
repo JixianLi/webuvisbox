@@ -1,7 +1,7 @@
 // ABOUTME: Central registry for scenario plugins.
 // ABOUTME: Scenarios self-register at import time via scenarioRegistry.register().
 
-import type { GlobalContext } from "@/Types/GlobalContext";
+import type { GlobalContext } from "../Types/GlobalContext";
 import type { ReactNode } from "react";
 
 export interface ScenarioDefinition {

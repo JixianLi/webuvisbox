@@ -1,10 +1,10 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import type { GlobalContext} from "@/Types/GlobalContext";
-import type { PanelLayouts } from "@/Types/PanelLayouts";
-import type { Scenario } from "@/Types/Scenario";
-import PanelLayoutManager from "@/LayoutManager/PanelLayoutManager";
+import type { GlobalContext} from "../Types/GlobalContext";
+import type { PanelLayouts } from "../Types/PanelLayouts";
+import type { Scenario } from "../Types/Scenario";
+import PanelLayoutManager from "../LayoutManager/PanelLayoutManager";
 import { createContext, useContext, useEffect, useState } from "react";
-import { getGlobalContext } from "@/Scenarios";
+import { getGlobalContext } from "../Scenarios";
 
 class ScenarioManager implements Scenario {
     name: string;

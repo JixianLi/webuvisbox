@@ -17,11 +17,11 @@
 
 - **Frontend**: React 19+ with TypeScript
 - **3D Graphics**: Three.js, React Three Fiber, Drei
-- **State Management**: MobX 6.13+
-- **UI Components**: Material-UI (MUI) v7
+- **State Management**: MobX 6.16+
+- **UI Components**: Material-UI (MUI) v9
 - **Charting**: Chart.js 4.5, D3.js 7.9
-- **Layout**: React Grid Layout
-- **Build Tool**: Vite 7
+- **Layout**: React Grid Layout 2
+- **Build Tool**: Vite 8
 
 ## Getting Started
 
@@ -255,7 +255,7 @@ Contributions are welcome! Please feel free to submit issues and pull requests.
 
 ## License
 
-[Add your license information here]
+MIT; see [LICENSE](LICENSE).
 
 ## Acknowledgments
 

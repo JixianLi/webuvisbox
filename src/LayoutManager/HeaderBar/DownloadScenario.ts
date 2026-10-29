@@ -1,4 +1,4 @@
-import type { Scenario } from '@/Types/Scenario';
+import type { Scenario } from '../../Types/Scenario';
 
 export function downloadScenario(scenario: Scenario, handleClose: () => void) {
     try {

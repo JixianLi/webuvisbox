@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { makeAutoObservable, runInAction } from "mobx";
-import type { GlobalContext } from "@/Types/GlobalContext";
+import type { GlobalContext } from "../../Types/GlobalContext";
 
 export class SharedTrackballPerspectiveCamera {
     private _position: THREE.Vector3;

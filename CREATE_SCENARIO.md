@@ -37,7 +37,7 @@ my-vis/
 
 ## 3. `package.json`
 
-Copy webuvisbox's runtime deps verbatim. The host installs everything in one `node_modules` so React (and other singletons) don't get duplicated.
+Copy webuvisbox's runtime `dependencies` verbatim from `vendor/webuvisbox/package.json`, and from its `devDependencies` the `@types/*` packages, `@vitejs/plugin-react`, `typescript` and `vite`. The host installs everything in one `node_modules` so React (and other singletons) don't get duplicated. Copy them from the submodule's current `package.json` rather than from an older list: a version mismatch with the library's code (e.g. MUI's major version) breaks the build.
 
 ```json
 {
@@ -50,40 +50,8 @@ Copy webuvisbox's runtime deps verbatim. The host installs everything in one `no
     "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@fontsource/roboto": "^5.2.6",
-    "@mui/icons-material": "^7.3.1",
-    "@mui/material": "^7.3.1",
-    "@react-three/drei": "^10.7.4",
-    "@react-three/fiber": "^9.3.0",
-    "chart.js": "^4.5.0",
-    "chartjs-plugin-annotation": "^3.1.0",
-    "d3": "^7.9.0",
-    "lodash": "^4.17.21",
-    "mobx": "^6.13.7",
-    "mobx-react": "^9.2.0",
-    "r3f-perf": "^7.2.3",
-    "react": "^19.1.1",
-    "react-chartjs-2": "^5.3.0",
-    "react-dom": "^19.1.1",
-    "react-grid-layout": "^1.5.2",
-    "react-promise-tracker": "^2.1.1",
-    "react-spinners": "^0.17.0",
-    "three": "^0.179.1"
-  },
-  "devDependencies": {
-    "@types/d3": "^7.4.3",
-    "@types/lodash": "^4.17.20",
-    "@types/node": "^24.3.1",
-    "@types/react": "^19.1.10",
-    "@types/react-dom": "^19.1.7",
-    "@types/three": "^0.180.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.3",
-    "vite": "^7.1.2"
-  }
+  "dependencies": { "...": "copied from vendor/webuvisbox/package.json" },
+  "devDependencies": { "...": "the @types/*, @vitejs/plugin-react, typescript and vite entries from it" }
 }
 ```
 
@@ -91,7 +59,9 @@ Then `npm install` once at the host root.
 
 ## 4. `vite.config.ts`
 
-Two aliases: `@core` for the library, `@` for your own source.
+Two aliases: `@core` for the library, `@` for your own source. The library's own files import each other with relative paths, so they don't depend on either alias.
+
+The `define` and `optimizeDeps` entries carry over the library's workarounds (see its `vite.config.ts`): react-grid-layout reads `process.env.DRAGGABLE_DEBUG`, which throws `process is not defined` in the browser, and MUI needs the CJS `prop-types` and `react-is` pre-bundled for their default exports.
 
 ```ts
 import { defineConfig } from "vite";
@@ -100,10 +70,17 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  define: { "process.env.DRAGGABLE_DEBUG": "false" },
   resolve: {
     alias: {
       "@core": path.resolve(__dirname, "vendor/webuvisbox/src"),
       "@":     path.resolve(__dirname, "src"),
+    },
+  },
+  optimizeDeps: {
+    include: ["prop-types", "react-is", "react-grid-layout/legacy"],
+    rolldownOptions: {
+      transform: { define: { "process.env.DRAGGABLE_DEBUG": "false" } },
     },
   },
 });

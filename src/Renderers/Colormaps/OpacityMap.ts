@@ -1,5 +1,5 @@
 import { makeObservable, observable, runInAction } from 'mobx';
-import { findSmallerIndex } from '@/Helpers/MathHelper';
+import { findSmallerIndex } from '../../Helpers/MathHelper';
 
 export class OpacityMap {
     /** Control points for opacity interpolation */

@@ -8,7 +8,7 @@ import Menu from "@mui/material/Menu";
 import Clear from "@mui/icons-material/Clear";
 import HelpOutline from "@mui/icons-material/HelpOutlined";
 import { useState } from "react";
-import { useScenario } from "@/ScenarioManager/ScenarioManager";
+import { useScenario } from "../ScenarioManager/ScenarioManager";
 
 interface PanelProps {
     panelName: string;

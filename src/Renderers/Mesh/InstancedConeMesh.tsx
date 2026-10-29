@@ -1,5 +1,5 @@
 import { Instance, Instances } from "@react-three/drei";
-import type { InstanceTransform } from "@/Types/Geometry";
+import type { InstanceTransform } from "../../Types/Geometry";
 
 interface ConeMeshProps {
     instances: InstanceTransform[]; // Array of instances to be rendered

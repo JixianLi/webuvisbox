@@ -5,11 +5,11 @@ import React from "react";
 import { observer } from "mobx-react-lite";
 import { Responsive, WidthProvider } from "react-grid-layout/legacy";
 
-import type { AppLayout, AppLayouts, PanelLayouts } from "@/Types/PanelLayouts";
+import type { AppLayout, AppLayouts, PanelLayouts } from "../Types/PanelLayouts";
 import { useTheme } from "@mui/material/styles";
 import HeaderBar from "./HeaderBar/HeaderBar";
-import { useScenario } from "@/ScenarioManager/ScenarioManager";
-import { scenarioRegistry } from "@/Scenarios";
+import { useScenario } from "../ScenarioManager/ScenarioManager";
+import { scenarioRegistry } from "../Scenarios";
 import { usePromiseTracker } from "react-promise-tracker";
 import { PacmanLoader } from "react-spinners";
 // @ts-ignore

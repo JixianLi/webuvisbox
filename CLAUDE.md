@@ -82,6 +82,8 @@ Within a scenario folder, prefer **relative imports** for files inside the same 
 - **MobX everywhere**: All state is reactive. Use `observer()` wrapper for components, `makeAutoObservable()` in stores
 - **Panel mapping**: Each scenario has `{name}PanelMappingFunction.tsx` that maps string IDs to JSX
 - **Path alias**: `@/` maps to `src/` (configured in `vite.config.ts` and `tsconfig.app.json`). Examples consume library code through this alias.
+  Library code in `src/` imports its own files with relative paths, never `@/`: host projects point their own aliases
+  elsewhere (see `CREATE_SCENARIO.md`), so a self-import through `@/` would resolve into the host's source.
 - **Config-driven layouts**: Panel positions/sizes defined in `examples/public/ScenarioConfigs/*.json`
 
 ### 3D Rendering Stack

@@ -1,7 +1,7 @@
 // ABOUTME: Public registry surface for the scenario plugin system.
 // ABOUTME: Re-exports the registry and provides convenience accessors; does not register any scenarios.
 
-import type { GlobalContext } from "@/Types/GlobalContext";
+import type { GlobalContext } from "../Types/GlobalContext";
 import type { ReactNode } from "react";
 import { scenarioRegistry } from "./ScenarioRegistry";
 

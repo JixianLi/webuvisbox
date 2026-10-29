@@ -3,7 +3,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
 import { observer } from 'mobx-react-lite';
-import { useScenario } from '@/ScenarioManager/ScenarioManager';
+import { useScenario } from '../../ScenarioManager/ScenarioManager';
 
 
 export const ViewMenuList = observer(() => {

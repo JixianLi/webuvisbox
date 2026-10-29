@@ -1,7 +1,7 @@
 import { presets, presetnames } from './Presets'
 import * as d3 from 'd3';
 import { makeObservable, observable, runInAction } from 'mobx';
-import { findSmallerIndex } from '@/Helpers/MathHelper';
+import { findSmallerIndex } from '../../Helpers/MathHelper';
 
 export class PresetLinearColormap {
     presetName: string;

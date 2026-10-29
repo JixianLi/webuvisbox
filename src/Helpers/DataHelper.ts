@@ -1,4 +1,4 @@
-import {Buffer} from 'buffer';
+const BASE64_CHUNK_BYTES = 0x8000;
 
 type DataType = "float32" | "float64" | "int32" | "int16" | "int8" | "uint32" | "uint16" | "uint8";
 
@@ -13,7 +13,12 @@ type TypedArray = Float32Array | Float64Array | Int32Array | Int16Array | Int8Ar
  */
 
 export const decode64 = (str: string, dataType: DataType = "float32"): TypedArray => {
-    const buffer = Buffer.from(str, 'base64').buffer;
+    const binary = atob(str);
+    const bytes = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index++) {
+        bytes[index] = binary.charCodeAt(index);
+    }
+    const buffer = bytes.buffer;
 
     switch (dataType) {
         case "float32":
@@ -43,6 +48,11 @@ export const decode64 = (str: string, dataType: DataType = "float32"): TypedArra
  * @returns A base64 encoded string representing the array data.
  */
 export const encode64 = (array: TypedArray): string => {
-    const buffer = Buffer.from(array.buffer, array.byteOffset, array.byteLength);
-    return buffer.toString('base64');
+    const bytes = new Uint8Array(array.buffer, array.byteOffset, array.byteLength);
+    let binary = '';
+    // In chunks: String.fromCharCode takes its bytes as arguments, and engines cap the argument count.
+    for (let offset = 0; offset < bytes.length; offset += BASE64_CHUNK_BYTES) {
+        binary += String.fromCharCode(...bytes.subarray(offset, offset + BASE64_CHUNK_BYTES));
+    }
+    return btoa(binary);
 }
