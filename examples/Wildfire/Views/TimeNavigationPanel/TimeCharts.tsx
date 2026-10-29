@@ -9,7 +9,7 @@ const TimeCharts = observer(() => {
     const globalData = scenario.globalContext as WildfireGlobalContext;
     const lineCharts = globalData.timeDiffData?.dataNames.map((name) => {
         return (
-            <Box key={name} sx={{ flexGrow: 1, w: 1, m: 0.1 }} minHeight={200}>
+            <Box key={name} sx={{ flexGrow: 1, w: 1, m: 0.1, minHeight: 200 }}>
                 <TimeLineChart name={name} />
             </Box>
         );

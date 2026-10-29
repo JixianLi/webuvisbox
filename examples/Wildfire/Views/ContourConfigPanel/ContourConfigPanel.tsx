@@ -29,7 +29,7 @@ const ContourConfigPanel = observer(() => {
                 <Typography color={contourConfig.displayPrimary ? "primary" : "textSecondary"}>Display Primary</Typography>
             </Grid>
             <Grid size={12} sx={{ justifyContent: 'center', display: 'flex' }}>
-                <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
+                <Stack direction="row" spacing={1} sx={{ alignItems: 'center', justifyContent: 'center' }}>
                     <Switch checked={contourConfig.displaySecondary} onChange={(e) => {
                         contourConfig.setDisplaySecondary(e.target.checked);
                     }} />

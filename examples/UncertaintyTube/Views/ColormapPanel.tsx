@@ -67,7 +67,7 @@ const ColormapPanel = observer(() => {
 
     return (
         <Panel panelName="Colormap Config">
-            <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" sx={{ marginBottom: '10px' }}>
+            <Stack direction="row" spacing={2} sx={{ alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
                 <Typography variant="h6">Colormap:</Typography>
                 <Select
                     value={colormap.presetName}
@@ -83,7 +83,7 @@ const ColormapPanel = observer(() => {
                     ))}
                 </Select>
             </Stack>
-            <Grid container alignItems="center">
+            <Grid container sx={{ alignItems: 'center' }}>
                 {/* Vertical "- Uncertainty +" label */}
                 <Grid size={1}>
                     <Box sx={{
@@ -125,7 +125,7 @@ const ColormapPanel = observer(() => {
                     </Box>
                 </Grid>
             </Grid>
-            <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" sx={{ marginTop: '10px' }}>
+            <Stack direction="row" spacing={2} sx={{ alignItems: 'center', justifyContent: 'center', marginTop: '10px' }}>
                 <Typography variant="h6">Colormap Depth:</Typography>
 
                 <Select

@@ -41,7 +41,7 @@ const QueryConfigPanel = observer(() => {
                         <Typography color={globalContext.queryConfig.sym ? "primary" : "textSecondary"}>Symmetric Tubes</Typography>
                     </Grid>
                     <Grid size={{ xl: 6, lg: 12 }} sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-                        <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
+                        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', justifyContent: 'center' }}>
                             <Typography color={globalContext.queryConfig.method === "swag" ? "primary" : "textSecondary"}>SWAG</Typography>
                             <Switch checked={globalContext.queryConfig.method === "mcdropout"}
                                 color={'default'}

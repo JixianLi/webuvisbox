@@ -12,7 +12,7 @@ export const ColorEditorPanel = observer(() => {
     if (!globalContext) {
         return (
             <Panel panelName="Color Editor">
-                <Box p={2}>
+                <Box sx={{ p: 2 }}>
                     <Typography color="warning">Loading</Typography>
                 </Box>
             </Panel>
@@ -24,7 +24,7 @@ export const ColorEditorPanel = observer(() => {
     if (!scalarNames || scalarNames.length === 0) {
         return (
             <Panel panelName="Color Editor">
-                <Box p={2}>
+                <Box sx={{ p: 2 }}>
                     <Typography color="error">No scalar fields available</Typography>
                 </Box>
             </Panel>
@@ -38,9 +38,9 @@ export const ColorEditorPanel = observer(() => {
     if (!colormap) {
         return (
             <Panel panelName="Color Editor">
-                <Box p={2}>
+                <Box sx={{ p: 2 }}>
                     <Typography color="warning">Loading colormap... ({currentScalarName})</Typography>
-                    <Typography variant="caption" display="block">
+                    <Typography variant="caption" sx={{ display: 'block' }}>
                         Available: {Array.from(Object.keys(globalContext.scalars.tfs || {})).join(', ')}
                     </Typography>
                 </Box>
@@ -50,7 +50,7 @@ export const ColorEditorPanel = observer(() => {
 
     return (
         <Panel panelName="Color Editor">
-            <Box p={2}>
+            <Box sx={{ p: 2 }}>
                 <Typography variant="h6" gutterBottom>
                     Colormap Editor
                 </Typography>

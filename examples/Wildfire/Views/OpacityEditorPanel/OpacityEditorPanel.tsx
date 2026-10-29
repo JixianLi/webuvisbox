@@ -12,7 +12,7 @@ export const OpacityEditorPanel = observer(() => {
     if (!globalContext) {
         return (
             <Panel panelName="Opacity Editor">
-                <Box p={2}>
+                <Box sx={{ p: 2 }}>
                     <Typography color="warning">Loading</Typography>
                 </Box>
             </Panel>
@@ -24,7 +24,7 @@ export const OpacityEditorPanel = observer(() => {
     if (!scalarNames || scalarNames.length === 0) {
         return (
             <Panel panelName="Opacity Editor">
-                <Box p={2}>
+                <Box sx={{ p: 2 }}>
                     <Typography color="error">No scalar fields available</Typography>
                 </Box>
             </Panel>
@@ -37,7 +37,7 @@ export const OpacityEditorPanel = observer(() => {
     if (!opacityMap) {
         return (
             <Panel panelName="Opacity Editor">
-                <Box p={2}>
+                <Box sx={{ p: 2 }}>
                     <Typography color="warning">Loading opacity map... ({currentScalarName})</Typography>
                 </Box>
             </Panel>
@@ -46,7 +46,7 @@ export const OpacityEditorPanel = observer(() => {
 
     return (
         <Panel panelName="Opacity Editor">
-            <Box p={2}>
+            <Box sx={{ p: 2 }}>
                 <Typography variant="h6" gutterBottom>
                     Opacity Editor
                 </Typography>
