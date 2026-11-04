@@ -5,7 +5,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { CloudUpload } from 'lucide-react';
 import FileUploadDragBox from './DragBox';
 
 interface ScenarioUploadDialogProps {
@@ -123,7 +123,7 @@ const ScenarioUploadDialog: React.FC<ScenarioUploadDialogProps> = ({
                         }
                     }}
                 >
-                    <CloudUploadIcon fontSize="large" color="primary" style={{ marginBottom: 16 }} />
+                    <CloudUpload size={36} strokeWidth={1.5} style={{ marginBottom: 16 }} />
                     <Typography variant="body1" align="center" gutterBottom>
                         Drag and drop your scenario file here or click to browse
                     </Typography>

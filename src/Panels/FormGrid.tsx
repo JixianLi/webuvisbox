@@ -9,8 +9,8 @@ interface ConfigContentContainerProps {
 }
 
 export const FormGrid = (props: ConfigContentContainerProps) => {
-    return <Box sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex', p: "10px" }}>
-        <Grid container spacing={props.spacing || 2} sx={{ p: props.padding || "10px", ...props.sx }}>
+    return <Box sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex', width: 1 }}>
+        <Grid container spacing={props.spacing || 2} sx={{ p: props.padding ?? 0, pt: props.padding ?? '8px', width: 1, ...props.sx }}>
             {props.children}
         </Grid>
     </Box>

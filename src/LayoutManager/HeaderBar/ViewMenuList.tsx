@@ -1,4 +1,4 @@
-import Check from '@mui/icons-material/Check';
+import { Check } from 'lucide-react';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
@@ -27,7 +27,7 @@ export const ViewMenuList = observer(() => {
 
         const displayedItem = (
             <>
-                <ListItemIcon>{visible ? <Check /> : null}</ListItemIcon>
+                <ListItemIcon>{visible ? <Check size={16} strokeWidth={1.75} /> : null}</ListItemIcon>
                 <ListItemText>{panel.i}</ListItemText>
             </>
         );

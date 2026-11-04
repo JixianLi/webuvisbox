@@ -5,9 +5,7 @@ import { downloadScenario } from "./DownloadScenario";
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ScenarioUploadDialog from "./ScenarioUploadDialog";
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import FileUploadIcon from '@mui/icons-material/FileUpload';
-import ChatIcon from '@mui/icons-material/Chat';
+import { Download, MessageSquare, Upload } from 'lucide-react';
 import Divider from '@mui/material/Divider';
 import { useScenario } from "../../ScenarioManager/ScenarioManager";
 
@@ -49,17 +47,17 @@ export const ScenarioMenuList: React.FC<{ handleClose: () => void }> = observer(
         <>
             <Divider>Examples</Divider>
             <MenuItem onClick={() => server_load("ScenarioConfigs/ChatUI.json")}>
-                <ListItemIcon><ChatIcon /></ListItemIcon>
+                <ListItemIcon><MessageSquare size={16} strokeWidth={1.75} /></ListItemIcon>
                 <ListItemText>chatUI</ListItemText>
             </MenuItem>
             
             <Divider>Scenarios</Divider>
             <MenuItem onClick={() => downloadScenario(scenario, handleClose)}>
-                <ListItemIcon><FileDownloadIcon /></ListItemIcon>
+                <ListItemIcon><Download size={16} strokeWidth={1.75} /></ListItemIcon>
                 <ListItemText>Download Scenario</ListItemText>
             </MenuItem>
             <MenuItem onClick={() => setUploadDialogOpen(true)}>
-                <ListItemIcon><FileUploadIcon /></ListItemIcon>
+                <ListItemIcon><Upload size={16} strokeWidth={1.75} /></ListItemIcon>
                 <ListItemText>Upload Scenario</ListItemText>
             </MenuItem>
             

@@ -1,8 +1,7 @@
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
-import SaveIcon from '@mui/icons-material/Save';
-import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
+import { RotateCcw, Save } from 'lucide-react';
 
 import { observer } from "mobx-react-lite";
 import { useScenario } from '../../ScenarioManager/ScenarioManager';
@@ -29,13 +28,13 @@ export const LayoutMenuList: React.FC<LayoutMenuListProps> = observer(({ handleC
         <>
             <MenuItem onClick={() => saveDefaultLayout()}>
                 <ListItemIcon>
-                    <SaveIcon />
+                    <Save size={16} strokeWidth={1.75} />
                 </ListItemIcon>
                 <ListItemText primary="Save as Default Layout" />
             </MenuItem>
             <MenuItem onClick={resetLayout}>
                 <ListItemIcon>
-                    <SettingsBackupRestoreIcon />
+                    <RotateCcw size={16} strokeWidth={1.75} />
                 </ListItemIcon>
                 <ListItemText primary="Reset Layout" />
             </MenuItem>

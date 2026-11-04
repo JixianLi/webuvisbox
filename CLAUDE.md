@@ -23,10 +23,12 @@ The repo is split into a reusable library (`src/`) and a dev app that exercises 
 
 ```
 src/                      # Library — no scenario-specific code
-├── App.tsx               # Top-level app component (takes initialConfig prop)
+├── App.tsx               # Top-level app component (takes initialConfig prop): theme, commands, layout
+├── Theme/                # Design tokens (three display modes, UI scale) and the MUI theme built from them
+├── Commands/             # Command registry: named actions, keyboard shortcuts, the shortcut list
 ├── ScenarioManager/      # Loads config, drives scenario lifecycle
-├── LayoutManager/        # Responsive grid layout
-├── Panels/               # Base Panel component + grid container
+├── LayoutManager/        # Navbar; grid layout, or content panels with an inspector of tool panels
+├── Panels/               # Base Panel component (placement-aware frame, fit, collapse) + grid container
 ├── Renderers/            # Reusable renderers: Chat, Trace (swim lanes), Mesh, Colormaps, chart helpers
 ├── Scenarios/
 │   ├── ScenarioRegistry.ts   # Registry singleton + ScenarioDefinition type
@@ -96,8 +98,12 @@ Within a scenario folder, prefer **relative imports** for files inside the same 
 
 Scenario configs in `examples/public/ScenarioConfigs/*.json` define:
 - `name`: Must match the name used in `scenarioRegistry.register()`
-- `panel_layouts`: Responsive grid layouts per breakpoint (xl, lg, sm)
+- `panel_layouts`: Responsive grid layouts per breakpoint (xl, lg, sm); optionally each panel's `role`
+  (`content` or `tool`), `tool_placement` (`grid`, `docked`, `overlay`), `inspector_anchor` and `content_split`
+- `appearance` (optional): `accent`, `default_mode` (`bright`, `dark`, `neutral`), `ui_scale`
 - `global_data`: Scenario-specific initial state passed to GlobalContext
+
+`DESIGN.md` describes the design system: tokens and modes, panel placements, the inspector, and the shortcuts.
 
 ## Naming Conventions
 
@@ -111,7 +117,7 @@ Scenario configs in `examples/public/ScenarioConfigs/*.json` define:
 | Interfaces / Types | PascalCase, no `I` prefix | `Scenario`, `PanelProps` |
 | Variables and properties | camelCase | `currentTimeIndex`, `ensembleNames` |
 | Functions | camelCase | `computeHistogram()`, `timeInSecondsToString()` |
-| Custom hooks | `useXxx` | `useThemeMode()`, `useScenario()` |
+| Custom hooks | `useXxx` | `useDisplaySettings()`, `useScenario()` |
 | Constants | UPPER_CASE | `STEP_DIVISOR` |
 | MobX store properties | camelCase | `ensembleNames`, `currentTimeIndex` |
 | Scenario config JSON keys | snake_case | `panel_layouts`, `global_data` |

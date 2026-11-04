@@ -7,7 +7,7 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import SendIcon from "@mui/icons-material/Send";
+import { SendHorizontal } from "lucide-react";
 
 export type TextPart = { type: "text"; text: string };
 export type ImagePart = { type: "image"; url: string; alt?: string };
@@ -70,7 +70,7 @@ export function Chat({ messages, onSubmit, placeholder = "Type a message...", bu
                     }}
                 />
                 <IconButton color="primary" onClick={submit} disabled={busy || !draft.trim()}>
-                    <SendIcon />
+                    <SendHorizontal size={18} strokeWidth={1.75} />
                 </IconButton>
             </Box>
         </Box>

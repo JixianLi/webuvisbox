@@ -1,6 +1,6 @@
 // @ts-ignore unused import toJS TODO remove
 import { makeAutoObservable, runInAction, toJS } from 'mobx';
-import type { AppLayouts, PanelLayouts, RGLBreakpoints, RGLCols } from '../Types/PanelLayouts';
+import type { AppLayouts, InspectorAnchor, PanelLayouts, ToolPlacement, RGLBreakpoints, RGLCols } from '../Types/PanelLayouts';
 import _ from 'lodash';
 
 
@@ -11,12 +11,21 @@ export class PanelLayoutManager implements PanelLayouts {
     breakpoints: RGLBreakpoints;
     cols: RGLCols;
     currentBreakpoint: string = 'xl';
+    toolPlacement: ToolPlacement = 'grid';
+    inspectorAnchor: InspectorAnchor = 'top_right';
+    contentSplit: number[] = [];
 
     constructor(
         defaultLayouts: AppLayouts,
         breakpoints: RGLBreakpoints,
-        cols?: RGLCols
+        cols?: RGLCols,
+        toolPlacement?: ToolPlacement,
+        inspectorAnchor?: InspectorAnchor,
+        contentSplit?: number[]
     ) {
+        this.contentSplit = contentSplit ?? [];
+        this.toolPlacement = toolPlacement ?? 'grid';
+        this.inspectorAnchor = inspectorAnchor ?? 'top_right';
         this.defaultLayouts = _.cloneDeep(defaultLayouts);
         this.currentLayouts = _.cloneDeep(defaultLayouts);
         this.cacheLayouts = _.cloneDeep(defaultLayouts);
@@ -131,6 +140,60 @@ export class PanelLayoutManager implements PanelLayouts {
     resetToDefault() {
         runInAction(() => {
             this.currentLayouts = _.cloneDeep(this.defaultLayouts);
+        });
+    }
+
+    private currentPanel(panelId: string) {
+        return this.currentLayouts[this.currentBreakpoint].find(panel => panel.i === panelId);
+    }
+
+    // Heights are in grid rows; a collapsed panel keeps its expanded height and minimum to restore them.
+    setPanelHeight(panelId: string, rows: number): void {
+        runInAction(() => {
+            this.currentLayouts = _.cloneDeep(this.currentLayouts);
+            const panel = this.currentPanel(panelId);
+            if (!panel || !panel.visible) {
+                return;
+            }
+            if (panel.collapsed) {
+                panel.collapsed = false;
+                panel.minH = panel.expandedMinH;
+            }
+            panel.minH = Math.min(panel.minH ?? rows, rows);
+            panel.h = rows;
+        });
+    }
+
+    toggleCollapsed(panelId: string): void {
+        runInAction(() => {
+            this.currentLayouts = _.cloneDeep(this.currentLayouts);
+            const panel = this.currentPanel(panelId);
+            if (!panel || !panel.visible) {
+                return;
+            }
+            if (panel.collapsed) {
+                panel.collapsed = false;
+                panel.h = panel.expandedH;
+                panel.minH = panel.expandedMinH;
+            } else {
+                panel.collapsed = true;
+                panel.expandedH = panel.h;
+                panel.expandedMinH = panel.minH;
+                panel.minH = 1;
+                panel.h = 1;
+            }
+        });
+    }
+
+    setInspectorAnchor(anchor: InspectorAnchor) {
+        runInAction(() => {
+            this.inspectorAnchor = anchor;
+        });
+    }
+
+    setContentSplit(split: number[]) {
+        runInAction(() => {
+            this.contentSplit = split;
         });
     }
 

@@ -1,7 +1,7 @@
 import MenuItem from "@mui/material/MenuItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { Check } from "@mui/icons-material";
+import { Check } from "lucide-react";
 
 /**
  * A menu item that toggles options.
@@ -17,7 +17,7 @@ export const CheckMenuItem = (props: CheckMenuItemProps) => {
     return (
         <MenuItem onClick={props.onClick}>
             <ListItemIcon>
-                <Check style={{ visibility: props.checked ? 'visible' : 'hidden' }} />
+                <Check size={16} strokeWidth={1.75} style={{ visibility: props.checked ? 'visible' : 'hidden' }} />
             </ListItemIcon>
             <ListItemText primary={props.text} />
         </MenuItem>
