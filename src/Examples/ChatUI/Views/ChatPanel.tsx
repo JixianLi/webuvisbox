@@ -9,9 +9,9 @@ import Menu from "@mui/material/Menu";
 import Slider from "@mui/material/Slider";
 import Typography from "@mui/material/Typography";
 import MenuIcon from "@mui/icons-material/Menu";
-import Panel from "@/Panels/Panel";
-import { Chat } from "@/Renderers/Chat";
-import { useScenario } from "@/ScenarioManager/ScenarioManager";
+import Panel from "../../../Panels/Panel";
+import { Chat } from "../../../Renderers/Chat";
+import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import type ChatUIGlobalContext from "../ChatUIGlobalContext";
 
 const ChatPanel = observer(() => {

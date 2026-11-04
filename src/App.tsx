@@ -12,16 +12,19 @@ import './App.css';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import LayoutManager from './LayoutManager/LayoutManager';
-import { ScenarioProvider, useScenario } from './ScenarioManager/ScenarioManager';
+import { ScenarioProvider, useScenario, type ScenarioSource } from './ScenarioManager/ScenarioManager';
 import DisplaySettingsContext from './DisplaySettingsContext';
 import { createAppTheme } from './Theme/AppTheme';
 import type { DisplayMode } from './Theme/DesignTokens';
 import { commandRegistry } from './Commands/CommandRegistry';
 import { frameworkCommands } from './Commands/FrameworkCommands';
 import ShortcutsDialog from './Commands/ShortcutsDialog';
+import LoadErrorBanner from './ScenarioManager/LoadErrorBanner';
+import './Examples';
 
 interface AppProps {
-    initialConfig: string;
+    // A config object, or the URL of a config file.
+    initialConfig: ScenarioSource;
 }
 
 const ThemedApp = observer(() => {
@@ -65,6 +68,7 @@ const ThemedApp = observer(() => {
                 <CssBaseline />
                 <LayoutManager />
                 <ShortcutsDialog />
+                <LoadErrorBanner />
             </ThemeProvider>
         </DisplaySettingsContext.Provider>
     );

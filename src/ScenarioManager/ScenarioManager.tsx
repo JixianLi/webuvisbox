@@ -4,7 +4,7 @@ import type { PanelLayouts } from "../Types/PanelLayouts";
 import type { Scenario } from "../Types/Scenario";
 import PanelLayoutManager from "../LayoutManager/PanelLayoutManager";
 import { createContext, useContext, useEffect, useState } from "react";
-import { getGlobalContext } from "../Scenarios";
+import { getGlobalContext, scenarioRegistry } from "../Scenarios";
 import { DEFAULT_APPEARANCE, type Appearance, type DisplayMode } from "../Theme/DesignTokens";
 
 class ScenarioManager implements Scenario {
@@ -16,6 +16,8 @@ class ScenarioManager implements Scenario {
     appearance: Appearance = DEFAULT_APPEARANCE;
     initialized: boolean = false;
     fullyLoaded: boolean = false;
+    // Why the last load failed, shown on screen until dismissed; null when it did not.
+    loadError: string | null = null;
 
     constructor(config?: any) {
         if (config) {
@@ -109,6 +111,10 @@ class ScenarioManager implements Scenario {
         }, null, 2);
     }
 
+    setLoadError(message: string | null): void {
+        this.loadError = message;
+    }
+
     invalidate(): void {
         runInAction(() => {
             this.initialized = false;
@@ -141,18 +147,72 @@ class ScenarioManager implements Scenario {
     }
 }
 
+// A scenario to load: a config object, or the URL of a config file.
+export type ScenarioSource = object | string;
+
+async function fetchConfig(url: string): Promise<object> {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`${url}: the server answered ${response.status} ${response.statusText}.`);
+    }
+    // A dev server answers a missing file with its index.html (status 200), so the type tells a missing file apart.
+    if (!(response.headers.get('content-type') ?? '').includes('json')) {
+        throw new Error(`${url} was not found: the server answered with a page, not a JSON config.`);
+    }
+    try {
+        return await response.json();
+    } catch (error) {
+        throw new Error(`${url} is not valid JSON: ${error instanceof Error ? error.message : error}`);
+    }
+}
+
+// Checked before the current scenario is torn down, so a bad config leaves it running.
+function checkConfig(config: any): void {
+    if (!config || typeof config !== 'object') {
+        throw new Error('The config is not a JSON object.');
+    }
+    if (!config.name) {
+        throw new Error('The config has no "name".');
+    }
+    if (!scenarioRegistry.has(config.name)) {
+        throw new Error(`No scenario named "${config.name}" is registered in this app (registered: ${scenarioRegistry.list().join(', ')}).`);
+    }
+    if (!config.panel_layouts?.default_layouts) {
+        throw new Error(`The config of "${config.name}" has no panel_layouts.default_layouts.`);
+    }
+}
+
+export async function loadScenario(manager: ScenarioManager, source: ScenarioSource): Promise<void> {
+    try {
+        const config = typeof source === 'string' ? await fetchConfig(source) : source;
+        checkConfig(config);
+        manager.setLoadError(null);
+        await manager.completeInitialization(config);
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.error('Failed to load scenario:', error);
+        manager.setLoadError(message);
+    }
+}
+
+export function loadScenarioFromText(manager: ScenarioManager, text: string): Promise<void> {
+    let config: object;
+    try {
+        config = JSON.parse(text);
+    } catch (error) {
+        manager.setLoadError(`The uploaded file is not valid JSON: ${error instanceof Error ? error.message : error}`);
+        return Promise.resolve();
+    }
+    return loadScenario(manager, config);
+}
+
 const scenario = createContext<ScenarioManager | null>(null);
 
-export function ScenarioProvider({ children, initialConfig }: { children: React.ReactNode; initialConfig: string }) {
+export function ScenarioProvider({ children, initialConfig }: { children: React.ReactNode; initialConfig: ScenarioSource }) {
     const [scenarioManager] = useState<ScenarioManager>(new ScenarioManager());
 
     useEffect(() => {
-        fetch(initialConfig)
-            .then(response => response.json())
-            .then(data => scenarioManager.completeInitialization(data))
-            .catch(error => {
-                console.error("Failed to initialize scenario:", error);
-            });
+        loadScenario(scenarioManager, initialConfig);
     }, [scenarioManager, initialConfig]);
 
     return (

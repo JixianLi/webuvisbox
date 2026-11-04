@@ -72,7 +72,7 @@ The repository is split into a reusable library and a dev app that exercises it:
 
 ```
 webuvisbox/
-├── src/                         # Library (no scenario-specific code)
+├── src/                         # Library (no scenario-specific code but the built-in examples, src/Examples/)
 │   ├── App.tsx                  # Top-level component, accepts initialConfig prop
 │   ├── ScenarioManager/         # Loads scenario config, manages lifecycle
 │   ├── LayoutManager/           # Responsive grid layout
@@ -95,13 +95,14 @@ webuvisbox/
 │   ├── main.tsx                 # Registers examples and mounts <App>
 │   ├── public/
 │   │   └── ScenarioConfigs/     # JSON configs
-│   ├── ChatUI/                  # No-backend example (default)
 │   ├── Wildfire/                # Example scenario (requires data server)
 │   └── UncertaintyTube/         # Example scenario (requires data server)
 └── package.json
 ```
 
-The library only contains the framework — no scenarios ship with it. The example scenarios under `examples/` demonstrate how to consume the library and double as the dev playground.
+The library contains the framework and one built-in example, ChatUI (`src/Examples/ChatUI/`, no backend): its config is
+inlined, so every app built on the library offers it in the Scenario menu without serving a file. The example scenarios
+under `examples/` demonstrate how to consume the library and double as the dev playground.
 
 ## Scenarios
 

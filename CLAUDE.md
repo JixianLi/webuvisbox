@@ -22,13 +22,14 @@ npm run preview  # Preview production build
 The repo is split into a reusable library (`src/`) and a dev app that exercises it (`examples/`):
 
 ```
-src/                      # Library — no scenario-specific code
+src/                      # Library — no scenario-specific code, except the built-in examples in Examples/
 ├── App.tsx               # Top-level app component (takes initialConfig prop): theme, commands, layout
 ├── Theme/                # Design tokens (three display modes, UI scale) and the MUI theme built from them
 ├── Commands/             # Command registry: named actions, keyboard shortcuts, the shortcut list
 ├── ScenarioManager/      # Loads config, drives scenario lifecycle
 ├── LayoutManager/        # Navbar; grid layout, or content panels with an inspector of tool panels
 ├── Panels/               # Base Panel component (placement-aware frame, fit, collapse) + grid container
+├── Examples/             # Built-in examples (ChatUI): config inlined, registered by App, in every host's menu
 ├── Renderers/            # Reusable renderers: Chat, Trace (swim lanes), Mesh, Colormaps, chart helpers
 ├── Scenarios/
 │   ├── ScenarioRegistry.ts   # Registry singleton + ScenarioDefinition type
@@ -38,10 +39,9 @@ src/                      # Library — no scenario-specific code
 
 examples/                 # Dev app + example scenarios (Vite root)
 ├── index.html            # Entry HTML, loads main.tsx
-├── main.tsx              # Imports each example to register, mounts <App>
+├── main.tsx              # Imports each example to register, mounts <App> on the built-in ChatUI
 ├── public/
 │   └── ScenarioConfigs/  # JSON configs served at URL root
-├── ChatUI/               # Example scenario (no backend; default in main.tsx)
 ├── Wildfire/             # Example scenario (requires data server)
 └── UncertaintyTube/      # Example scenario (requires data server)
 ```
@@ -50,7 +50,11 @@ Vite's `root` is set to `examples/`, so `npm run dev` boots from there. Build ou
 
 ### Scenario Registration
 
-Scenarios self-register at import time. `src/Scenarios/ScenarioRegistry.ts` is a singleton; importing a scenario's `index.ts` triggers its `scenarioRegistry.register(...)` call. The registry is consumed by the library; registration is owned by whoever runs the app (currently `examples/main.tsx`).
+Scenarios self-register at import time. `src/Scenarios/ScenarioRegistry.ts` is a singleton; importing a scenario's `index.ts` triggers its `scenarioRegistry.register(...)` call. The registry is consumed by the library; registration is owned by whoever runs the app (currently `examples/main.tsx`), except for the built-in examples in
+`src/Examples/`, which `App` registers so that they work in any host project without a config file to serve. The
+Scenario menu lists every registered scenario that has a config (`defaultConfig` or `defaultConfigPath`), examples
+first; a scenario that fails to load (missing or invalid config, unregistered name) shows an error on screen and the
+current one keeps running.
 
 A scenario folder looks like:
 
@@ -124,4 +128,4 @@ Scenario configs in `examples/public/ScenarioConfigs/*.json` define:
 
 ## Data Server
 
-The `Wildfire` and `UncertaintyTube` example scenarios fetch ensemble data from a backend server, with the URL configured in scenario JSON (`global_data.data_server_address`). The backend is not included in this repo. The `ChatUI` example runs entirely client-side and needs no backend.
+The `Wildfire` and `UncertaintyTube` example scenarios fetch ensemble data from a backend server, with the URL configured in scenario JSON (`global_data.data_server_address`). The backend is not included in this repo. The `ChatUI` example (`src/Examples/ChatUI/`) runs entirely client-side and needs no backend.

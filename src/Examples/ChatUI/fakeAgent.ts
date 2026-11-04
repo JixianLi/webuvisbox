@@ -1,8 +1,8 @@
 // ABOUTME: Fake agent simulator for the chatUI scenario.
 // ABOUTME: Picks a random tool path with retries and animates trace + chat updates.
 
-import type { TraceMessage } from "@/Renderers/Trace";
-import type { ChatMessage, ContentPart } from "@/Renderers/Chat";
+import type { TraceMessage } from "../../Renderers/Trace";
+import type { ChatMessage, ContentPart } from "../../Renderers/Chat";
 
 type FakeAgentCtx = {
     appendTrace: (msg: Omit<TraceMessage, "id">) => void;

@@ -9,7 +9,11 @@ export interface ScenarioDefinition {
   description?: string;
   createGlobalContext: () => GlobalContext;
   panelMapping: (panelId: string) => ReactNode | null;
-  defaultConfigPath: string;
+  // Where its config comes from: a URL the host serves, or, for examples built into the library, the config itself.
+  defaultConfigPath?: string;
+  defaultConfig?: object;
+  // Listed under Examples in the Scenario menu (built into the library), not under Scenarios.
+  isExample?: boolean;
 }
 
 class ScenarioRegistry {
@@ -34,6 +38,10 @@ class ScenarioRegistry {
 
   list(): string[] {
     return Array.from(this.scenarios.keys());
+  }
+
+  definitions(): ScenarioDefinition[] {
+    return Array.from(this.scenarios.values());
   }
 
   has(name: string): boolean {

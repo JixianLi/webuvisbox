@@ -2,9 +2,9 @@
 // ABOUTME: Drives the fake agent on user prompt submit so the rendering components react.
 
 import { makeAutoObservable, runInAction } from "mobx";
-import type { GlobalContext } from "@/Types/GlobalContext";
-import type { Actor, TraceMessage } from "@/Renderers/Trace";
-import type { ChatMessage } from "@/Renderers/Chat";
+import type { GlobalContext } from "../../Types/GlobalContext";
+import type { Actor, TraceMessage } from "../../Renderers/Trace";
+import type { ChatMessage } from "../../Renderers/Chat";
 import { runFakeAgent } from "./fakeAgent";
 
 export class ChatUIGlobalContext implements GlobalContext {

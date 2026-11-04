@@ -5,38 +5,35 @@ import { downloadScenario } from "./DownloadScenario";
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ScenarioUploadDialog from "./ScenarioUploadDialog";
-import { Download, MessageSquare, Upload } from 'lucide-react';
+import { Download, LayoutGrid, MessageSquare, Upload } from 'lucide-react';
 import Divider from '@mui/material/Divider';
-import { useScenario } from "../../ScenarioManager/ScenarioManager";
+import { loadScenario, loadScenarioFromText, useScenario, type ScenarioSource } from "../../ScenarioManager/ScenarioManager";
+import { scenarioRegistry, type ScenarioDefinition } from "../../Scenarios";
 
 export const ScenarioMenuList: React.FC<{ handleClose: () => void }> = observer(({ handleClose }) => {
     const scenario = useScenario();
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
 
-    const server_load = async (filename: string) => {
+    const load = (source: ScenarioSource) => {
         handleClose();
-        try {
-            const response = await fetch(filename);
-            const data = await response.json();
-            await scenario.completeInitialization(data);
-        } catch (error) {
-            console.error(`Failed to load scenario ${filename}:`, error);
-        }
-    }
-
+        loadScenario(scenario, source);
+    };
 
     const handleUploadScenario = (jsonString: string) => {
-        console.log("Uploading scenario...");
         setUploadDialogOpen(false);
         handleClose();
-        
-        scenario.loadFromJson(jsonString);
-        scenario.asyncInitialization().catch(error => {
-            console.error("Error during async initialization of uploaded scenario:", error);
-        }).then(() => {
-            console.log("Uploaded scenario loaded successfully.");
-        });
+        loadScenarioFromText(scenario, jsonString);
     };
+
+    // Every registered scenario with a config: the library's built-in examples, then the host's own.
+    const loadable = scenarioRegistry.definitions().filter(definition => definition.defaultConfig || definition.defaultConfigPath);
+    const menuItemsOf = (definitions: ScenarioDefinition[]) => definitions.map(definition => (
+        <MenuItem key={definition.name} selected={definition.name === scenario.name}
+                  onClick={() => load(definition.defaultConfig ?? definition.defaultConfigPath!)}>
+            <ListItemIcon>{definition.isExample ? <MessageSquare size={16} strokeWidth={1.75} /> : <LayoutGrid size={16} strokeWidth={1.75} />}</ListItemIcon>
+            <ListItemText>{definition.name}</ListItemText>
+        </MenuItem>
+    ));
 
     const onClose = () => {
         setUploadDialogOpen(false);
@@ -46,12 +43,11 @@ export const ScenarioMenuList: React.FC<{ handleClose: () => void }> = observer(
     return (
         <>
             <Divider>Examples</Divider>
-            <MenuItem onClick={() => server_load("ScenarioConfigs/ChatUI.json")}>
-                <ListItemIcon><MessageSquare size={16} strokeWidth={1.75} /></ListItemIcon>
-                <ListItemText>chatUI</ListItemText>
-            </MenuItem>
-            
+            {menuItemsOf(loadable.filter(definition => definition.isExample))}
+
             <Divider>Scenarios</Divider>
+            {menuItemsOf(loadable.filter(definition => !definition.isExample))}
+            <Divider />
             <MenuItem onClick={() => downloadScenario(scenario, handleClose)}>
                 <ListItemIcon><Download size={16} strokeWidth={1.75} /></ListItemIcon>
                 <ListItemText>Download Scenario</ListItemText>
