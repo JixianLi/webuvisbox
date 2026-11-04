@@ -61,6 +61,10 @@ Then `npm install` once at the host root.
 
 Two aliases: `@core` for the library, `@` for your own source. The library's own files import each other with relative paths, so they don't depend on either alias.
 
+`dedupe` keeps one copy of React, MobX, MUI and Emotion, the host's: if the library's own dependencies are installed
+too (`npm install` inside `vendor/webuvisbox` to run its examples), the library's files would otherwise resolve them
+from there, and two Reacts break every hook ("Invalid hook call").
+
 The `define` and `optimizeDeps` entries carry over the library's workarounds (see its `vite.config.ts`): react-grid-layout reads `process.env.DRAGGABLE_DEBUG`, which throws `process is not defined` in the browser, and MUI needs the CJS `prop-types` and `react-is` pre-bundled for their default exports.
 
 ```ts
@@ -76,6 +80,7 @@ export default defineConfig({
       "@core": path.resolve(__dirname, "vendor/webuvisbox/src"),
       "@":     path.resolve(__dirname, "src"),
     },
+    dedupe: ["react", "react-dom", "mobx", "mobx-react-lite", "@mui/material", "@emotion/react", "@emotion/styled"],
   },
   optimizeDeps: {
     include: ["prop-types", "react-is", "react-grid-layout/legacy"],
