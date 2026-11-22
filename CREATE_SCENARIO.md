@@ -232,16 +232,28 @@ Note the import pattern: **`@core/...` for library code, relative paths for sibl
   "views": ["Hello"],
   "panel_layouts": {
     "default_layouts": {
-      "lg": [{ "i": "Hello", "x": 0, "y": 0, "w": 6, "h": 4 }]
+      "xl": [{ "i": "Hello", "x": 0, "y": 0, "w": 8, "h": 4, "visible": true }],
+      "lg": [{ "i": "Hello", "x": 0, "y": 0, "w": 6, "h": 4, "visible": true }],
+      "sm": [{ "i": "Hello", "x": 0, "y": 0, "w": 4, "h": 4, "visible": true }]
     },
-    "breakpoints": { "lg": 1200, "sm": 0 },
-    "cols":        { "lg": 12,   "sm": 4 }
+    "breakpoints": { "xl": 1440, "lg": 800, "sm": 0 },
+    "cols":        { "xl": 16,   "lg": 12,  "sm": 4 }
   },
   "global_data": {
     "message": "Hello from MyScenario"
   }
 }
 ```
+
+Layout rules the loader does not check (breaking them leaves a blank page with no error on screen):
+
+- **Every size in `breakpoints` needs a layout in `default_layouts`, and one of them must be `xl`.** The layout manager
+  starts at `xl` and only learns the real size from the grid's first breakpoint change, so a config without an `xl`
+  layout fails before that (`Cannot read properties of undefined (reading 'filter')`).
+- **Each size needs at least one panel with `"visible": true`.** A panel is shown only when `visible` is `true`; a
+  missing `visible` counts as hidden.
+- **With `tool_placement` `docked` or `overlay`, only the `xl` layout is used**: the breakpoint never changes outside
+  the grid. Other sizes are still required by the rules above but are not shown.
 
 ## 10. Run it
 

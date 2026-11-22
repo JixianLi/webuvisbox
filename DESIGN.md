@@ -110,10 +110,11 @@ Add shortcuts sparingly: each one is a key a scenario can no longer use.
     "tool_placement": "docked",
     "inspector_anchor": "top_right",
     "content_split": [0.6, 0.4],
-    "default_layouts": { "xl": [{ "i": "Viewport", "role": "content", "x": 0, "y": 0, "w": 16, "h": 16 }] }
+    "default_layouts": { "xl": [{ "i": "Viewport", "role": "content", "x": 0, "y": 0, "w": 16, "h": 16, "visible": true }] }
   }
 }
 ```
 
-Every key is optional; a config without them looks and lays out as before, in the new style. The mode and scale picked
+Every key is optional; a config without them looks and lays out as before, in the new style. Each panel still needs
+`"visible": true`, and docked and overlay placements use only the `xl` layout (see `CREATE_SCENARIO.md`, section 9). The mode and scale picked
 in the navbar are written back into `appearance`, so a downloaded scenario opens as it was seen.
