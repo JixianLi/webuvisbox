@@ -69,6 +69,7 @@ where tools go:
 | `grid` (default) | In the grid with the tools, as before | In the grid |
 | `docked` | Share the area left over, split by draggable dividers (`content_split`) | An inspector column on one side |
 | `overlay` | Share the whole area | An inspector floating over the content |
+| `stacked` | One above another, full width, 75% of the screen height each | Below the content at natural height; the page scrolls |
 
 A panel reads its placement (`usePanelPlacement`) and frames itself: `tile` and `content` are bordered surfaces,
 `stage` (the only content panel) is unframed and fills its area, `floating` (in the inspector) is glass.
@@ -116,5 +117,5 @@ Add shortcuts sparingly: each one is a key a scenario can no longer use.
 ```
 
 Every key is optional; a config without them looks and lays out as before, in the new style. Each panel still needs
-`"visible": true`, and docked and overlay placements use only the `xl` layout (see `CREATE_SCENARIO.md`, section 9). The mode and scale picked
+`"visible": true`, and `tool_placement` can be one value or one per breakpoint (see `CREATE_SCENARIO.md`, section 9). The mode and scale picked
 in the navbar are written back into `appearance`, so a downloaded scenario opens as it was seen.

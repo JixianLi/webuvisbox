@@ -248,12 +248,12 @@ Note the import pattern: **`@core/...` for library code, relative paths for sibl
 Layout rules the loader does not check (breaking them leaves a blank page with no error on screen):
 
 - **Every size in `breakpoints` needs a layout in `default_layouts`, and one of them must be `xl`.** The layout manager
-  starts at `xl` and only learns the real size from the grid's first breakpoint change, so a config without an `xl`
-  layout fails before that (`Cannot read properties of undefined (reading 'filter')`).
+  starts at `xl` and learns the window's size only after its first render, so a config without an `xl` layout fails
+  in that render (`Cannot read properties of undefined (reading 'filter')`).
 - **Each size needs at least one panel with `"visible": true`.** A panel is shown only when `visible` is `true`; a
   missing `visible` counts as hidden.
-- **With `tool_placement` `docked` or `overlay`, only the `xl` layout is used**: the breakpoint never changes outside
-  the grid. Other sizes are still required by the rules above but are not shown.
+- **Every placement follows the breakpoint.** `tool_placement` can be one value or one per size, for example
+  `{ "xl": "docked", "lg": "docked", "sm": "stacked" }`; each size uses its own layout's panels, visibility and roles.
 
 ## 10. Run it
 

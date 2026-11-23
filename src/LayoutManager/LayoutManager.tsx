@@ -1,11 +1,11 @@
 // ABOUTME: Manages the responsive grid layout of scenario panels.
 // ABOUTME: Renders the header bar, panel grid, and loading indicator.
 
-import React, { useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Responsive, WidthProvider } from "react-grid-layout/legacy";
 
-import type { AppLayout, AppLayouts, InspectorAnchor, PanelLayouts } from "../Types/PanelLayouts";
+import type { AppLayout, AppLayouts, InspectorAnchor, PanelLayouts, RGLBreakpoints } from "../Types/PanelLayouts";
 import { useTheme } from "@mui/material/styles";
 import HeaderBar from "./HeaderBar/HeaderBar";
 import { SHAPE } from "../Theme/DesignTokens";
@@ -32,6 +32,18 @@ const LoadingIndicator = observer(function LoadingIndicator() {
 
 const MIN_CONTENT_SHARE = 0.15;
 
+// The same rule react-grid-layout applies: the largest breakpoint whose width the viewport exceeds.
+function breakpointForWidth(breakpoints: RGLBreakpoints, width: number): string {
+    const ascending = Object.entries(breakpoints).sort(([, low], [, high]) => low - high);
+    let current = ascending[0][0];
+    for (const [name, minimumWidth] of ascending) {
+        if (width > minimumWidth) {
+            current = name;
+        }
+    }
+    return current;
+}
+
 // Inspector arrangement (tool_placement docked or overlay): the content panels share the area under the navbar side
 // by side (one alone fills it, unframed), split by draggable dividers; the tool panels stack in one inspector column,
 // each as tall as its content until the column is full, then each scrolls its own content. Docked, the inspector
@@ -50,7 +62,7 @@ const InspectorArrangement = observer(({ panelLayouts }: { panelLayouts: PanelLa
     const gap = tokens.px(SHAPE.panelGap);
     const inset = tokens.px(12);
     const inspectorWidth = tokens.px(SHAPE.inspectorWidth);
-    const docked = panelLayouts.toolPlacement === 'docked';
+    const docked = panelLayouts.currentToolPlacement === 'docked';
     const single = contentPanels.length === 1;
     const anchor = panelLayouts.inspectorAnchor;
     const onLeft = anchor.endsWith('left');
@@ -162,10 +174,50 @@ const InspectorArrangement = observer(({ panelLayouts }: { panelLayouts: PanelLa
     </Box>;
 });
 
+// Each content panel is this share of the viewport height, so the first tool panel's title peeks in below it and
+// shows that the page scrolls.
+const STACKED_CONTENT_HEIGHT = '75vh';
+
+// Stacked placement (meant for phones): one full-width column that the page scrolls. Content panels first, each STACKED_CONTENT_HEIGHT
+// tall, then the tool panels at their natural height (no nested scroll areas, which are awkward on touch screens).
+const StackedArrangement = observer(({ panelLayouts }: { panelLayouts: PanelLayouts }) => {
+    const scenario = useScenario();
+    const tokens = useTheme().tokens;
+    const panelMapping = scenarioRegistry.get(scenario.name).panelMapping;
+    const visiblePanels = panelLayouts.currentLayouts[panelLayouts.currentBreakpoint].filter(panel => panel.visible);
+    const contentPanels = visiblePanels.filter(panel => panel.role === 'content');
+    const toolPanels = visiblePanels.filter(panel => panel.role !== 'content');
+    const gap = tokens.px(SHAPE.panelGap);
+    const single = contentPanels.length === 1;
+    return <Box sx={{ display: 'flex', flexDirection: 'column', gap: `${gap}px`, pb: `${gap}px` }}>
+        {contentPanels.map(panel => (
+            <Box key={panel.i} sx={{ height: STACKED_CONTENT_HEIGHT, minHeight: 0, mx: single ? 0 : `${gap}px` }}>
+                <PanelPlacementContext.Provider value={single ? 'stage' : 'content'}>{panelMapping(panel.i)}</PanelPlacementContext.Provider>
+            </Box>
+        ))}
+        {toolPanels.map(panel => (
+            <Box key={panel.i} sx={{ mx: `${gap}px` }}>
+                <PanelPlacementContext.Provider value="floating">{panelMapping(panel.i)}</PanelPlacementContext.Provider>
+            </Box>
+        ))}
+    </Box>;
+});
+
 const LayoutManager: React.FC = observer(() => {
     const scenario = useScenario();
     const panelLayouts: PanelLayouts = scenario.panelLayouts!;
     const theme = useTheme();
+    // The grid reports breakpoint changes itself, but the other placements need them too (tool_placement can differ
+    // per breakpoint). Layout effect: on a phone the first paint already uses the small breakpoint's placement.
+    useLayoutEffect(() => {
+        if (!panelLayouts) {
+            return;
+        }
+        const update = () => panelLayouts.setCurrentBreakpoint(breakpointForWidth(panelLayouts.breakpoints, window.innerWidth));
+        update();
+        window.addEventListener('resize', update);
+        return () => window.removeEventListener('resize', update);
+    }, [panelLayouts]);
 
     if (!scenario.fullyLoaded) {
         return <div style={{ width: '100vw', height: '100vh', backgroundColor: theme.palette.background.default }}>
@@ -195,7 +247,17 @@ const LayoutManager: React.FC = observer(() => {
         });
     };
 
-    if (panelLayouts.toolPlacement !== 'grid') {
+    const toolPlacement = panelLayouts.currentToolPlacement;
+
+    if (toolPlacement === 'stacked') {
+        return <div style={{ width: '100%', minHeight: '100vh', backgroundColor: theme.palette.background.default }}>
+            <HeaderBar />
+            <StackedArrangement panelLayouts={panelLayouts} />
+            <LoadingIndicator />
+        </div>;
+    }
+
+    if (toolPlacement !== 'grid') {
         return <div style={{ width: '100vw', height: '100vh', backgroundColor: theme.palette.background.default }}>
             <HeaderBar />
             <InspectorArrangement panelLayouts={panelLayouts} />

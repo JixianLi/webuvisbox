@@ -1,6 +1,6 @@
 // @ts-ignore unused import toJS TODO remove
 import { makeAutoObservable, runInAction, toJS } from 'mobx';
-import type { AppLayouts, InspectorAnchor, PanelLayouts, ToolPlacement, RGLBreakpoints, RGLCols } from '../Types/PanelLayouts';
+import type { AppLayouts, InspectorAnchor, PanelLayouts, ToolPlacement, ToolPlacementConfig, RGLBreakpoints, RGLCols } from '../Types/PanelLayouts';
 import _ from 'lodash';
 
 
@@ -11,7 +11,7 @@ export class PanelLayoutManager implements PanelLayouts {
     breakpoints: RGLBreakpoints;
     cols: RGLCols;
     currentBreakpoint: string = 'xl';
-    toolPlacement: ToolPlacement = 'grid';
+    toolPlacement: ToolPlacementConfig = 'grid';
     inspectorAnchor: InspectorAnchor = 'top_right';
     contentSplit: number[] = [];
 
@@ -19,7 +19,7 @@ export class PanelLayoutManager implements PanelLayouts {
         defaultLayouts: AppLayouts,
         breakpoints: RGLBreakpoints,
         cols?: RGLCols,
-        toolPlacement?: ToolPlacement,
+        toolPlacement?: ToolPlacementConfig,
         inspectorAnchor?: InspectorAnchor,
         contentSplit?: number[]
     ) {
@@ -63,6 +63,13 @@ export class PanelLayoutManager implements PanelLayouts {
         });
         console.log('Initialized PanelLayoutManager:', toJS(this.currentLayouts), toJS(this.cacheLayouts));
         makeAutoObservable(this);
+    }
+
+    get currentToolPlacement(): ToolPlacement {
+        if (typeof this.toolPlacement === 'string') {
+            return this.toolPlacement;
+        }
+        return this.toolPlacement[this.currentBreakpoint] ?? 'grid';
     }
 
     reinitializeLayouts(newLayouts: AppLayouts) {

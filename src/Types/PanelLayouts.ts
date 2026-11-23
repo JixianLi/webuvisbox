@@ -4,8 +4,11 @@ export type AppLayouts = {
 };
 
 // Where tool panels go. grid: with the content, in the grid. docked: in an inspector beside the content.
-// overlay: in an inspector floating over the content.
-export type ToolPlacement = 'grid' | 'docked' | 'overlay';
+// overlay: in an inspector floating over the content. stacked: below the content in one scrolling column (phones).
+export type ToolPlacement = 'grid' | 'docked' | 'overlay' | 'stacked';
+
+// One placement for every breakpoint, or one per breakpoint name (a breakpoint left out uses grid).
+export type ToolPlacementConfig = ToolPlacement | { [breakpoint: string]: ToolPlacement };
 
 // The corner the inspector sits in (overlay); docked uses only its side (left or right).
 export type InspectorAnchor = 'top_left' | 'top_right' | 'bottom_left' | 'bottom_right';
@@ -43,7 +46,9 @@ export interface PanelLayouts {
   breakpoints: RGLBreakpoints;
   cols: RGLCols;
   currentBreakpoint: string;
-  toolPlacement: ToolPlacement;
+  toolPlacement: ToolPlacementConfig;
+  // toolPlacement resolved for currentBreakpoint.
+  readonly currentToolPlacement: ToolPlacement;
   inspectorAnchor: InspectorAnchor;
   // Docked or overlay: the content panels' shares of the width, left to right (equal when unset or stale).
   contentSplit: number[];
