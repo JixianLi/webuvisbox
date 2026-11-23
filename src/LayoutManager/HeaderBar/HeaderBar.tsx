@@ -1,5 +1,5 @@
 // ABOUTME: Application navbar: brand mark, scenario name and description, the Scenario, Layout and Views menus,
-// ABOUTME: and the display mode switch (bright, dark, neutral).
+// ABOUTME: and the display mode switch (bright, dark, neutral). On phones the menus fold into one.
 
 import React from "react";
 import { observer } from "mobx-react-lite";
@@ -14,7 +14,9 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
-import { ChevronDown, Moon, SunMedium, Contrast, Keyboard } from "lucide-react";
+import { ChevronDown, Moon, SunMedium, Contrast, Keyboard, Ellipsis } from "lucide-react";
+import ListSubheader from "@mui/material/ListSubheader";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import IconButton from "@mui/material/IconButton";
 
 import ViewMenuList from "./ViewMenuList";
@@ -71,17 +73,49 @@ const DisplayModeSwitch: React.FC = () => {
     );
 };
 
-const UiScaleMenu: React.FC = () => {
+const UiScaleItems: React.FC<{ handleClose: () => void }> = ({ handleClose }) => {
     const { uiScale, setUiScale } = useDisplaySettings();
+    return <>{UI_SCALES.map(scale => (
+        <MenuItem key={scale} selected={Math.abs(scale - uiScale) < 1e-6}
+                  onClick={() => { setUiScale(scale); handleClose(); }}>
+            UI {Math.round(scale * 100)}%
+        </MenuItem>
+    ))}</>;
+};
+
+const UiScaleMenu: React.FC = () => {
+    const { uiScale } = useDisplaySettings();
     return (
         <NavbarMenu label={`${Math.round(uiScale * 100)}%`}>
-            {close => UI_SCALES.map(scale => (
-                <MenuItem key={scale} selected={Math.abs(scale - uiScale) < 1e-6}
-                          onClick={() => { setUiScale(scale); close(); }}>
-                    UI {Math.round(scale * 100)}%
-                </MenuItem>
-            ))}
+            {close => <UiScaleItems handleClose={close} />}
         </NavbarMenu>
+    );
+};
+
+// Phones: the Scenario, Layout, Views and UI size menus as sections of one menu, so the navbar fits.
+const CompactMenu: React.FC = () => {
+    const px = useTheme().tokens.px;
+    const [anchor, setAnchor] = React.useState<null | HTMLElement>(null);
+    const close = () => setAnchor(null);
+    const section = { lineHeight: 2.25, backgroundColor: 'transparent' };
+    return (
+        <>
+            <IconButton color="inherit" size="small" aria-label="menu" onClick={event => setAnchor(event.currentTarget)}>
+                <Ellipsis size={px(18)} strokeWidth={1.75} />
+            </IconButton>
+            <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={close}>
+                <MenuList dense disablePadding>
+                    <ListSubheader sx={section}>Scenario</ListSubheader>
+                    <ScenarioMenuList handleClose={close} />
+                    <ListSubheader sx={section}>Layout</ListSubheader>
+                    <LayoutMenuList handleClose={close} />
+                    <ListSubheader sx={section}>Views</ListSubheader>
+                    <ViewMenuList />
+                    <ListSubheader sx={section}>UI size</ListSubheader>
+                    <UiScaleItems handleClose={close} />
+                </MenuList>
+            </Menu>
+        </>
     );
 };
 
@@ -98,17 +132,35 @@ const HeaderBar: React.FC = observer(() => {
     const theme = useTheme();
     const tokens = theme.tokens;
     const onAccent = tokens.navbar === 'accent';
+    const compact = useMediaQuery(theme.breakpoints.down('sm'));
+    const header = { height: tokens.px(SHAPE.navbarHeight), display: 'flex', alignItems: 'center', gap: 1.5, px: 1.75,
+                     backgroundColor: onAccent ? tokens.accent : tokens.surface,
+                     color: onAccent ? '#FFFFFF' : tokens.text,
+                     borderBottom: onAccent ? 'none' : `1px solid ${tokens.border}` };
+    const title = (
+        <Typography component="h1" noWrap
+                    sx={{ fontSize: tokens.px(TYPE.navbarTitleSize), fontWeight: 600, letterSpacing: '-0.01em', minWidth: 0 }}>
+            {scenario.name}
+        </Typography>
+    );
+
+    // Phones have no keyboard, so the shortcuts button goes too.
+    if (compact) {
+        return (
+            <Box component="header" sx={header}>
+                <BrandMark onAccent={onAccent} />
+                {title}
+                <Box sx={{ flexGrow: 1 }} />
+                <DisplayModeSwitch />
+                <CompactMenu />
+            </Box>
+        );
+    }
 
     return (
-        <Box component="header"
-             sx={{ height: tokens.px(SHAPE.navbarHeight), display: 'flex', alignItems: 'center', gap: 1.5, px: 1.75,
-                   backgroundColor: onAccent ? tokens.accent : tokens.surface,
-                   color: onAccent ? '#FFFFFF' : tokens.text,
-                   borderBottom: onAccent ? 'none' : `1px solid ${tokens.border}` }}>
+        <Box component="header" sx={header}>
             <BrandMark onAccent={onAccent} />
-            <Typography component="h1" sx={{ fontSize: tokens.px(TYPE.navbarTitleSize), fontWeight: 600, letterSpacing: '-0.01em' }}>
-                {scenario.name}
-            </Typography>
+            {title}
             {scenario.description && (
                 <Typography sx={{ fontSize: tokens.px(13), opacity: 0.65, display: { xs: 'none', md: 'block' } }} noWrap>
                     {scenario.description}
