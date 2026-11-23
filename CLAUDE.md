@@ -30,7 +30,7 @@ src/                      # Library — no scenario-specific code, except the bu
 ├── LayoutManager/        # Navbar; grid layout, or content panels with an inspector of tool panels
 ├── Panels/               # Base Panel component (placement-aware frame, fit, collapse) + grid container
 ├── Examples/             # Built-in examples (ChatUI): config inlined, registered by App, in every host's menu
-├── Renderers/            # Reusable renderers: Chat, Trace (swim lanes), Mesh, Colormaps, chart helpers
+├── Renderers/            # Reusable renderers: Chat, Trace (swim lanes), Graph (word-cloud force layout + SVG view), Mesh, Colormaps, chart helpers
 ├── Scenarios/
 │   ├── ScenarioRegistry.ts   # Registry singleton + ScenarioDefinition type
 │   └── index.ts              # Re-exports registry; registers no scenarios

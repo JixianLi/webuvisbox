@@ -80,6 +80,7 @@ webuvisbox/
 │   ├── Renderers/               # Reusable renderers
 │   │   ├── Chat/                # Chat surface (text + image content parts)
 │   │   ├── Trace/               # Swim-lane sequence diagram
+│   │   ├── Graph/               # Word cloud: force layout (similarity links, rectangle collision) in a worker + SVG view
 │   │   ├── Mesh/                # 3D primitives
 │   │   ├── Colormaps/           # Colormap + texture management
 │   │   ├── Chartjs/             # Chart.js helpers
