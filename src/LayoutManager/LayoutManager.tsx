@@ -34,8 +34,8 @@ const MIN_CONTENT_SHARE = 0.15;
 
 // Inspector arrangement (tool_placement docked or overlay): the content panels share the area under the navbar side
 // by side (one alone fills it, unframed), split by draggable dividers; the tool panels stack in one inspector column,
-// each as tall as its content. Docked, the inspector takes a strip on the anchor's side; overlay, it floats in the
-// anchor's corner. Dragging a tool panel's title row moves the inspector, with the corner it will snap to outlined.
+// each as tall as its content until the column is full, then each scrolls its own content. Docked, the inspector
+// takes a strip on the anchor's side; overlay, it floats in the anchor's corner. Dragging a tool panel's title row moves the inspector, with the corner it will snap to outlined.
 const InspectorArrangement = observer(({ panelLayouts }: { panelLayouts: PanelLayouts }) => {
     const scenario = useScenario();
     const tokens = useTheme().tokens;

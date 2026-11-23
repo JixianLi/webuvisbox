@@ -133,7 +133,7 @@ export const Panel = observer((props: PanelProps) => {
             </Tooltip>
         </Box>
         <Box ref={contentRef}
-             sx={{ display: showBody ? 'flex' : 'none', flexDirection: 'column', flex: placement === 'floating' ? 'none' : 1,
+             sx={{ display: showBody ? 'flex' : 'none', flexDirection: 'column', flex: placement === 'floating' ? '0 1 auto' : 1,
                    minHeight: 0, m: placement === 'stage' ? 0 : 1.5, overflow: 'auto', justifyContent: 'flex-start',
                    alignItems: 'center' }}>
             {props.children}
