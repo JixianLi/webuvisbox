@@ -22,7 +22,7 @@ through the theme (`theme.tokens`), never as literal colors or sizes.
 | `controlFill`, `border` | Text fields and selects; 1px hairlines (no shadows on panels) |
 | `text`, `textSecondary`, `textMuted` | Three levels of ink |
 | `accentFill`, `accentOnSurface` | The accent as a fill (white text on it) and as a line or text on the surface |
-| `glass` | Fill, blur, saturation, edge and highlight of floating panels |
+| `glass` | Fill, blur, saturation, edge and highlight of overlay panels |
 | `px(size)` | A size at the current UI scale |
 
 Type: Inter (variable), with tabular figures so changing numbers do not jitter. Icons: Lucide, 1.75 stroke. Shapes:
@@ -59,31 +59,31 @@ One factor over every size (type, controls, headers, spacing): 85% to 175%, from
 `appearance.ui_scale`. Content (a render's resolution, a chart's data) is unaffected. For larger screenshots and
 projection without the browser's zoom, which also changes layout breakpoints.
 
-## Panels and placement
+## Panels
 
-Each panel has a role, `content` (what you look at) or `tool` (what you adjust; the default). `tool_placement` decides
-where tools go:
+Every panel sits on the responsive grid: its `x`, `y`, `w`, `h` are given per breakpoint in `default_layouts`, so a
+phone layout is just the `sm` layout (for example, panels stacked one above another). Each panel's `type` picks how it
+is drawn; it can differ per breakpoint like the position:
 
-| `tool_placement` | Content panels | Tool panels |
+| `type` | Drawn as | Takes grid space |
 |---|---|---|
-| `grid` (default) | In the grid with the tools, as before | In the grid |
-| `docked` | Share the area left over, split by draggable dividers (`content_split`) | An inspector column on one side |
-| `overlay` | Share the whole area | An inspector floating over the content |
-| `stacked` | One above another, full width, 75% of the screen height each | Below the content at natural height; the page scrolls |
+| `regular` (default) | A bordered tile | Yes; tiles push each other aside |
+| `borderless` | Unframed on the canvas, content edge to edge (for the main view); keeps a thin title row | Yes |
+| `overlay` | Glass, above the grid at its `x`, `y`, `w`; as tall as its content up to `h` rows, then it scrolls | No; it floats over what is under it |
 
-A panel reads its placement (`usePanelPlacement`) and frames itself: `tile` and `content` are bordered surfaces,
-`stage` (the only content panel) is unframed and fills its area, `floating` (in the inspector) is glass.
+Dragging a title row moves a panel: grid panels with the grid, overlays freely, snapping to the nearest cell on release.
 
-The inspector is moved by dragging any tool panel's title row; an outline shows the corner it will snap to, and
-`inspector_anchor` keeps it (`top_left`, `top_right`, `bottom_left`, `bottom_right`; docked uses only the side).
-Corners rather than free positions: a layout stays the same on every screen and nothing can be lost off-screen.
+Glass belongs to overlays only: it needs something behind it to blur. Over a render it shows the render's own colors,
+averaged, which distorts color judgment far less than a saturated frame; still, use `regular` panels beside the view
+where the whole content must stay visible.
 
-Glass belongs to floating panels only: it needs something behind it to blur. Over a render it shows the render's own
-colors, averaged, which distorts color judgment far less than a saturated frame; still, prefer `docked` where the whole
-content must stay visible.
+Rows fill the window: `fit_rows` (per breakpoint) is how many grid rows span the height below the navbar, and the row
+height follows from it. A breakpoint without `fit_rows` uses the bottom edge of its default layout (overlays
+excluded), so a layout as written fills the window; give phones a smaller `fit_rows` than their layout's height so the
+page scrolls.
 
-Panel actions: fit to content (grid only; snaps to the 50px row grid), collapse to the title row, close. A help button
-appears only when the panel has help content.
+Panel actions: fit to content (`regular` only; snaps to whole rows), collapse to the title row (`regular`, `overlay`),
+close. A help button appears only when the panel has help content.
 
 ## Commands and shortcuts
 
@@ -108,14 +108,18 @@ Add shortcuts sparingly: each one is a key a scenario can no longer use.
 {
   "appearance": { "accent": "#BE0000", "default_mode": "dark", "ui_scale": 1 },
   "panel_layouts": {
-    "tool_placement": "docked",
-    "inspector_anchor": "top_right",
-    "content_split": [0.6, 0.4],
-    "default_layouts": { "xl": [{ "i": "Viewport", "role": "content", "x": 0, "y": 0, "w": 16, "h": 16, "visible": true }] }
+    "default_layouts": {
+      "xl": [
+        { "i": "Viewport", "type": "borderless", "x": 0, "y": 0, "w": 16, "h": 16, "visible": true },
+        { "i": "Settings", "x": 16, "y": 0, "w": 6, "h": 16, "visible": true },
+        { "i": "Legend", "type": "overlay", "x": 1, "y": 12, "w": 4, "h": 3, "visible": true }
+      ]
+    },
+    "fit_rows": { "sm": 13 }
   }
 }
 ```
 
-Every key is optional; a config without them looks and lays out as before, in the new style. Each panel still needs
-`"visible": true`, and `tool_placement` can be one value or one per breakpoint (see `CREATE_SCENARIO.md`, section 9). The mode and scale picked
-in the navbar are written back into `appearance`, so a downloaded scenario opens as it was seen.
+Every key is optional: `type` defaults to `regular`, `fit_rows` to each layout's own height. Each panel still needs
+`"visible": true` (see `CREATE_SCENARIO.md`, section 9). The mode and scale picked in the navbar are written back into
+`appearance`, so a downloaded scenario opens as it was seen.

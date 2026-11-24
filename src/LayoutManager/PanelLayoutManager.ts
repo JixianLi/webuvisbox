@@ -1,6 +1,6 @@
 // @ts-ignore unused import toJS TODO remove
 import { makeAutoObservable, runInAction, toJS } from 'mobx';
-import type { AppLayouts, InspectorAnchor, PanelLayouts, ToolPlacement, ToolPlacementConfig, RGLBreakpoints, RGLCols } from '../Types/PanelLayouts';
+import type { AppLayouts, FitRows, PanelLayouts, RGLBreakpoints, RGLCols } from '../Types/PanelLayouts';
 import _ from 'lodash';
 
 
@@ -11,21 +11,16 @@ export class PanelLayoutManager implements PanelLayouts {
     breakpoints: RGLBreakpoints;
     cols: RGLCols;
     currentBreakpoint: string = 'xl';
-    toolPlacement: ToolPlacementConfig = 'grid';
-    inspectorAnchor: InspectorAnchor = 'top_right';
-    contentSplit: number[] = [];
+    fitRows: FitRows;
+    rowHeight: number = 0;
 
     constructor(
         defaultLayouts: AppLayouts,
         breakpoints: RGLBreakpoints,
         cols?: RGLCols,
-        toolPlacement?: ToolPlacementConfig,
-        inspectorAnchor?: InspectorAnchor,
-        contentSplit?: number[]
+        fitRows?: FitRows
     ) {
-        this.contentSplit = contentSplit ?? [];
-        this.toolPlacement = toolPlacement ?? 'grid';
-        this.inspectorAnchor = inspectorAnchor ?? 'top_right';
+        this.fitRows = _.cloneDeep(fitRows ?? {});
         this.defaultLayouts = _.cloneDeep(defaultLayouts);
         this.currentLayouts = _.cloneDeep(defaultLayouts);
         this.cacheLayouts = _.cloneDeep(defaultLayouts);
@@ -65,11 +60,15 @@ export class PanelLayoutManager implements PanelLayouts {
         makeAutoObservable(this);
     }
 
-    get currentToolPlacement(): ToolPlacement {
-        if (typeof this.toolPlacement === 'string') {
-            return this.toolPlacement;
+    // Default: the bottom edge of the breakpoint's default layout (overlays excluded, they take no grid space), so a
+    // layout as written fills the window.
+    fitRowsAt(breakpoint: string): number {
+        const configured = this.fitRows[breakpoint];
+        if (configured !== undefined && configured > 0) {
+            return configured;
         }
-        return this.toolPlacement[this.currentBreakpoint] ?? 'grid';
+        const gridPanels = (this.defaultLayouts[breakpoint] ?? []).filter(panel => panel.type !== 'overlay');
+        return Math.max(1, ...gridPanels.map(panel => panel.y + panel.h));
     }
 
     reinitializeLayouts(newLayouts: AppLayouts) {
@@ -119,8 +118,9 @@ export class PanelLayoutManager implements PanelLayouts {
         const newLayouts = layout[breakpoint];
         const currentLayout = this.currentLayouts[breakpoint];
 
-        newLayouts.forEach((newPanel, index) => {
-            _.merge(currentLayout[index], newPanel);
+        // Matched by id, not position: the grid reports only the panels it holds (overlays are not among them).
+        newLayouts.forEach(newPanel => {
+            _.merge(currentLayout.find(panel => panel.i === newPanel.i), newPanel);
         });
     }
 
@@ -192,15 +192,22 @@ export class PanelLayoutManager implements PanelLayouts {
         });
     }
 
-    setInspectorAnchor(anchor: InspectorAnchor) {
+    setRowHeight(rowHeight: number) {
         runInAction(() => {
-            this.inspectorAnchor = anchor;
+            this.rowHeight = rowHeight;
         });
     }
 
-    setContentSplit(split: number[]) {
+    // Overlay panels only: grid panels are moved by the grid itself (setCurrentLayout).
+    movePanel(panelId: string, x: number, y: number): void {
         runInAction(() => {
-            this.contentSplit = split;
+            this.currentLayouts = _.cloneDeep(this.currentLayouts);
+            const panel = this.currentPanel(panelId);
+            if (!panel || !panel.visible) {
+                return;
+            }
+            panel.x = x;
+            panel.y = y;
         });
     }
 

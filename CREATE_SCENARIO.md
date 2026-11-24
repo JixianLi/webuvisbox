@@ -252,8 +252,9 @@ Layout rules the loader does not check (breaking them leaves a blank page with n
   in that render (`Cannot read properties of undefined (reading 'filter')`).
 - **Each size needs at least one panel with `"visible": true`.** A panel is shown only when `visible` is `true`; a
   missing `visible` counts as hidden.
-- **Every placement follows the breakpoint.** `tool_placement` can be one value or one per size, for example
-  `{ "xl": "docked", "lg": "docked", "sm": "stacked" }`; each size uses its own layout's panels, visibility and roles.
+- **`fit_rows` defaults to each layout's own height** (the bottom edge of its lowest non-overlay panel), so every
+  size fills the window as written. A phone layout taller than one screen needs its own `fit_rows` (for example 13),
+  or its rows shrink until the whole layout fits on one screen.
 
 ## 10. Run it
 

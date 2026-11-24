@@ -3,18 +3,10 @@ export type AppLayouts = {
   [key: string]: AppLayout[];
 };
 
-// Where tool panels go. grid: with the content, in the grid. docked: in an inspector beside the content.
-// overlay: in an inspector floating over the content. stacked: below the content in one scrolling column (phones).
-export type ToolPlacement = 'grid' | 'docked' | 'overlay' | 'stacked';
-
-// One placement for every breakpoint, or one per breakpoint name (a breakpoint left out uses grid).
-export type ToolPlacementConfig = ToolPlacement | { [breakpoint: string]: ToolPlacement };
-
-// The corner the inspector sits in (overlay); docked uses only its side (left or right).
-export type InspectorAnchor = 'top_left' | 'top_right' | 'bottom_left' | 'bottom_right';
-
-// content: what the user looks at (renders, maps, charts). tool: what they adjust (settings, editors). Default: tool.
-export type PanelRole = 'content' | 'tool';
+// How a panel is drawn. regular: a bordered tile in the grid. borderless: in the grid, unframed on the canvas (for
+// the main view). overlay: glass, floating above the grid at its x/y/w, as tall as its content up to h rows; it takes
+// no grid space. Default: regular.
+export type PanelType = 'regular' | 'borderless' | 'overlay';
 
 export type RGLBreakpoints = {
   [key: string]: number;
@@ -24,9 +16,14 @@ export type RGLCols = {
   [key: string]: number;
 };
 
+// Per breakpoint: how many grid rows fill the window height below the navbar (the row height follows from it).
+export type FitRows = {
+  [key: string]: number;
+};
+
 export interface AppLayout {
   visible?: boolean; // Optional property to track visibility
-  role?: PanelRole;
+  type?: PanelType;
   x: number;
   y: number;
   w: number;
@@ -45,15 +42,15 @@ export interface PanelLayouts {
   cacheLayouts: AppLayouts;
   breakpoints: RGLBreakpoints;
   cols: RGLCols;
+  // As configured; a breakpoint left out fits its default layout (see fitRowsAt).
+  fitRows: FitRows;
   currentBreakpoint: string;
-  toolPlacement: ToolPlacementConfig;
-  // toolPlacement resolved for currentBreakpoint.
-  readonly currentToolPlacement: ToolPlacement;
-  inspectorAnchor: InspectorAnchor;
-  // Docked or overlay: the content panels' shares of the width, left to right (equal when unset or stale).
-  contentSplit: number[];
+  // The current row height in px, set by the layout manager from fitRows and the window height.
+  rowHeight: number;
 
   // Methods
+  fitRowsAt(breakpoint: string): number;
+
   reinitializeLayouts(newLayouts: AppLayouts): void;
 
   toggleVisibility(panelIndex: number): void;
@@ -74,7 +71,7 @@ export interface PanelLayouts {
 
   toggleCollapsed(panelId: string): void;
 
-  setInspectorAnchor(anchor: InspectorAnchor): void;
+  setRowHeight(rowHeight: number): void;
 
-  setContentSplit(split: number[]): void;
+  movePanel(panelId: string, x: number, y: number): void;
 }

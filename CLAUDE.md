@@ -27,8 +27,8 @@ src/                      # Library — no scenario-specific code, except the bu
 ├── Theme/                # Design tokens (three display modes, UI scale) and the MUI theme built from them
 ├── Commands/             # Command registry: named actions, keyboard shortcuts, the shortcut list
 ├── ScenarioManager/      # Loads config, drives scenario lifecycle
-├── LayoutManager/        # Navbar; grid layout, or content panels with an inspector of tool panels
-├── Panels/               # Base Panel component (placement-aware frame, fit, collapse) + grid container
+├── LayoutManager/        # Navbar; the responsive panel grid, with overlay panels above it
+├── Panels/               # Base Panel component (frame by panel type, fit, collapse) + grid container
 ├── Examples/             # Built-in examples (ChatUI): config inlined, registered by App, in every host's menu
 ├── Renderers/            # Reusable renderers: Chat, Trace (swim lanes), Graph (word-cloud force layout + SVG view), Mesh, Colormaps, chart helpers
 ├── Scenarios/
@@ -102,12 +102,12 @@ Within a scenario folder, prefer **relative imports** for files inside the same 
 
 Scenario configs in `examples/public/ScenarioConfigs/*.json` define:
 - `name`: Must match the name used in `scenarioRegistry.register()`
-- `panel_layouts`: Responsive grid layouts per breakpoint (xl, lg, sm); optionally each panel's `role`
-  (`content` or `tool`), `tool_placement` (`grid`, `docked`, `overlay`), `inspector_anchor` and `content_split`
+- `panel_layouts`: Responsive grid layouts per breakpoint (xl, lg, sm); optionally each panel's `type`
+  (`regular`, `borderless`, `overlay`) and, per breakpoint, `fit_rows` (how many rows fill the window height)
 - `appearance` (optional): `accent`, `default_mode` (`bright`, `dark`, `neutral`), `ui_scale`
 - `global_data`: Scenario-specific initial state passed to GlobalContext
 
-`DESIGN.md` describes the design system: tokens and modes, panel placements, the inspector, and the shortcuts.
+`DESIGN.md` describes the design system: tokens and modes, panel types, fitting rows to the window, and the shortcuts.
 
 ## Naming Conventions
 

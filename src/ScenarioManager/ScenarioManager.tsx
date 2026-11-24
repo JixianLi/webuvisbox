@@ -41,8 +41,7 @@ class ScenarioManager implements Scenario {
             this.views = config.views || this.views || [];
             const panelLayoutsConfig = config.panel_layouts;
             this.panelLayouts = new PanelLayoutManager(panelLayoutsConfig.default_layouts, panelLayoutsConfig.breakpoints, panelLayoutsConfig.cols,
-                                                       panelLayoutsConfig.tool_placement,
-                                                       panelLayoutsConfig.inspector_anchor, panelLayoutsConfig.content_split);
+                                                       panelLayoutsConfig.fit_rows);
             this.appearance = {
                 accent: config.appearance?.accent ?? DEFAULT_APPEARANCE.accent,
                 defaultMode: config.appearance?.default_mode,
@@ -76,9 +75,7 @@ class ScenarioManager implements Scenario {
                 default_layouts: this.panelLayouts.defaultLayouts,
                 breakpoints: this.panelLayouts.breakpoints,
                 cols: this.panelLayouts.cols,
-                tool_placement: this.panelLayouts.toolPlacement,
-                inspector_anchor: this.panelLayouts.inspectorAnchor,
-                content_split: this.panelLayouts.contentSplit,
+                fit_rows: this.panelLayouts.fitRows,
             },
             appearance: {
                 accent: this.appearance.accent,
@@ -98,9 +95,7 @@ class ScenarioManager implements Scenario {
                 default_layouts: this.panelLayouts.defaultLayouts,
                 breakpoints: this.panelLayouts.breakpoints,
                 cols: this.panelLayouts.cols,
-                tool_placement: this.panelLayouts.toolPlacement,
-                inspector_anchor: this.panelLayouts.inspectorAnchor,
-                content_split: this.panelLayouts.contentSplit,
+                fit_rows: this.panelLayouts.fitRows,
             },
             appearance: {
                 accent: this.appearance.accent,

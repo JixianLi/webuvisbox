@@ -100,7 +100,6 @@ export const SHAPE = {
     navbarHeight: 44,
     panelHeaderHeight: 34,
     panelGap: 8,
-    inspectorWidth: 340,
 };
 
 export interface Appearance {

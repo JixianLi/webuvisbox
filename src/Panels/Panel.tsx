@@ -1,5 +1,5 @@
 // ABOUTME: A panel: a title row (title, the panel's own header content, help, fit, collapse, close) over its content.
-// ABOUTME: Its frame follows its placement: a bordered grid tile or content panel, the bare stage, or glass in the inspector.
+// ABOUTME: Its frame follows its type (layout item `type`): a bordered tile, unframed on the canvas, or glass (overlay).
 
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -13,7 +13,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useScenario } from "../ScenarioManager/ScenarioManager";
 import { commandRegistry, shortcutLabel } from "../Commands/CommandRegistry";
 import { SHAPE, TYPE } from "../Theme/DesignTokens";
-import { usePanelPlacement } from "./PanelPlacement";
+import type { PanelType } from "../Types/PanelLayouts";
 
 interface PanelProps {
     panelName: string;
@@ -22,9 +22,6 @@ interface PanelProps {
     helpContent?: React.ReactNode;
     sx?: object;
 }
-
-// The grid's row height in px (LayoutManager's rowHeight), for converting a measured height into rows.
-export const GRID_ROW_HEIGHT = 50;
 
 function withShortcut(label: string, commandId: string): string {
     const shortcut = commandRegistry.shortcutOf(commandId);
@@ -35,10 +32,10 @@ export const Panel = observer((props: PanelProps) => {
     const scenario = useScenario();
     const theme = useTheme();
     const tokens = theme.tokens;
-    const placement = usePanelPlacement();
     const panelName = props.panelName;
     const panelLayouts = scenario.panelLayouts;
     const layoutItem = panelLayouts.currentLayouts[panelLayouts.currentBreakpoint]?.find(panel => panel.i === panelName);
+    const type: PanelType = layoutItem?.type ?? 'regular';
     const collapsed = Boolean(layoutItem?.collapsed);
 
     const [helpAnchor, setHelpAnchor] = useState<HTMLElement | null>(null);
@@ -49,7 +46,7 @@ export const Panel = observer((props: PanelProps) => {
     const fitToContent = useCallback(() => {
         const content = contentRef.current;
         const header = headerRef.current;
-        if (!content || !header || placement !== 'tile') {
+        if (!content || !header || type !== 'regular') {
             return;
         }
         const childrenHeight = Array.from(content.children).reduce((sum, child) => {
@@ -59,24 +56,22 @@ export const Panel = observer((props: PanelProps) => {
         const contentStyle = getComputedStyle(content);
         const frame = 2 + header.offsetHeight + parseFloat(contentStyle.marginTop) + parseFloat(contentStyle.marginBottom);
         const gap = tokens.px(SHAPE.panelGap);
-        const rows = Math.max(1, Math.ceil((frame + childrenHeight + gap) / (GRID_ROW_HEIGHT + gap)));
+        const rows = Math.max(1, Math.ceil((frame + childrenHeight + gap) / (panelLayouts.rowHeight + gap)));
         panelLayouts.setPanelHeight(panelName, rows);
-    }, [placement, panelLayouts, panelName, tokens]);
+    }, [type, panelLayouts, panelName, tokens]);
 
     useEffect(() => commandRegistry.setPanelAction(panelName, 'fit', fitToContent), [panelName, fitToContent]);
 
     const frames = {
-        tile: { backgroundColor: tokens.surface, border: `1px solid ${tokens.border}`,
-                borderRadius: `${tokens.px(SHAPE.panelRadius)}px` },
-        content: { backgroundColor: tokens.surface, border: `1px solid ${tokens.border}`,
+        regular: { backgroundColor: tokens.surface, border: `1px solid ${tokens.border}`,
                    borderRadius: `${tokens.px(SHAPE.panelRadius)}px` },
-        stage: { backgroundColor: tokens.canvas },
-        floating: { backgroundColor: tokens.glass.fill,
-                    backdropFilter: `blur(${tokens.glass.blur}px) saturate(${tokens.glass.saturate})`,
-                    WebkitBackdropFilter: `blur(${tokens.glass.blur}px) saturate(${tokens.glass.saturate})`,
-                    border: `1px solid ${tokens.glass.edge}`,
-                    boxShadow: `inset 0 1px 0 ${tokens.glass.highlight}, ${tokens.shadowRaised}`,
-                    borderRadius: `${tokens.px(12)}px` },
+        borderless: { backgroundColor: tokens.canvas },
+        overlay: { backgroundColor: tokens.glass.fill,
+                   backdropFilter: `blur(${tokens.glass.blur}px) saturate(${tokens.glass.saturate})`,
+                   WebkitBackdropFilter: `blur(${tokens.glass.blur}px) saturate(${tokens.glass.saturate})`,
+                   border: `1px solid ${tokens.glass.edge}`,
+                   boxShadow: `inset 0 1px 0 ${tokens.glass.highlight}, ${tokens.shadowRaised}`,
+                   borderRadius: `${tokens.px(12)}px` },
     };
     const headerAction = { color: tokens.textSecondary, p: 0.5, opacity: 0.5, transition: 'opacity 120ms',
                            '&:hover': { opacity: 1, backgroundColor: tokens.controlFill } };
@@ -86,15 +81,15 @@ export const Panel = observer((props: PanelProps) => {
     return <Box key={"panel_" + panelName}
                 onPointerEnter={() => commandRegistry.setActivePanel(panelName)}
                 onFocusCapture={() => commandRegistry.setActivePanel(panelName)}
-                sx={{ width: 1, height: placement === 'floating' ? 'auto' : 1, display: 'flex', flexDirection: 'column',
-                      overflow: 'hidden', ...frames[placement],
+                sx={{ width: 1, height: type === 'overlay' ? 'auto' : 1, display: 'flex', flexDirection: 'column',
+                      overflow: 'hidden', ...frames[type],
                       '&:hover .panel-header-action': { opacity: 0.85 }, ...props.sx }}>
         <Box ref={headerRef} className="drag-handle"
              sx={{ height: tokens.px(SHAPE.panelHeaderHeight), flexShrink: 0, display: 'flex', alignItems: 'center',
                    gap: 0.25, pl: 1.5, pr: 0.75, color: tokens.text,
-                   cursor: placement === 'tile' ? 'grab' : 'default',
-                   borderBottom: showBody && placement !== 'stage' ? `1px solid ${tokens.border}` : 'none',
-                   '&:active': { cursor: placement === 'tile' ? 'grabbing' : 'default' } }}>
+                   cursor: 'grab',
+                   borderBottom: showBody && type !== 'borderless' ? `1px solid ${tokens.border}` : 'none',
+                   '&:active': { cursor: 'grabbing' } }}>
             <Typography component="h2" noWrap
                         sx={{ flexGrow: 1, fontSize: tokens.px(TYPE.panelTitleSize), fontWeight: 600, letterSpacing: '0.005em' }}>
                 {panelName}
@@ -109,7 +104,7 @@ export const Panel = observer((props: PanelProps) => {
                     {props.helpContent}
                 </Menu>
             </>}
-            {placement === 'tile' && (
+            {type === 'regular' && (
                 <Tooltip title={withShortcut('Fit to content', 'panel.fit')}>
                     <IconButton size="small" aria-label="fit to content" className="panel-header-action" sx={headerAction}
                                 onClick={fitToContent}>
@@ -117,7 +112,7 @@ export const Panel = observer((props: PanelProps) => {
                     </IconButton>
                 </Tooltip>
             )}
-            {(placement === 'tile' || placement === 'floating') && (
+            {type !== 'borderless' && (
                 <Tooltip title={withShortcut(collapsed ? 'Expand' : 'Collapse', 'panel.collapse')}>
                     <IconButton size="small" aria-label={collapsed ? 'expand' : 'collapse'} className="panel-header-action"
                                 sx={headerAction} onClick={() => commandRegistry.run('panel.collapse', panelName)}>
@@ -133,8 +128,8 @@ export const Panel = observer((props: PanelProps) => {
             </Tooltip>
         </Box>
         <Box ref={contentRef}
-             sx={{ display: showBody ? 'flex' : 'none', flexDirection: 'column', flex: placement === 'floating' ? '0 1 auto' : 1,
-                   minHeight: 0, m: placement === 'stage' ? 0 : 1.5, overflow: 'auto', justifyContent: 'flex-start',
+             sx={{ display: showBody ? 'flex' : 'none', flexDirection: 'column', flex: type === 'overlay' ? '0 1 auto' : 1,
+                   minHeight: 0, m: type === 'borderless' ? 0 : 1.5, overflow: 'auto', justifyContent: 'flex-start',
                    alignItems: 'center' }}>
             {props.children}
         </Box>
