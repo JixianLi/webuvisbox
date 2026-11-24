@@ -6,7 +6,7 @@ import { observer } from "mobx-react-lite";
 import { Responsive } from "react-grid-layout/legacy";
 
 import type { AppLayout, AppLayouts, PanelLayouts, RGLBreakpoints } from "../Types/PanelLayouts";
-import { useTheme } from "@mui/material/styles";
+import { useTheme, type Theme } from "@mui/material/styles";
 import HeaderBar from "./HeaderBar/HeaderBar";
 import { SHAPE } from "../Theme/DesignTokens";
 import { useScenario } from "../ScenarioManager/ScenarioManager";
@@ -43,6 +43,13 @@ function breakpointForWidth(breakpoints: RGLBreakpoints, width: number): string 
 //     rowHeight = (H − 2p − (fitRows − 1)·m) / fitRows
 interface GridGeometry { columnWidth: number; rowHeight: number; gap: number }
 
+// Where a dragged panel will land: dashed accent outline, faint fill. Theme-dependent, so styled here rather than in
+// App.css.
+function dropOutline(tokens: Theme["tokens"]) {
+    return { border: `2px dashed ${tokens.accentOnSurface}`, borderRadius: `${tokens.px(SHAPE.panelRadius)}px`,
+             backgroundColor: 'rgba(127, 127, 127, 0.08)' };
+}
+
 function cellBox(geometry: GridGeometry, panel: { x: number; y: number; w: number; h: number }) {
     const { columnWidth, rowHeight, gap } = geometry;
     return {
@@ -54,14 +61,22 @@ function cellBox(geometry: GridGeometry, panel: { x: number; y: number; w: numbe
 }
 
 // Overlay panels: glass, above the grid, as tall as their content up to h rows. Dragging the title row moves one;
-// on release it snaps to the nearest cell, so overlays keep grid coordinates like every other panel.
+// on release it snaps to the nearest cell (outlined while dragging), so overlays keep grid coordinates like every other
+// panel.
 const OverlayLayer = observer(({ panelLayouts, geometry, cols }:
                                 { panelLayouts: PanelLayouts; geometry: GridGeometry; cols: number }) => {
     const scenario = useScenario();
+    const tokens = useTheme().tokens;
     const panelMapping = scenarioRegistry.get(scenario.name).panelMapping;
-    const [drag, setDrag] = useState<{ panelId: string; dx: number; dy: number } | null>(null);
+    const [drag, setDrag] = useState<{ panelId: string; dx: number; dy: number; height: number } | null>(null);
     const overlays = panelLayouts.currentLayouts[panelLayouts.currentBreakpoint]
         .filter(panel => panel.visible && panel.type === 'overlay');
+
+    const snappedCell = (panel: AppLayout, dx: number, dy: number) => {
+        const x = Math.round(panel.x + dx / (geometry.columnWidth + geometry.gap));
+        const y = Math.round(panel.y + dy / (geometry.rowHeight + geometry.gap));
+        return { ...panel, x: Math.min(Math.max(0, x), cols - panel.w), y: Math.max(0, y) };
+    };
 
     const startDrag = (panel: AppLayout) => (event: React.PointerEvent) => {
         const target = event.target as HTMLElement;
@@ -69,15 +84,16 @@ const OverlayLayer = observer(({ panelLayouts, geometry, cols }:
             return;
         }
         const start = { x: event.clientX, y: event.clientY };
+        const height = (event.currentTarget as HTMLElement).offsetHeight;
         const offsetOf = (clientX: number, clientY: number) => ({ dx: clientX - start.x, dy: clientY - start.y });
-        const move = (moveEvent: PointerEvent) => setDrag({ panelId: panel.i, ...offsetOf(moveEvent.clientX, moveEvent.clientY) });
+        const move = (moveEvent: PointerEvent) => setDrag({ panelId: panel.i, height,
+                                                                       ...offsetOf(moveEvent.clientX, moveEvent.clientY) });
         const release = (upEvent: PointerEvent) => {
             window.removeEventListener('pointermove', move);
             window.removeEventListener('pointerup', release);
             const { dx, dy } = offsetOf(upEvent.clientX, upEvent.clientY);
-            const x = Math.round(panel.x + dx / (geometry.columnWidth + geometry.gap));
-            const y = Math.round(panel.y + dy / (geometry.rowHeight + geometry.gap));
-            panelLayouts.movePanel(panel.i, Math.min(Math.max(0, x), cols - panel.w), Math.max(0, y));
+            const target = snappedCell(panel, dx, dy);
+            panelLayouts.movePanel(panel.i, target.x, target.y);
             setDrag(null);
         };
         window.addEventListener('pointermove', move);
@@ -85,7 +101,14 @@ const OverlayLayer = observer(({ panelLayouts, geometry, cols }:
         event.preventDefault();
     };
 
+    const draggedPanel = drag ? overlays.find(panel => panel.i === drag.panelId) : undefined;
+    const outline = drag && draggedPanel ? cellBox(geometry, snappedCell(draggedPanel, drag.dx, drag.dy)) : null;
+
     return <>
+        {outline && drag && (
+            <Box sx={{ position: 'absolute', left: outline.left, top: outline.top, width: outline.width, height: drag.height,
+                       zIndex: 2, pointerEvents: 'none', ...dropOutline(tokens) }} />
+        )}
         {overlays.map(panel => {
             const box = cellBox(geometry, panel);
             const dragged = drag?.panelId === panel.i;
@@ -165,7 +188,8 @@ const LayoutManager: React.FC = observer(() => {
 
     return <div style={{ width: '100%', minHeight: '100vh', backgroundColor: theme.palette.background.default }}>
         <HeaderBar />
-        <div ref={gridRef} style={{ position: 'relative' }}>
+        <Box ref={gridRef} sx={{ position: 'relative',
+                                 '& .react-grid-item.react-grid-placeholder': { ...dropOutline(theme.tokens), opacity: 1 } }}>
             {ready && <>
                 <Responsive
                     className="layout"
@@ -186,7 +210,7 @@ const LayoutManager: React.FC = observer(() => {
                 </Responsive>
                 <OverlayLayer panelLayouts={panelLayouts} geometry={geometry} cols={cols} />
             </>}
-        </div>
+        </Box>
         <LoadingIndicator />
     </div>
 });
