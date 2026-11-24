@@ -16,7 +16,7 @@ export function terrainPalette(preset: string, continuous: boolean): VSUP {
     return palettes.get(key)!;
 }
 
-// VSUP.getColorForTexture's second argument works as certainty (1 = full color, 0 = fully faded), so pass 1 − uncertainty.
+// VSUP.getColorForTexture takes certainty (1 = full color, 0 = fully faded).
 export function terrainColor(palette: VSUP, value: number, uncertainty: number) {
     return palette.getColorForTexture(value, 1 - uncertainty);
 }

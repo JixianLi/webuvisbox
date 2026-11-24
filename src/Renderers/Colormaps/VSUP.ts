@@ -113,17 +113,18 @@ export class VSUP extends PresetLinearColormap {
         }
     }
 
+    // y is certainty ∈ [0, 1]: 1 gives the full color (finest value bins), 0 the fully faded one; flipY reverses it.
     getColorForTexture(x: number, y: number): d3.RGBColor {
         const ratio = x;
-        let uncertainty = y;
+        let certainty = y;
         const continuous = this.continuous;
-        uncertainty = Math.max(0, Math.min(uncertainty, 1));
+        certainty = Math.max(0, Math.min(certainty, 1));
         if (this.flipY) {
-            uncertainty = 1 - uncertainty;
+            certainty = 1 - certainty;
         }
         const value = Math.max(0, Math.min(ratio, 1));
 
-        const cacheKey = `${uncertainty.toFixed(3)}-${value.toFixed(3)}-${continuous}`;
+        const cacheKey = `${certainty.toFixed(3)}-${value.toFixed(3)}-${continuous}`;
         if (this._colorCache.has(cacheKey)) {
             return this._colorCache.get(cacheKey)!;
         }
@@ -132,9 +133,9 @@ export class VSUP extends PresetLinearColormap {
 
         if (continuous || this.depth === 1) {
             const color1 = this.getColorByValue(value);
-            result = d3.rgb(d3.interpolateLab(color1, this.fadingColor)(1 - uncertainty));
+            result = d3.rgb(d3.interpolateLab(color1, this.fadingColor)(1 - certainty));
         } else {
-            let depth = Math.floor(this.depth * uncertainty);
+            let depth = Math.floor(this.depth * certainty);
             if (depth === this.depth) depth = this.depth - 1;
             if (depth === 0) return this.nodes[0];
 

@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { WebGLProgramParametersWithUniforms } from 'three';
 
@@ -69,11 +69,15 @@ const getAttributeLoaderLogic = (n: number): string => {
     return colorLogic + opacityLogic;
 };
 
+// The material depends only on scalarCount (its shader declares that many attributes); everything else is synced onto it
+// by ScalarFieldMesh. Its uniforms exist before the shader compiles and are shared with it, so setting
+// material.userData.uniforms.*.value updates the compiled shader directly.
 export const ScalarFieldPhongMaterial = (props) => {
+    const uniforms = { uLutTexture: { value: null }, cIndex: { value: 0 }, oIndex: { value: 0 } };
     const material = new THREE.MeshPhongMaterial({
-        color: props.color || '#ffffff',
-        specular: props.specular || '#ffffff',
-        shininess: props.shininess || 30,
+        color: props.color ?? '#ffffff',
+        specular: props.specular ?? '#ffffff',
+        shininess: props.shininess ?? 30,
         transparent: props.transparent !== undefined ? props.transparent : true,
         depthTest: props.depthTest !== undefined ? props.depthTest : true,
         depthWrite: props.depthWrite !== undefined ? props.depthWrite : true,
@@ -84,9 +88,9 @@ export const ScalarFieldPhongMaterial = (props) => {
 
     material.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms) => {
         // 1. Pass our LUT texture as a uniform
-        shader.uniforms.uLutTexture = { value: null };
-        shader.uniforms.cIndex = { value: 0 };
-        shader.uniforms.oIndex = { value: 0 };
+        shader.uniforms.uLutTexture = uniforms.uLutTexture;
+        shader.uniforms.cIndex = uniforms.cIndex;
+        shader.uniforms.oIndex = uniforms.oIndex;
 
         let scalarAttributes = '';
         for (let i = 0; i < props.scalarCount; i++) {
@@ -132,9 +136,11 @@ export const ScalarFieldPhongMaterial = (props) => {
                 diffuseColor = vec4(lutColor.rgb, lutOpacity.a);
             `
         );
-
-        material.userData.shader = shader;
     };
+    // three.js reuses a compiled program for materials whose onBeforeCompile source matches, which every
+    // ScalarFieldPhongMaterial shares; key it by scalarCount so meshes with different attribute counts never share one.
+    material.customProgramCacheKey = () => `scalar-field-phong-${props.scalarCount}`;
+    material.userData.uniforms = uniforms;
 
     return material;
 };
@@ -179,27 +185,36 @@ export const ScalarFieldMesh = (props: ScalarFieldMeshProps) => {
 
     const meshRef = useRef<THREE.Mesh>(null);
 
-    const materialProps = {
-        scalarCount: scalars.length,
-        color,
-        specular,
-        shininess,
-        transparent,
-        depthTest,
-        depthWrite,
-        side
-    };
+    const invalidate = useThree(state => state.invalidate);
+    const scalarCount = scalars.length;
 
-    const material = useMemo(() => ScalarFieldPhongMaterial(materialProps), [materialProps]);
+    // One material per scalar count, kept across renders (rebuilding it every render recompiled the shader and leaked the
+    // old material). Prop and uniform changes are synced onto it below, so transfer-function edits still show.
+    const material = useMemo(() => ScalarFieldPhongMaterial({ scalarCount }), [scalarCount]);
+    useEffect(() => () => material.dispose(), [material]);
 
-    useFrame(() => {
-        if (material.userData.shader) {
-            material.userData.shader.uniforms.uLutTexture.value = texture;
-            material.userData.shader.uniforms.cIndex.value = cIndex;
-            material.userData.shader.uniforms.oIndex.value = oIndex;
-        }
-        // console.log(material.userData.shader);
-    });
+    useLayoutEffect(() => {
+        material.color.set(color);
+        material.specular.set(specular);
+        material.shininess = shininess;
+        material.transparent = transparent;
+        material.depthTest = depthTest;
+        material.depthWrite = depthWrite;
+        material.side = side;
+        // side changes the compiled program (double-sided lighting), so the material is recompiled when needed.
+        material.needsUpdate = true;
+        invalidate();
+    }, [material, color, specular, shininess, transparent, depthTest, depthWrite, side, invalidate]);
+
+    // The texture object stays the same while a transfer function is edited: TextureManager rewrites its data and sets
+    // needsUpdate, which three.js uploads on the next frame. A new texture (another colormap) or index is set here.
+    useLayoutEffect(() => {
+        const uniforms = material.userData.uniforms;
+        uniforms.uLutTexture.value = texture;
+        uniforms.cIndex.value = cIndex;
+        uniforms.oIndex.value = oIndex;
+        invalidate();
+    }, [material, texture, cIndex, oIndex, invalidate]);
 
     // Create geometry with memoization for performance
     const geometry = useMemo(() => {
@@ -211,7 +226,6 @@ export const ScalarFieldMesh = (props: ScalarFieldMeshProps) => {
     useEffect(() => {
         return () => {
             geometry?.dispose();
-            material?.dispose();
         };
     }, [geometry]);
 
