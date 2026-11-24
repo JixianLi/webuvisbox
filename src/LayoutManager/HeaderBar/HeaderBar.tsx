@@ -1,5 +1,5 @@
 // ABOUTME: Application navbar: brand mark, scenario name and description, the Scenario, Layout and Views menus,
-// ABOUTME: and the display mode switch (bright, dark, neutral). On phones the menus fold into one.
+// ABOUTME: the full screen button and the display mode switch (bright, dark, neutral). On phones the menus fold into one.
 
 import React from "react";
 import { observer } from "mobx-react-lite";
@@ -14,7 +14,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
-import { ChevronDown, Moon, SunMedium, Contrast, Keyboard, Ellipsis } from "lucide-react";
+import { ChevronDown, Moon, SunMedium, Contrast, Keyboard, Ellipsis, Maximize, Minimize } from "lucide-react";
 import ListSubheader from "@mui/material/ListSubheader";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import IconButton from "@mui/material/IconButton";
@@ -25,6 +25,7 @@ import ScenarioMenuList from "./ScenarioMenuList";
 import { useDisplaySettings } from "../../DisplaySettingsContext";
 import { commandRegistry, shortcutLabel } from "../../Commands/CommandRegistry";
 import { useScenario } from "../../ScenarioManager/ScenarioManager";
+import { isFullscreenSupported, toggleFullscreen, useIsFullscreen } from "../../Helpers/Fullscreen";
 import { SHAPE, TYPE, UI_SCALES, type DisplayMode } from "../../Theme/DesignTokens";
 
 const MODE_CHOICES: Array<{ mode: DisplayMode; label: string; Icon: typeof Moon }> = [
@@ -119,6 +120,21 @@ const CompactMenu: React.FC = () => {
     );
 };
 
+const FullscreenButton: React.FC = () => {
+    const px = useTheme().tokens.px;
+    const isFullscreen = useIsFullscreen();
+    if (!isFullscreenSupported()) return null;
+    const label = isFullscreen ? 'Exit full screen' : 'Full screen';
+    const Icon = isFullscreen ? Minimize : Maximize;
+    return (
+        <Tooltip title={`${label} (${shortcutLabel('Alt+Enter')})`}>
+            <IconButton color="inherit" size="small" aria-label={label} sx={{ opacity: 0.75 }} onClick={toggleFullscreen}>
+                <Icon size={px(17)} strokeWidth={1.75} />
+            </IconButton>
+        </Tooltip>
+    );
+};
+
 const BrandMark: React.FC<{ onAccent: boolean }> = ({ onAccent }) => {
     const theme = useTheme();
     const px = theme.tokens.px;
@@ -151,6 +167,7 @@ const HeaderBar: React.FC = observer(() => {
                 <BrandMark onAccent={onAccent} />
                 {title}
                 <Box sx={{ flexGrow: 1 }} />
+                <FullscreenButton />
                 <DisplayModeSwitch />
                 <CompactMenu />
             </Box>
@@ -180,6 +197,7 @@ const HeaderBar: React.FC = observer(() => {
                     <Keyboard size={tokens.px(17)} strokeWidth={1.75} />
                 </IconButton>
             </Tooltip>
+            <FullscreenButton />
             <DisplayModeSwitch />
         </Box>
     );

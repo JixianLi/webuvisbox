@@ -96,6 +96,7 @@ without ⌥, ⌃ or ⌘ are ignored while typing in a field.
 |---|---|
 | ⌥M | Next display mode |
 | ⌥= / ⌥− / ⌥0 | Larger UI / smaller UI / UI at 100% |
+| ⌥Enter | Full screen on or off (also the navbar's button; absent where the browser has no Fullscreen API, e.g. iPhone) |
 | ⌥F / ⌥C / ⌥W | Fit / collapse or expand / close the panel under the pointer |
 | ⌥⇧R | Reset layout |
 | ⇧/ | Show keyboard shortcuts |

@@ -1,9 +1,10 @@
-// ABOUTME: The framework's own commands: display mode and UI scale, the active panel (fit, collapse, close),
+// ABOUTME: The framework's own commands: display mode, UI scale and full screen, the active panel (fit, collapse, close),
 // ABOUTME: the layout (reset) and the shortcut list. Scenarios add theirs to the same registry.
 
 import type { PanelLayouts } from '../Types/PanelLayouts';
 import { DISPLAY_MODES, UI_SCALES, type DisplayMode } from '../Theme/DesignTokens';
 import type { Command, CommandRegistry } from './CommandRegistry';
+import { isFullscreenSupported, toggleFullscreen } from '../Helpers/Fullscreen';
 
 interface FrameworkCommandTargets {
     panelLayouts: () => PanelLayouts | undefined;
@@ -29,6 +30,10 @@ export function frameworkCommands(registry: CommandRegistry, targets: FrameworkC
           run: () => targets.setUiScale(nextScale(targets.uiScale(), -1)) },
         { id: 'display.scale_reset', label: 'UI at 100%', group: 'Display', shortcut: 'Alt+Digit0',
           run: () => targets.setUiScale(1) },
+        ...(isFullscreenSupported() ? [
+            { id: 'display.fullscreen', label: 'Full screen (on or off)', group: 'Display', shortcut: 'Alt+Enter',
+              run: toggleFullscreen } satisfies Command,
+        ] : []),
         { id: 'panel.fit', label: 'Fit panel to its content', group: 'Panel', shortcut: 'Alt+KeyF', isPanelCommand: true,
           run: panelId => registry.runPanelAction(panelId!, 'fit') },
         { id: 'panel.collapse', label: 'Collapse or expand panel', group: 'Panel', shortcut: 'Alt+KeyC', isPanelCommand: true,
