@@ -3,6 +3,8 @@
 
 import './ChatUI';
 import './UncertainTerrain';
+import './LorenzEnsemble';
 
 export { CHAT_UI_CONFIG } from './ChatUI';
 export { UNCERTAIN_TERRAIN_CONFIG } from './UncertainTerrain';
+export { LORENZ_ENSEMBLE_CONFIG } from './LorenzEnsemble';

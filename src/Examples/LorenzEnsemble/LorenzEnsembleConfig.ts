@@ -1,0 +1,40 @@
+// ABOUTME: The Lorenz ensemble example's scenario config, built into the library (same shape as a ScenarioConfigs/*.json).
+// ABOUTME: A borderless 3D view with regular tiles beside it and the colorbar as an overlay; stacked on phones.
+
+export const LORENZ_ENSEMBLE_CONFIG = {
+    "name": "Lorenz ensemble",
+    "description": "Chaos as uncertainty: paths of the Lorenz system from nearly the same start, colored as they diverge",
+    "views": ["Trajectories", "Controls", "Spread", "Colorbar"],
+    "panel_layouts": {
+        "default_layouts": {
+            "xl": [
+                { "i": "Trajectories", "type": "borderless", "x": 0, "y": 0, "w": 18, "h": 16, "visible": true },
+                { "i": "Controls", "x": 18, "y": 0, "w": 6, "h": 9, "visible": true },
+                { "i": "Spread", "x": 18, "y": 9, "w": 6, "h": 7, "visible": true },
+                { "i": "Colorbar", "type": "overlay", "x": 0, "y": 13, "w": 5, "h": 3, "visible": true }
+            ],
+            "lg": [
+                { "i": "Trajectories", "type": "borderless", "x": 0, "y": 0, "w": 8, "h": 14, "visible": true },
+                { "i": "Controls", "x": 8, "y": 0, "w": 4, "h": 8, "visible": true },
+                { "i": "Spread", "x": 8, "y": 8, "w": 4, "h": 6, "visible": true },
+                { "i": "Colorbar", "type": "overlay", "x": 0, "y": 11, "w": 4, "h": 3, "visible": true }
+            ],
+            "sm": [
+                { "i": "Trajectories", "type": "borderless", "x": 0, "y": 0, "w": 4, "h": 9, "visible": true },
+                { "i": "Colorbar", "x": 0, "y": 9, "w": 4, "h": 2, "visible": true },
+                { "i": "Spread", "x": 0, "y": 11, "w": 4, "h": 5, "visible": true },
+                { "i": "Controls", "x": 0, "y": 16, "w": 4, "h": 10, "visible": true }
+            ]
+        },
+        "breakpoints": { "xl": 1440, "lg": 800, "sm": 0 },
+        "cols": { "xl": 24, "lg": 12, "sm": 4 },
+        "fit_rows": { "sm": 13 }
+    },
+    "global_data": {
+        "member_count": 50,
+        "jitter_exponent": -5,
+        "speed": 1.5,
+        "color_mode": "spread",
+        "colormap_preset": "Plasma (matplotlib)"
+    }
+};

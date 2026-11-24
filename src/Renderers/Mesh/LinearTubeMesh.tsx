@@ -1,4 +1,5 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useEffect, useLayoutEffect } from 'react';
+import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 export interface LinearTubeMeshProps {
@@ -12,6 +13,12 @@ export interface LinearTubeMeshProps {
     depthWrite?: boolean;
     specular?: string;
     shininess?: number;
+    // Per-point colors, one array per path: 3 floats (linear RGB) per point. The material color multiplies them,
+    // so leave `color` white to show them as given.
+    colors?: Float32Array[];
+    // Draw each path only up to this point (its first visiblePointCount points); all points when omitted. Passing it
+    // orders the index buffer for growth, which renders somewhat slower than the default order: omit it if unused.
+    visiblePointCount?: number;
 }
 
 function calculateGeometrySize(paths: Float32Array[], radialSegments: number, tubularSegments: number) {
@@ -40,7 +47,8 @@ function createLinearTubeGeometry(
     paths: Float32Array[],
     radius: number,
     radialSegments: number = 8,
-    tubularSegments: number = 1
+    tubularSegments: number = 1,
+    growable: boolean = false
 ) {
     const { totalVertices, totalIndices } = calculateGeometrySize(paths, radialSegments, tubularSegments);
 
@@ -55,6 +63,10 @@ function createLinearTubeGeometry(
 
     let vertexOffset = 0;
     let indexOffset = 0;
+    const pathVertexStarts: number[] = [];
+    const pathSegmentCounts: number[] = [];
+    let maxSegments = 0;
+    let growthRanges: Uint32Array | undefined;
 
     // Process each path
     for (const pathData of paths) {
@@ -122,30 +134,53 @@ function createLinearTubeGeometry(
             }
         }
 
-        // Generate indices connecting the rings (unchanged)
-        const pathVertexStart = vertexOffset - (segments + 1) * radialSegments;
-        for (let segIdx = 0; segIdx < segments; segIdx++) {
-            for (let i = 0; i < radialSegments; i++) {
-                const next = (i + 1) % radialSegments;
+        pathVertexStarts.push(vertexOffset - (segments + 1) * radialSegments);
+        pathSegmentCounts.push(segments);
+        maxSegments = Math.max(maxSegments, segments);
+    }
 
-                const ringStart = pathVertexStart + segIdx * radialSegments;
-                const nextRingStart = pathVertexStart + (segIdx + 1) * radialSegments;
+    const emitSegment = (ringStart: number) => {
+        const nextRingStart = ringStart + radialSegments;
+        for (let i = 0; i < radialSegments; i++) {
+            const next = (i + 1) % radialSegments;
 
-                const a = ringStart + i;
-                const b = ringStart + next;
-                const c = nextRingStart + i;
-                const d = nextRingStart + next;
+            const a = ringStart + i;
+            const b = ringStart + next;
+            const c = nextRingStart + i;
+            const d = nextRingStart + next;
 
-                // Two triangles per quad
-                indices[indexOffset++] = a;
-                indices[indexOffset++] = b;
-                indices[indexOffset++] = c;
+            // Two triangles per quad
+            indices[indexOffset++] = a;
+            indices[indexOffset++] = b;
+            indices[indexOffset++] = c;
 
-                indices[indexOffset++] = b;
-                indices[indexOffset++] = d;
-                indices[indexOffset++] = c;
+            indices[indexOffset++] = b;
+            indices[indexOffset++] = d;
+            indices[indexOffset++] = c;
+        }
+    };
+
+    if (!growable) {
+        // Path-major: consecutive segments share a ring, so the GPU's vertex cache reuses it (measured ~20% faster at
+        // 51k tubes than segment-major).
+        for (let pathIdx = 0; pathIdx < pathVertexStarts.length; pathIdx++) {
+            for (let segIdx = 0; segIdx < pathSegmentCounts[pathIdx]; segIdx++) {
+                emitSegment(pathVertexStarts[pathIdx] + segIdx * radialSegments);
             }
         }
+    } else {
+        // Segment-major (segment 0 of every path, then segment 1, ...), so drawing a prefix of the index buffer
+        // (setDrawRange) shows every path grown to the same length without rebuilding anything.
+        // indexCountBeforeSegment[s] = number of indices of all segments < s.
+        const indexCountBeforeSegment = new Uint32Array(maxSegments + 1);
+        for (let segIdx = 0; segIdx < maxSegments; segIdx++) {
+            indexCountBeforeSegment[segIdx] = indexOffset;
+            for (let pathIdx = 0; pathIdx < pathVertexStarts.length; pathIdx++) {
+                if (segIdx < pathSegmentCounts[pathIdx]) emitSegment(pathVertexStarts[pathIdx] + segIdx * radialSegments);
+            }
+        }
+        indexCountBeforeSegment[maxSegments] = indexOffset;
+        growthRanges = indexCountBeforeSegment;
     }
 
     // Create geometry with pre-allocated buffers
@@ -154,8 +189,62 @@ function createLinearTubeGeometry(
     geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
     geometry.setIndex(new THREE.BufferAttribute(indices, 1));
 
+    geometry.userData.indexCountBeforeSegment = growthRanges;
+
     geometry.computeBoundingSphere();
     return geometry;
+}
+
+// Per-vertex colors in the geometry's vertex order: each ring takes its path's per-point color, interpolated like the
+// ring's position. pathColors[p] holds 3 floats (linear RGB) per point of paths[p]; paths without colors stay white.
+function createRingColors(
+    paths: Float32Array[],
+    pathColors: Float32Array[],
+    totalVertices: number,
+    radialSegments: number,
+    tubularSegments: number
+) {
+    const colors = new Float32Array(totalVertices * 3).fill(1);
+    let vertexOffset = 0;
+    paths.forEach((pathData, pathIdx) => {
+        if (pathData.length < 6) return;
+        const pointCount = pathData.length / 3;
+        const segments = Math.max(1, (pointCount - 1) * tubularSegments);
+        const colorData = pathColors[pathIdx];
+        if (!colorData || colorData.length < pointCount * 3) {
+            vertexOffset += (segments + 1) * radialSegments;
+            return;
+        }
+        for (let segIdx = 0; segIdx <= segments; segIdx++) {
+            const t = segIdx / segments;
+            const pathIndex = Math.min(Math.floor(t * (pointCount - 1)), pointCount - 2);
+            const localT = (t * (pointCount - 1)) - pathIndex;
+            const red = colorData[pathIndex * 3] + (colorData[pathIndex * 3 + 3] - colorData[pathIndex * 3]) * localT;
+            const green = colorData[pathIndex * 3 + 1] + (colorData[pathIndex * 3 + 4] - colorData[pathIndex * 3 + 1]) * localT;
+            const blue = colorData[pathIndex * 3 + 2] + (colorData[pathIndex * 3 + 5] - colorData[pathIndex * 3 + 2]) * localT;
+            for (let i = 0; i < radialSegments; i++) {
+                const colorIdx = vertexOffset * 3;
+                colors[colorIdx] = red;
+                colors[colorIdx + 1] = green;
+                colors[colorIdx + 2] = blue;
+                vertexOffset++;
+            }
+        }
+    });
+    return colors;
+}
+
+// A key that changes exactly when some element array is a different object: a caller that rebuilds the outer array on
+// each render (e.g. [contours[i]], or a filter) doesn't trigger a geometry rebuild, while any new path data always does.
+const arrayIds = new WeakMap<Float32Array, number>();
+let nextArrayId = 0;
+
+function identityKey(arrays: Float32Array[] | undefined): string {
+    if (!arrays) return "";
+    return arrays.map(array => {
+        if (!arrayIds.has(array)) arrayIds.set(array, nextArrayId++);
+        return arrayIds.get(array);
+    }).join(",");
 }
 
 function calculateConsistentFrames(pathData: Float32Array, pointCount: number, segments: number) {
@@ -287,26 +376,58 @@ export function LinearTubeMesh(props: LinearTubeMeshProps) {
         transparent = false,
         depthWrite = true,
         specular = 'white',
-        shininess = 30
+        shininess = 30,
+        colors,
+        visiblePointCount
     } = props;
 
     const meshRef = useRef<THREE.Mesh>(null);
+    const invalidate = useThree(state => state.invalidate);
 
-    const pathsKey = useMemo(() =>
-        paths.map(p => p.length).join(','), [paths]
-    );
+    const pathsKey = identityKey(paths);
+    const growable = visiblePointCount !== undefined;
+    const colorsKey = identityKey(colors);
 
     const geometry = useMemo(() => {
-        return createLinearTubeGeometry(paths, radius, radialSegments, tubularSegments);
-    }, [pathsKey, radius, radialSegments, tubularSegments]);
+        return createLinearTubeGeometry(paths, radius, radialSegments, tubularSegments, growable);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- pathsKey stands for paths (see identityKey)
+    }, [pathsKey, radius, radialSegments, tubularSegments, growable]);
 
     useEffect(() => {
         return () => geometry?.dispose();
     }, [geometry]);
 
+    const hasColors = !!colors && colors.length > 0;
+    useLayoutEffect(() => {
+        const position = geometry.getAttribute('position');
+        if (!hasColors || !position) {
+            geometry.deleteAttribute('color');
+        } else {
+            geometry.setAttribute('color', new THREE.BufferAttribute(
+                createRingColors(paths, colors, position.count, radialSegments, tubularSegments), 3));
+        }
+        invalidate();
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- the keys stand for paths and colors (see identityKey)
+    }, [geometry, colorsKey, hasColors, invalidate]);
+
+    useLayoutEffect(() => {
+        const indexCountBeforeSegment: Uint32Array | undefined = geometry.userData.indexCountBeforeSegment;
+        if (!indexCountBeforeSegment) {
+            geometry.setDrawRange(0, Infinity);
+            return;
+        }
+        const segmentCount = Math.max(0, Math.min((visiblePointCount! - 1) * tubularSegments,
+            indexCountBeforeSegment.length - 1));
+        geometry.setDrawRange(0, indexCountBeforeSegment[segmentCount]);
+        invalidate();
+    }, [geometry, visiblePointCount, tubularSegments, invalidate]);
+
     return (
         <mesh ref={meshRef} geometry={geometry}>
+            {/* Keyed so toggling vertex colors builds a fresh material: the flag picks the shader program. */}
             <meshPhongMaterial
+                key={hasColors ? 'vertex-colors' : 'uniform-color'}
+                vertexColors={hasColors}
                 color={color}
                 opacity={opacity}
                 transparent={transparent}
