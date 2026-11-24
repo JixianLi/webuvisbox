@@ -29,7 +29,7 @@ src/                      # Library — no scenario-specific code, except the bu
 ├── ScenarioManager/      # Loads config, drives scenario lifecycle
 ├── LayoutManager/        # Navbar; the responsive panel grid, with overlay panels above it
 ├── Panels/               # Base Panel component (frame by panel type, fit, collapse) + grid container
-├── Examples/             # Built-in examples (ChatUI): config inlined, registered by App, in every host's menu
+├── Examples/             # Built-in examples (ChatUI, Uncertain terrain): config inlined, registered by App, in every host's menu
 ├── Renderers/            # Reusable renderers: Chat, Trace (swim lanes), Graph (word-cloud force layout + SVG view), Mesh, Colormaps, chart helpers
 ├── Scenarios/
 │   ├── ScenarioRegistry.ts   # Registry singleton + ScenarioDefinition type

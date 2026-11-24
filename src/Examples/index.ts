@@ -2,5 +2,7 @@
 // ABOUTME: without serving a config file. App imports it.
 
 import './ChatUI';
+import './UncertainTerrain';
 
 export { CHAT_UI_CONFIG } from './ChatUI';
+export { UNCERTAIN_TERRAIN_CONFIG } from './UncertainTerrain';
