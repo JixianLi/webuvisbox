@@ -68,6 +68,17 @@ function createLinearTubeGeometry(
     let maxSegments = 0;
     let growthRanges: Uint32Array | undefined;
 
+    // The ring's angles are the same for every ring: compute their cos/sin once instead of per vertex.
+    const ringCos = new Float64Array(radialSegments);
+    const ringSin = new Float64Array(radialSegments);
+    for (let i = 0; i < radialSegments; i++) {
+        const angle = (i / radialSegments) * Math.PI * 2;
+        ringCos[i] = Math.cos(angle);
+        ringSin[i] = Math.sin(angle);
+    }
+    // One frames buffer for all paths, grown to the longest so far: 6 numbers (u, v) per ring, no object per ring.
+    let frames = new Float64Array(0);
+
     // Process each path
     for (const pathData of paths) {
         if (pathData.length < 6) continue;
@@ -77,8 +88,8 @@ function createLinearTubeGeometry(
 
         const segments = Math.max(1, (pointCount - 1) * tubularSegments);
 
-        // ✅ Pre-calculate consistent frame for entire path
-        const frames = calculateConsistentFrames(pathData, pointCount, segments);
+        if (frames.length < (segments + 1) * 6) frames = new Float64Array((segments + 1) * 6);
+        calculateConsistentFrames(pathData, pointCount, segments, frames);
 
         // Generate vertices for each ring along the path
         for (let segIdx = 0; segIdx <= segments; segIdx++) {
@@ -101,15 +112,14 @@ function createLinearTubeGeometry(
             const centerY = p1Y + (p2Y - p1Y) * localT;
             const centerZ = p1Z + (p2Z - p1Z) * localT;
 
-            // ✅ Use pre-calculated consistent frame
-            const frame = frames[segIdx];
-            const { ux, uy, uz, vx, vy, vz } = frame;
+            const frameIdx = segIdx * 6;
+            const ux = frames[frameIdx], uy = frames[frameIdx + 1], uz = frames[frameIdx + 2];
+            const vx = frames[frameIdx + 3], vy = frames[frameIdx + 4], vz = frames[frameIdx + 5];
 
             // Generate ring vertices
             for (let i = 0; i < radialSegments; i++) {
-                const angle = (i / radialSegments) * Math.PI * 2;
-                const cos = Math.cos(angle);
-                const sin = Math.sin(angle);
+                const cos = ringCos[i];
+                const sin = ringSin[i];
 
                 // Position
                 const x = centerX + radius * (cos * ux + sin * vx);
@@ -247,8 +257,8 @@ function identityKey(arrays: Float32Array[] | undefined): string {
     }).join(",");
 }
 
-function calculateConsistentFrames(pathData: Float32Array, pointCount: number, segments: number) {
-    const frames = [];
+// Writes ring segIdx's frame into frames[segIdx * 6 ...]: u (x, y, z), then v (x, y, z).
+function calculateConsistentFrames(pathData: Float32Array, pointCount: number, segments: number, frames: Float64Array) {
 
     // Calculate initial frame for first segment
     let prevUx = 0, prevUy = 1, prevUz = 0; // Initial up vector
@@ -276,10 +286,8 @@ function calculateConsistentFrames(pathData: Float32Array, pointCount: number, s
 
         if (dirLength === 0) {
             // Use previous frame if direction is zero
-            frames.push({
-                ux: prevUx, uy: prevUy, uz: prevUz,
-                vx: prevVx, vy: prevVy, vz: prevVz
-            });
+            frames[segIdx * 6] = prevUx; frames[segIdx * 6 + 1] = prevUy; frames[segIdx * 6 + 2] = prevUz;
+            frames[segIdx * 6 + 3] = prevVx; frames[segIdx * 6 + 4] = prevVy; frames[segIdx * 6 + 5] = prevVz;
             continue;
         }
 
@@ -355,14 +363,13 @@ function calculateConsistentFrames(pathData: Float32Array, pointCount: number, s
             uz = vx * tangentY - vy * tangentX;
         }
 
-        frames.push({ ux, uy, uz, vx, vy, vz });
+        frames[segIdx * 6] = ux; frames[segIdx * 6 + 1] = uy; frames[segIdx * 6 + 2] = uz;
+        frames[segIdx * 6 + 3] = vx; frames[segIdx * 6 + 4] = vy; frames[segIdx * 6 + 5] = vz;
 
         // Store for next iteration
         prevUx = ux; prevUy = uy; prevUz = uz;
         prevVx = vx; prevVy = vy; prevVz = vz;
     }
-
-    return frames;
 }
 
 export function LinearTubeMesh(props: LinearTubeMeshProps) {
