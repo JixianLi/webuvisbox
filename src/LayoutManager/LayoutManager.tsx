@@ -176,6 +176,7 @@ const LayoutManager: React.FC = observer(() => {
                     rowHeight={rowHeight}
                     onLayoutChange={onLayoutChange}
                     draggableHandle={".drag-handle"}
+                    draggableCancel="button"
                     margin={[gap, gap]}
                     containerPadding={[gap, gap]}
                 >
