@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { WebGLProgramParametersWithUniforms } from 'three';
+import { onTextureUpdate } from '../Colormaps/TextureUpdates';
 
 interface ScalarFieldBufferedGeometryProps {
     vertices: Float32Array;        // Vertex positions [x,y,z,x,y,z,...]
@@ -207,7 +208,8 @@ export const ScalarFieldMesh = (props: ScalarFieldMeshProps) => {
     }, [material, color, specular, shininess, transparent, depthTest, depthWrite, side, invalidate]);
 
     // The texture object stays the same while a transfer function is edited: TextureManager rewrites its data and sets
-    // needsUpdate, which three.js uploads on the next frame. A new texture (another colormap) or index is set here.
+    // needsUpdate, which three.js uploads on the next frame, and announces it so a canvas drawing on demand redraws.
+    // A new texture (another colormap) or index is set here.
     useLayoutEffect(() => {
         const uniforms = material.userData.uniforms;
         uniforms.uLutTexture.value = texture;
@@ -215,6 +217,7 @@ export const ScalarFieldMesh = (props: ScalarFieldMeshProps) => {
         uniforms.oIndex.value = oIndex;
         invalidate();
     }, [material, texture, cIndex, oIndex, invalidate]);
+    useEffect(() => onTextureUpdate(texture, invalidate), [texture, invalidate]);
 
     // Create geometry with memoization for performance
     const geometry = useMemo(() => {

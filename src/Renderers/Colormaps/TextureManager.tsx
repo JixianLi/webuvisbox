@@ -3,6 +3,7 @@ import { autorun, makeAutoObservable, type IReactionDisposer } from 'mobx';
 import PresetLinearColormap from './PresetLinearColormap';
 import { OpacityMap } from './OpacityMap';
 import VSUP from './VSUP';
+import { announceTextureUpdate } from './TextureUpdates';
 
 type Colormap = PresetLinearColormap | VSUP;
 
@@ -14,8 +15,11 @@ class TextureManager {
     private textures = new Map<string, THREE.DataTexture>();
     private disposers = new Map<string, IReactionDisposer>();
 
+    // The registered maps are observable, so a texture's autorun follows a map registered again under its name. The
+    // textures and autorun disposers are a plain cache: observable, the autorun that creates a texture would write a
+    // map it reads, and run twice.
     private constructor() {
-        makeAutoObservable(this);
+        makeAutoObservable<this, 'textures' | 'disposers'>(this, { textures: false, disposers: false });
     }
 
     public static getInstance(): TextureManager {
@@ -92,31 +96,31 @@ class TextureManager {
                 }
             }
 
+            // Uploaded as 16-bit floats: about three significant digits at any magnitude, so opacities well below 0.1
+            // stay distinct (8 bits would step by 1/255 ≈ 0.004), and, unlike 32-bit floats, linearly filterable in
+            // WebGL2 without an extension.
+            const halfFloatData = Uint16Array.from(textureData, THREE.DataUtils.toHalfFloat);
             let texture = this.textures.get(key);
             if (!texture) {
-                texture = new THREE.DataTexture(
-                    textureData,
-                    width,
-                    height,
-                    THREE.RGBAFormat,
-                    THREE.FloatType
-                );
-                texture.internalFormat = "RGBA32F";
-                texture.minFilter = THREE.NearestFilter;
-                texture.magFilter = THREE.NearestFilter;
+                texture = new THREE.DataTexture(halfFloatData, width, height, THREE.RGBAFormat, THREE.HalfFloatType);
+                texture.internalFormat = "RGBA16F";
+                texture.minFilter = THREE.LinearFilter;
+                texture.magFilter = THREE.LinearFilter;
                 texture.wrapS = THREE.ClampToEdgeWrapping;
                 texture.wrapT = THREE.ClampToEdgeWrapping;
                 this.textures.set(key, texture);
             } else {
-                texture.image.data = textureData;
+                texture.image.data = halfFloatData;
             }
             texture.needsUpdate = true;
+            // Rewritten in place, which React never sees: announce it, so canvases drawing on demand redraw.
+            announceTextureUpdate(texture);
         });
 
         this.disposers.set(key, disposer);
     }
 
-    public dispose(colormapName: string, opacityMapName?: string, width?: number, height?: number): void {
+    public dispose(colormapName: string, opacityMapName?: string, width: number = 256, height: number = 1): void {
         const key = this.getTextureKey(colormapName, opacityMapName, width, height);
         if (this.textures.has(key)) {
             this.textures.get(key)!.dispose();

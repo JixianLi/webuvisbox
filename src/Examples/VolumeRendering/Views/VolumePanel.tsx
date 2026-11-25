@@ -3,7 +3,6 @@
 
 import { useEffect, useRef } from "react";
 import { observer } from "mobx-react-lite";
-import { reaction } from "mobx";
 import { Canvas, useThree } from "@react-three/fiber";
 import { AdaptiveDpr, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -13,7 +12,7 @@ import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import { getTextureManager } from "../../../Renderers/Colormaps/TextureManager";
 import { VolumeRenderer } from "../../../Renderers/Volume/VolumeRenderer";
 import type { VolumeRenderingGlobalContext } from "../VolumeRenderingGlobalContext";
-import { transferFunctionFor, type TransferFunction } from "../VolumeTransferFunctions";
+import { transferFunctionFor } from "../VolumeTransferFunctions";
 
 const CAMERA_POSITION = new THREE.Vector3(1.1, 1.0, 1.3);
 
@@ -26,22 +25,6 @@ function FitCameraToAspect() {
         camera.position.copy(CAMERA_POSITION).multiplyScalar(Math.max(1, 1.0 / aspect));
         invalidate();
     }, [camera, aspect, invalidate]);
-    return null;
-}
-
-// The canvas draws on demand, and the TextureManager updates the lookup texture in place, which React does not see:
-// redraw whenever any point of the transfer function changes.
-function RedrawOnEdit({ transferFunction }: { transferFunction: TransferFunction }) {
-    const invalidate = useThree(state => state.invalidate);
-    useEffect(() => reaction(
-        () => [
-            transferFunction.colormap.colorControlPoints.slice(),
-            transferFunction.colormap.colorPoints.map(color => color.slice()),
-            transferFunction.opacityMap.opacityControlPoints.slice(),
-            transferFunction.opacityMap.opacityValues.slice(),
-        ],
-        () => invalidate(),
-    ), [transferFunction, invalidate]);
     return null;
 }
 
@@ -66,14 +49,11 @@ const Volume = observer(function Volume() {
     const { data, dimensions } = context.volume;
     if (!texture) return null;
     return (
-        <>
-            <RedrawOnEdit transferFunction={transferFunction} />
-            {/* The datasets' z axis is up; three.js' up is y. */}
-            <group rotation={[-Math.PI / 2, 0, 0]}>
-                <VolumeRenderer data={data} dimensions={dimensions} transferFunction={texture}
-                                samplesPerVoxel={context.samplesPerVoxel} lighting={context.lighting} />
-            </group>
-        </>
+        // The datasets' z axis is up; three.js' up is y.
+        <group rotation={[-Math.PI / 2, 0, 0]}>
+            <VolumeRenderer data={data} dimensions={dimensions} transferFunction={texture}
+                            samplesPerVoxel={context.samplesPerVoxel} lighting={context.lighting} />
+        </group>
     );
 });
 

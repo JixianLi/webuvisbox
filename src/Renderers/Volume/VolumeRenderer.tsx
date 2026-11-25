@@ -4,6 +4,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { onTextureUpdate } from "../Colormaps/TextureUpdates";
 
 export interface VolumeRendererProps {
     data: Float32Array | Uint8Array;            // Float32 in [0, 1], or Uint8 (0–255 read as 0–1); x fastest, then y, z
@@ -62,9 +63,10 @@ vec2 intersectBox(vec3 origin, vec3 direction) {
     return vec2(max(max(entry.x, entry.y), entry.z), min(min(exit.x, exit.y), exit.z));
 }
 
-// Linear interpolation between the lookup table's two nearest entries, done here rather than by texture filtering:
-// the table may be a 32-bit float texture (TextureManager's are), which WebGL2 cannot filter linearly without an
-// extension, and nearest lookup steps the classification, drawing contour rings wherever opacity ramps steeply.
+// Linear interpolation between the lookup table's two nearest entries, done here rather than by texture filtering: it
+// places entry i exactly at value i / (n − 1) (a filtered lookup at value v is off by up to half an entry), and it
+// works for any table texture, including ones that cannot be filtered linearly (32-bit float without an extension) or
+// use nearest filtering, which steps the classification into contour rings wherever opacity ramps steeply.
 vec4 classify(float value) {
     float last = float(textureSize(uTransferFunction, 0).x - 1);
     float position = clamp(value, 0.0, 1.0) * last;
@@ -172,6 +174,8 @@ export function VolumeRenderer({ data, dimensions, transferFunction, samplesPerV
 
     // The step follows samplesPerVoxel in useFrame, which runs only when a frame is drawn: request one.
     useEffect(() => invalidate(), [samplesPerVoxel, invalidate]);
+    // An edited transfer function is rewritten into the same texture in place: redraw when its manager announces it.
+    useEffect(() => onTextureUpdate(transferFunction, invalidate), [transferFunction, invalidate]);
 
     // Per frame: the camera in box coordinates, and the step for the current sampling rate (in box units, where a
     // voxel along the longest side is 1 / largest).
