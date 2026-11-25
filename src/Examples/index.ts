@@ -5,8 +5,10 @@ import './ChatUI';
 import './UncertainTerrain';
 import './LorenzEnsemble';
 import './ContourUncertainty';
+import './VolumeRendering';
 
 export { CHAT_UI_CONFIG } from './ChatUI';
 export { UNCERTAIN_TERRAIN_CONFIG } from './UncertainTerrain';
 export { LORENZ_ENSEMBLE_CONFIG } from './LorenzEnsemble';
 export { CONTOUR_UNCERTAINTY_CONFIG } from './ContourUncertainty';
+export { VOLUME_RENDERING_CONFIG } from './VolumeRendering';

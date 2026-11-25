@@ -1,4 +1,4 @@
-import { makeObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable, runInAction } from 'mobx';
 import { findSmallerIndex } from '../../Helpers/MathHelper';
 
 export class OpacityMap {
@@ -15,7 +15,19 @@ export class OpacityMap {
         makeObservable(this, {
             opacityControlPoints: observable,
             opacityValues: observable,
+            setOpacityControlPoint: action,
         });
+    }
+
+    // Moves a point and sets its opacity. The endpoints keep their positions, and an interior point stays strictly
+    // between its neighbors, so the points stay sorted.
+    setOpacityControlPoint(index: number, position: number, opacity: number) {
+        const points = this.opacityControlPoints;
+        if (index > 0 && index < points.length - 1) {
+            const gap = 1e-4;
+            points[index] = Math.min(points[index + 1] - gap, Math.max(points[index - 1] + gap, position));
+        }
+        this.opacityValues[index] = Math.max(0, Math.min(1, opacity));
     }
 
     removeOpacityControlPoint(index: number) {

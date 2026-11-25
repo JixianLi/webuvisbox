@@ -75,6 +75,8 @@ webuvisbox/
 │   │   ├── Graph/               # Word cloud: force layout (similarity links, rectangle collision) in a worker + SVG view
 │   │   ├── Mesh/                # 3D primitives
 │   │   ├── Colormaps/           # Colormap + texture management
+│   │   ├── Volume/              # Direct volume rendering (GPU ray marching)
+│   │   ├── TransferFunction/    # Piecewise-linear transfer-function editor (opacity curve + color points)
 │   │   ├── DepthRenderer/       # 3D depth-pass utilities
 │   │   └── SharedCameraControl/ # Camera sync across multiple R3F canvases
 │   ├── Scenarios/
@@ -90,7 +92,7 @@ webuvisbox/
 ```
 
 The library contains the framework and its built-in examples (`src/Examples/`: ChatUI, Uncertain terrain, Lorenz
-ensemble, Contour uncertainty). They run entirely in the browser with generated data, and their configs are inlined, so
+ensemble, Contour uncertainty, Volume rendering). They run entirely in the browser with generated data, and their configs are inlined, so
 every app built on the library offers them in the Scenario menu without serving a file or running a server. The dev app
 under `examples/` mounts the library and is where a dev-only scenario would go.
 

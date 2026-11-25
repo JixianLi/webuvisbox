@@ -54,17 +54,18 @@ class TextureManager {
     }
 
     private createTexture(colormapName: string, opacityMapName: string | undefined, width: number, height: number): void {
-        const opacityMap = opacityMapName ? this.opacityMaps.get(opacityMapName) : undefined;
-
         const key = this.getTextureKey(colormapName, opacityMapName, width, height);
 
         if (this.disposers.has(key)) {
             this.disposers.get(key)!();
         }
 
+        // Both maps are looked up inside the autorun, so registering a new map under the same name (a scenario opened
+        // again creates new ones) updates the texture rather than leaving it tied to the old map.
         const disposer = autorun(() => {
             const textureData = new Float32Array(width * height * 4);
             const colormap = this.colormaps.get(colormapName);
+            const opacityMap = opacityMapName ? this.opacityMaps.get(opacityMapName) : undefined;
             if (!colormap) {
                 console.error(`Colormap '${colormapName}' not registered.`);
                 return;

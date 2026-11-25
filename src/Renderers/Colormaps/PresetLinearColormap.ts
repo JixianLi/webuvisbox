@@ -1,6 +1,6 @@
 import { presets, presetnames } from './Presets'
 import * as d3 from 'd3';
-import { makeObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable, runInAction } from 'mobx';
 import { findSmallerIndex } from '../../Helpers/MathHelper';
 
 export class PresetLinearColormap {
@@ -20,7 +20,20 @@ export class PresetLinearColormap {
             presetName: observable,
             colorControlPoints: observable,
             colorPoints: observable,
+            setColorControlPoint: action,
         });
+    }
+
+    // Moves a color point and, if given, sets its color (RGB in [0, 1]). The endpoints keep their positions, and an
+    // interior point stays strictly between its neighbors, so the points stay sorted.
+    setColorControlPoint(index: number, position: number, color?: number[]) {
+        const points = this.colorControlPoints;
+        if (index > 0 && index < points.length - 1) {
+            const gap = 1e-4;
+            points[index] = Math.min(points[index + 1] - gap, Math.max(points[index - 1] + gap, position));
+        }
+        if (color) this.colorPoints[index] = [...color];
+        this._colorCache.clear();
     }
 
     removeColorControlPoint(index: number) {
