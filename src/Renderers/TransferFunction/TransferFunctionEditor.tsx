@@ -140,6 +140,9 @@ export const TransferFunctionEditor = observer(function TransferFunctionEditor(p
     const handlePointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
         const target = dragging.current;
         if (!target) return;
+        // A release the editor never received (outside the window, or after the capture was lost) leaves no button
+        // held: end the drag rather than move the point.
+        if (event.buttons === 0) { endDrag(); return; }
         const { position, opacity } = pointerPosition(event);
         if (target.kind === "opacity") opacityMap.setOpacityControlPoint(target.index, position, opacity);
         else colormap.setColorControlPoint(target.index, position);
@@ -171,7 +174,7 @@ export const TransferFunctionEditor = observer(function TransferFunctionEditor(p
                          aria-label="Transfer function editor: opacity curve and color points"
                          style={{ position: "absolute", inset: 0, touchAction: "none", outline: "none", cursor: "crosshair" }}
                          onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
-                         onPointerUp={endDrag} onPointerCancel={endDrag}
+                         onPointerUp={endDrag} onPointerCancel={endDrag} onLostPointerCapture={endDrag}
                          onKeyDown={event => { if (event.key === "Delete" || event.key === "Backspace") removeSelected(); }}>
                         <defs>
                             <linearGradient id={gradientId} gradientUnits="userSpaceOnUse" x1={x(0)} x2={x(1)} y1={0} y2={0}>
