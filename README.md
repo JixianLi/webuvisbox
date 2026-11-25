@@ -5,13 +5,11 @@
 ## Features
 
 - 🎨 **Interactive Visualization**: Real-time 3D rendering with Three.js and React Three Fiber
-- 📊 **Advanced Analytics**: Integrated statistical visualizations using Chart.js and D3
+- 📊 **Advanced Analytics**: Integrated statistical visualizations using D3
 - 💬 **Agent-Tracing Renderers**: Chat surface and swim-lane sequence-diagram (`Trace`) for visualizing tool-calling agents
 - 🔄 **Reactive State Management**: MobX-powered reactive updates across all components
 - 🎯 **Scenario-Based Architecture**: Modular design supporting multiple domain-specific visualizations
 - 📐 **Flexible Layout System**: Drag-and-drop panel management with React Grid Layout
-- 🎨 **Customizable Transfer Functions**: Interactive colormap and opacity editors
-- 🌐 **Optional Data Server Integration**: Fetch and visualize remote ensemble datasets (only required for the scientific examples)
 
 ## Tech Stack
 
@@ -19,7 +17,7 @@
 - **3D Graphics**: Three.js, React Three Fiber, Drei
 - **State Management**: MobX 6.16+
 - **UI Components**: Material-UI (MUI) v9
-- **Charting**: Chart.js 4.5, D3.js 7.9
+- **Charting**: D3.js 7.9
 - **Layout**: React Grid Layout 2
 - **Build Tool**: Vite 8
 
@@ -29,12 +27,6 @@
 
 - Node.js 18+ 
 - npm or yarn
-
-### Data Server (optional)
-
-The bundled `chatUI` example runs entirely in the browser and needs no backend. The other example scenarios (`Wildfire`, `UncertaintyTube`) fetch ensemble data from a server that is not part of this repository. If you plan to wire those scenarios to your own data source, please open an issue with details about your planned usage. Example server code will be provided in a future release.
-
-For development and testing, you can modify the `data_server_address` in scenario configuration files to point to your own data source.
 
 ### Installation
 
@@ -83,7 +75,6 @@ webuvisbox/
 │   │   ├── Graph/               # Word cloud: force layout (similarity links, rectangle collision) in a worker + SVG view
 │   │   ├── Mesh/                # 3D primitives
 │   │   ├── Colormaps/           # Colormap + texture management
-│   │   ├── Chartjs/             # Chart.js helpers
 │   │   ├── DepthRenderer/       # 3D depth-pass utilities
 │   │   └── SharedCameraControl/ # Camera sync across multiple R3F canvases
 │   ├── Scenarios/
@@ -94,16 +85,17 @@ webuvisbox/
 ├── examples/                    # Dev app + example scenarios (Vite root)
 │   ├── index.html
 │   ├── main.tsx                 # Registers examples and mounts <App>
-│   ├── public/
-│   │   └── ScenarioConfigs/     # JSON configs
-│   ├── Wildfire/                # Example scenario (requires data server)
-│   └── UncertaintyTube/         # Example scenario (requires data server)
+│   └── public/                  # Static files; a dev scenario's ScenarioConfigs/*.json would go here
 └── package.json
 ```
 
-The library contains the framework and one built-in example, ChatUI (`src/Examples/ChatUI/`, no backend): its config is
-inlined, so every app built on the library offers it in the Scenario menu without serving a file. The example scenarios
-under `examples/` demonstrate how to consume the library and double as the dev playground.
+The library contains the framework and its built-in examples (`src/Examples/`: ChatUI, Uncertain terrain, Lorenz
+ensemble, Contour uncertainty). They run entirely in the browser with generated data, and their configs are inlined, so
+every app built on the library offers them in the Scenario menu without serving a file or running a server. The dev app
+under `examples/` mounts the library and is where a dev-only scenario would go.
+
+The earlier server-backed examples, Wildfire and Uncertainty Tube, are archived on the
+`archive/wildfire-and-uncertainty-tube` branch.
 
 ## Scenarios
 
@@ -111,20 +103,6 @@ under `examples/` demonstrate how to consume the library and double as the dev p
 A sandbox that exercises the library's `Chat` and `Trace` renderers. A simulated tool-calling agent walks between User, Model, and two Tools — with retries, occasional failures, and base64-encoded image responses — animated through a swim-lane sequence diagram on the left and a chat window on the right.
 
 This is the scenario `npm run dev` boots into. It runs entirely client-side.
-
-### Wildfire Simulation (requires data server)
-Visualize WRF-SFIRE ensemble simulations with:
-- 3D terrain visualization with scalar field overlays
-- Wind glyph rendering
-- Contour boxplots and band depth analysis
-- Interactive time navigation
-- Customizable colormaps and opacity transfer functions
-
-### Uncertainty Tube (requires data server)
-Explore flow field uncertainty with:
-- Seed placement and trajectory visualization
-- Uncertainty tube rendering
-- Ensemble member path analysis
 
 ## Configuration
 

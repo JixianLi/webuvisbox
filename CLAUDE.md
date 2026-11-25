@@ -30,7 +30,7 @@ src/                      # Library — no scenario-specific code, except the bu
 ├── LayoutManager/        # Navbar; the responsive panel grid, with overlay panels above it
 ├── Panels/               # Base Panel component (frame by panel type, fit, collapse) + grid container
 ├── Examples/             # Built-in examples (ChatUI, Uncertain terrain, Lorenz ensemble, Contour uncertainty): config inlined, registered by App, in every host's menu
-├── Renderers/            # Reusable renderers: Chat, Trace (swim lanes), Graph (word-cloud force layout + SVG view), Mesh, Colormaps, chart helpers
+├── Renderers/            # Reusable renderers: Chat, Trace (swim lanes), Graph (word-cloud force layout + SVG view), Mesh, Colormaps
 ├── Scenarios/
 │   ├── ScenarioRegistry.ts   # Registry singleton + ScenarioDefinition type
 │   └── index.ts              # Re-exports registry; registers no scenarios
@@ -40,10 +40,7 @@ src/                      # Library — no scenario-specific code, except the bu
 examples/                 # Dev app + example scenarios (Vite root)
 ├── index.html            # Entry HTML, loads main.tsx
 ├── main.tsx              # Imports each example to register, mounts <App> on the built-in ChatUI
-├── public/
-│   └── ScenarioConfigs/  # JSON configs served at URL root
-├── Wildfire/             # Example scenario (requires data server)
-└── UncertaintyTube/      # Example scenario (requires data server)
+└── public/               # Static files served at URL root (a dev scenario's ScenarioConfigs/*.json)
 ```
 
 Vite's `root` is set to `examples/`, so `npm run dev` boots from there. Build output stays at project root (`dist/`) via `build.outDir`.
@@ -117,7 +114,7 @@ Scenario configs in `examples/public/ScenarioConfigs/*.json` define:
 | Component files (.tsx) | PascalCase | `Panel.tsx`, `HeaderBar.tsx` |
 | Non-component files (.ts) | PascalCase | `DataHelper.ts`, `MathHelper.ts` |
 | React components | PascalCase | `FormGrid`, `CheckMenuItem` |
-| Classes | PascalCase | `WildfireGlobalContext`, `PanelLayoutManager` |
+| Classes | PascalCase | `LorenzEnsembleGlobalContext`, `PanelLayoutManager` |
 | Interfaces / Types | PascalCase, no `I` prefix | `Scenario`, `PanelProps` |
 | Variables and properties | camelCase | `currentTimeIndex`, `ensembleNames` |
 | Functions | camelCase | `computeHistogram()`, `timeInSecondsToString()` |
@@ -126,6 +123,8 @@ Scenario configs in `examples/public/ScenarioConfigs/*.json` define:
 | MobX store properties | camelCase | `ensembleNames`, `currentTimeIndex` |
 | Scenario config JSON keys | snake_case | `panel_layouts`, `global_data` |
 
-## Data Server
+## Examples Are Standalone
 
-The `Wildfire` and `UncertaintyTube` example scenarios fetch ensemble data from a backend server, with the URL configured in scenario JSON (`global_data.data_server_address`). The backend is not included in this repo. The `ChatUI` example (`src/Examples/ChatUI/`) runs entirely client-side and needs no backend.
+Every example runs entirely in the browser with generated or bundled data: no data server, no backend. Keep it that
+way for new examples. The earlier server-backed examples (Wildfire, Uncertainty Tube) and the Chart.js charts they used
+are archived on the `archive/wildfire-and-uncertainty-tube` branch; main has no Chart.js dependency.
