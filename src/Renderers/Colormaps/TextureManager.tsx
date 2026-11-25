@@ -63,18 +63,30 @@ class TextureManager {
         if (this.disposers.has(key)) {
             this.disposers.get(key)!();
         }
+        if (!this.colormaps.get(colormapName)) {
+            console.error(`Colormap '${colormapName}' not registered.`);
+            return;
+        }
 
-        // Both maps are looked up inside the autorun, so registering a new map under the same name (a scenario opened
+        // Uploaded as 16-bit floats: about three significant digits at any magnitude, so opacities well below 0.1
+        // stay distinct (8 bits would step by 1/255 ≈ 0.004), and, unlike 32-bit floats, linearly filterable in
+        // WebGL2 without an extension.
+        const texture = new THREE.DataTexture(new Uint16Array(width * height * 4), width, height, THREE.RGBAFormat,
+                                              THREE.HalfFloatType);
+        texture.internalFormat = "RGBA16F";
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.wrapS = THREE.ClampToEdgeWrapping;
+        texture.wrapT = THREE.ClampToEdgeWrapping;
+        this.textures.set(key, texture);
+
+        // Both maps are looked up on every fill, so registering a new map under the same name (a scenario opened
         // again creates new ones) updates the texture rather than leaving it tied to the old map.
-        const disposer = autorun(() => {
-            const textureData = new Float32Array(width * height * 4);
+        const fill = () => {
             const colormap = this.colormaps.get(colormapName);
             const opacityMap = opacityMapName ? this.opacityMaps.get(opacityMapName) : undefined;
-            if (!colormap) {
-                console.error(`Colormap '${colormapName}' not registered.`);
-                return;
-            }
-
+            if (!colormap) return;
+            const textureData = new Float32Array(width * height * 4);
             for (let y = 0; y < height; y++) {
                 for (let x = 0; x < width; x++) {
                     const x_norm = width === 1 ? 0 : x / (width - 1);
@@ -86,38 +98,20 @@ class TextureManager {
                     textureData[idx] = color.r / 255;
                     textureData[idx + 1] = color.g / 255;
                     textureData[idx + 2] = color.b / 255;
-
-                    if (opacityMap) {
-                        const opacity = opacityMap.getOpacityFromControlPoints(x_norm);
-                        textureData[idx + 3] = opacity;
-                    } else {
-                        textureData[idx + 3] = 1.0;
-                    }
+                    textureData[idx + 3] = opacityMap ? opacityMap.getOpacityFromControlPoints(x_norm) : 1.0;
                 }
             }
-
-            // Uploaded as 16-bit floats: about three significant digits at any magnitude, so opacities well below 0.1
-            // stay distinct (8 bits would step by 1/255 ≈ 0.004), and, unlike 32-bit floats, linearly filterable in
-            // WebGL2 without an extension.
-            const halfFloatData = Uint16Array.from(textureData, THREE.DataUtils.toHalfFloat);
-            let texture = this.textures.get(key);
-            if (!texture) {
-                texture = new THREE.DataTexture(halfFloatData, width, height, THREE.RGBAFormat, THREE.HalfFloatType);
-                texture.internalFormat = "RGBA16F";
-                texture.minFilter = THREE.LinearFilter;
-                texture.magFilter = THREE.LinearFilter;
-                texture.wrapS = THREE.ClampToEdgeWrapping;
-                texture.wrapT = THREE.ClampToEdgeWrapping;
-                this.textures.set(key, texture);
-            } else {
-                texture.image.data = halfFloatData;
-            }
+            texture.image.data = Uint16Array.from(textureData, THREE.DataUtils.toHalfFloat);
             texture.needsUpdate = true;
             // Rewritten in place, which React never sees: announce it, so canvases drawing on demand redraw.
             announceTextureUpdate(texture);
-        });
+        };
 
-        this.disposers.set(key, disposer);
+        // Filled now, so getTexture returns a ready texture even when called inside a MobX action (getTexture is one),
+        // where a new autorun's first run waits until the action ends; the autorun then keeps it current as the maps
+        // are edited or registered again.
+        fill();
+        this.disposers.set(key, autorun(fill));
     }
 
     public dispose(colormapName: string, opacityMapName?: string, width: number = 256, height: number = 1): void {
