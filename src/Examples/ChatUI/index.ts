@@ -4,7 +4,9 @@
 import { scenarioRegistry } from "../../Scenarios/ScenarioRegistry";
 import { ChatUIGlobalContext } from "./ChatUIGlobalContext";
 import { chatUIPanelMappingFunction } from "./chatUIPanelMappingFunction";
-import { CHAT_UI_CONFIG } from "./ChatUIConfig";
+// The scenario config is a plain JSON file, the same format a host serves from ScenarioConfigs/ or a user uploads;
+// importing it bundles it, so the example needs no file to be served.
+import CHAT_UI_CONFIG from "./ChatUIConfig.json";
 
 scenarioRegistry.register({
   name: "chatUI",

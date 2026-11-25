@@ -1,13 +1,7 @@
-// ABOUTME: The ChatUI example's scenario config, built into the library so the example loads in any host project
-// ABOUTME: without a config file to serve (same shape as a ScenarioConfigs/*.json file).
-
-export const CHAT_UI_CONFIG = {
+{
     "name": "chatUI",
     "description": "Two-panel sandbox for testing new rendering components",
-    "views": [
-        "Trace",
-        "Chat"
-    ],
+    "views": ["Trace", "Chat"],
     "panel_layouts": {
         "default_layouts": {
             "xl": [
@@ -19,10 +13,7 @@ export const CHAT_UI_CONFIG = {
                     "h": 16,
                     "minW": 3,
                     "minH": 3,
-                    "resizeHandles": [
-                        "sw",
-                        "se"
-                    ],
+                    "resizeHandles": ["sw", "se"],
                     "visible": true,
                     "moved": false,
                     "static": false
@@ -35,10 +26,7 @@ export const CHAT_UI_CONFIG = {
                     "h": 16,
                     "minW": 3,
                     "minH": 3,
-                    "resizeHandles": [
-                        "sw",
-                        "se"
-                    ],
+                    "resizeHandles": ["sw", "se"],
                     "visible": true,
                     "moved": false,
                     "static": false
@@ -53,10 +41,7 @@ export const CHAT_UI_CONFIG = {
                     "h": 12,
                     "minW": 3,
                     "minH": 3,
-                    "resizeHandles": [
-                        "sw",
-                        "se"
-                    ],
+                    "resizeHandles": ["sw", "se"],
                     "visible": true,
                     "moved": false,
                     "static": false
@@ -69,10 +54,7 @@ export const CHAT_UI_CONFIG = {
                     "h": 12,
                     "minW": 3,
                     "minH": 3,
-                    "resizeHandles": [
-                        "sw",
-                        "se"
-                    ],
+                    "resizeHandles": ["sw", "se"],
                     "visible": true,
                     "moved": false,
                     "static": false
@@ -87,10 +69,7 @@ export const CHAT_UI_CONFIG = {
                     "h": 8,
                     "minW": 2,
                     "minH": 2,
-                    "resizeHandles": [
-                        "sw",
-                        "se"
-                    ],
+                    "resizeHandles": ["sw", "se"],
                     "visible": true,
                     "moved": false,
                     "static": false
@@ -103,29 +82,15 @@ export const CHAT_UI_CONFIG = {
                     "h": 8,
                     "minW": 2,
                     "minH": 2,
-                    "resizeHandles": [
-                        "sw",
-                        "se"
-                    ],
+                    "resizeHandles": ["sw", "se"],
                     "visible": true,
                     "moved": false,
                     "static": false
                 }
             ]
         },
-        "breakpoints": {
-            "xl": 1440,
-            "lg": 800,
-            "sm": 400
-        },
-        "cols": {
-            "xl": 22,
-            "lg": 12,
-            "sm": 6
-        }
+        "breakpoints": {"xl": 1440, "lg": 800, "sm": 400},
+        "cols": {"xl": 22, "lg": 12, "sm": 6}
     },
-    "global_data": {
-        "chat_font_size": 14,
-        "trace_font_size": 13
-    }
-};
+    "global_data": {"chat_font_size": 14, "trace_font_size": 13}
+}

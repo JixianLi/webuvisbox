@@ -4,7 +4,9 @@
 import { scenarioRegistry } from "../../Scenarios/ScenarioRegistry";
 import { UncertainTerrainGlobalContext } from "./UncertainTerrainGlobalContext";
 import { uncertainTerrainPanelMappingFunction } from "./uncertainTerrainPanelMappingFunction";
-import { UNCERTAIN_TERRAIN_CONFIG } from "./UncertainTerrainConfig";
+// The scenario config is a plain JSON file, the same format a host serves from ScenarioConfigs/ or a user uploads;
+// importing it bundles it, so the example needs no file to be served.
+import UNCERTAIN_TERRAIN_CONFIG from "./UncertainTerrainConfig.json";
 
 scenarioRegistry.register({
   name: UNCERTAIN_TERRAIN_CONFIG.name,

@@ -92,8 +92,9 @@ webuvisbox/
 ```
 
 The library contains the framework and its built-in examples (`src/Examples/`: ChatUI, Uncertain terrain, Lorenz
-ensemble, Contour uncertainty, Volume rendering). They run entirely in the browser with generated data, and their configs are inlined, so
-every app built on the library offers them in the Scenario menu without serving a file or running a server. The dev app
+ensemble, Contour uncertainty, Volume rendering). They run entirely in the browser with generated data, and each imports
+its scenario config from a JSON file beside it, which bundles it, so every app built on the library offers them in the
+Scenario menu without serving a file or running a server. The dev app
 under `examples/` mounts the library and is where a dev-only scenario would go.
 
 The earlier server-backed examples, Wildfire and Uncertainty Tube, are archived on the
@@ -108,21 +109,74 @@ This is the scenario `npm run dev` boots into. It runs entirely client-side.
 
 ## Configuration
 
-Scenarios are configured via JSON files in `examples/public/ScenarioConfigs/`. Each scenario defines:
-- Panel layouts (responsive grid configurations)
-- Data sources and ensemble members
-- Initial visualization parameters
-- UI configurations
+Every scenario is specified by a **scenario config**: a JSON file that names the scenario, lists its panels (views),
+lays them out per screen size, and gives its initial state. The built-in examples' configs are good references:
+`src/Examples/LorenzEnsemble/LorenzEnsembleConfig.json`, `src/Examples/VolumeRendering/VolumeRenderingConfig.json`, and
+the others beside each example.
 
-Example structure:
+### The format
+
 ```json
 {
-  "name": "chatUI",
-  "description": "Two-panel sandbox for testing new rendering components",
-  "panel_layouts": { ... },
-  "global_data": { ... }
+  "name": "Lorenz ensemble",
+  "description": "Chaos as uncertainty: paths of the Lorenz system from nearly the same start",
+  "views": ["Trajectories", "Controls"],
+  "panel_layouts": {
+    "default_layouts": {
+      "xl": [
+        { "i": "Trajectories", "type": "borderless", "x": 0, "y": 0, "w": 18, "h": 16, "visible": true },
+        { "i": "Controls", "x": 18, "y": 0, "w": 6, "h": 16, "visible": true }
+      ],
+      "lg": [
+        { "i": "Trajectories", "type": "borderless", "x": 0, "y": 0, "w": 8, "h": 14, "visible": true },
+        { "i": "Controls", "x": 8, "y": 0, "w": 4, "h": 14, "visible": true }
+      ],
+      "sm": [
+        { "i": "Trajectories", "type": "borderless", "x": 0, "y": 0, "w": 4, "h": 9, "visible": true },
+        { "i": "Controls", "x": 0, "y": 9, "w": 4, "h": 10, "visible": true }
+      ]
+    },
+    "breakpoints": { "xl": 1440, "lg": 800, "sm": 0 },
+    "cols": { "xl": 24, "lg": 12, "sm": 4 },
+    "fit_rows": { "sm": 13 }
+  },
+  "appearance": { "default_mode": "dark" },
+  "global_data": { "member_count": 50, "speed": 1.5 }
 }
 ```
+
+| Key | Meaning |
+|---|---|
+| `name` | Must equal the name the scenario registers under (`scenarioRegistry.register({ name, ... })`). |
+| `description` | Shown next to the name in the navbar. |
+| `views` | The panel IDs; each must be known to the scenario's panel mapping function. |
+| `panel_layouts.default_layouts` | One layout per breakpoint (`xl` is required). Each entry places a view `i` on the grid (`x`, `y`, `w`, `h` in columns and rows) and may set `type` (`regular`, `borderless`, `overlay`), `visible`, `minW`, `minH`. |
+| `panel_layouts.breakpoints`, `cols` | The window width at which each layout applies, and its number of grid columns. |
+| `panel_layouts.fit_rows` | Optional, per breakpoint: how many rows fill the window height. |
+| `appearance` | Optional: `accent` color, `default_mode` (`bright`, `dark`, `neutral`), `ui_scale`. |
+| `global_data` | The scenario's own initial state, passed to its GlobalContext's `initialize()`. Keys are snake_case. |
+
+`DESIGN.md` describes panel types and fitting rows; `CREATE_SCENARIO.md` lists layout rules the loader does not check.
+
+### Supplying a config
+
+1. **Serve it and pass its path** to the app, which fetches it at startup. Put the file under your app's `public/`:
+   ```tsx
+   <App initialConfig="ScenarioConfigs/MyScenario.json" />
+   ```
+2. **Register it as the scenario's default**, so the Scenario menu can open the scenario: `defaultConfigPath` fetches a
+   served file, `defaultConfig` takes an imported one.
+   ```ts
+   scenarioRegistry.register({ name: "MyScenario", /* ... */ defaultConfigPath: "ScenarioConfigs/MyScenario.json" });
+   // or, bundled: import MY_SCENARIO_CONFIG from "./MyScenarioConfig.json";  ...  defaultConfig: MY_SCENARIO_CONFIG
+   ```
+   The built-in examples use the bundled form, so they need no file to be served in any host (TypeScript needs
+   `"resolveJsonModule": true` to import `.json`).
+3. **Upload it** at runtime: Scenario → Upload Scenario, then pick a `.json` file. The scenario it names must be
+   registered in the app.
+4. **Write one from the running app**: Scenario → Download Scenario saves the open scenario's config, with its current
+   `global_data` and its default layout (to include a rearranged layout, first use Layout → Save as Default Layout).
+   Any of the ways above loads the file again.
 
 ## Key Features
 
@@ -138,17 +192,16 @@ Example structure:
 - Kind-based arrow coloring (`prompt`, `tool_call`, `tool_result`, `retry`, `error`)
 - Click-to-select with payload detail panel
 
-### Interactive Colormap Editor
-- Histogram-based scalar distribution visualization
-- Click to add control points
-- Right-click to remove control points
-- Real-time colormap updates
+### Transfer Function Editor
+- Piecewise-linear, in the style of ParaView's: an opacity curve over the data's log-scale histogram, filled with the
+  colormap, and a color strip with movable color points
+- Drag points (mouse or touch), click or tap to add, Delete or "Remove point" to remove; type exact values
+- Pick a color point's color; sampled presets (256 points) simplify to 8 editable points
 
-### Opacity Transfer Function Editor
-- Y-position represents opacity (0-1)
-- Line plot shows opacity function
-- Interactive control point editing
-- Light gray histogram background
+### Volume Renderer
+- GPU ray marching of a scalar volume (WebGL2 3D texture) through a transfer function
+- Opacity corrected for the sampling rate, jittered ray starts, optional gradient lighting
+- Lower resolution and sampling only while the view is dragged
 
 ### Responsive Layout Management
 - Drag-and-drop panel repositioning

@@ -29,7 +29,7 @@ src/                      # Library — no scenario-specific code, except the bu
 ├── ScenarioManager/      # Loads config, drives scenario lifecycle
 ├── LayoutManager/        # Navbar; the responsive panel grid, with overlay panels above it
 ├── Panels/               # Base Panel component (frame by panel type, fit, collapse) + grid container
-├── Examples/             # Built-in examples (ChatUI, Uncertain terrain, Lorenz ensemble, Contour uncertainty, Volume rendering): config inlined, registered by App, in every host's menu
+├── Examples/             # Built-in examples (ChatUI, Uncertain terrain, Lorenz ensemble, Contour uncertainty, Volume rendering): config in a JSON file imported (bundled), registered by App, in every host's menu
 ├── Renderers/            # Reusable renderers: Chat, Trace (swim lanes), Graph (word-cloud force layout + SVG view), Mesh, Colormaps, Volume (ray marching), TransferFunction (editor)
 ├── Scenarios/
 │   ├── ScenarioRegistry.ts   # Registry singleton + ScenarioDefinition type
@@ -87,7 +87,8 @@ Within a scenario folder, prefer **relative imports** for files inside the same 
 - **Path alias**: `@/` maps to `src/` (configured in `vite.config.ts` and `tsconfig.app.json`). Examples consume library code through this alias.
   Library code in `src/` imports its own files with relative paths, never `@/`: host projects point their own aliases
   elsewhere (see `CREATE_SCENARIO.md`), so a self-import through `@/` would resolve into the host's source.
-- **Config-driven layouts**: Panel positions/sizes defined in `examples/public/ScenarioConfigs/*.json`
+- **Config-driven layouts**: Panel positions/sizes defined in scenario config JSON files: `src/Examples/*/*Config.json`
+  for the built-in examples, `examples/public/ScenarioConfigs/*.json` for dev-only scenarios
 
 ### 3D Rendering Stack
 
@@ -97,7 +98,8 @@ Within a scenario folder, prefer **relative imports** for files inside the same 
 
 ### Configuration Files
 
-Scenario configs in `examples/public/ScenarioConfigs/*.json` define:
+Scenario configs are JSON files (never TypeScript objects, so the examples show the format users write). The built-in
+examples import theirs (`src/Examples/*/*Config.json`) so no file has to be served; a host serves its own. They define:
 - `name`: Must match the name used in `scenarioRegistry.register()`
 - `panel_layouts`: Responsive grid layouts per breakpoint (xl, lg, sm); optionally each panel's `type`
   (`regular`, `borderless`, `overlay`) and, per breakpoint, `fit_rows` (how many rows fill the window height)

@@ -101,6 +101,7 @@ No `root:` override needed — `index.html`, `main.tsx`, and `public/` all sit a
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "resolveJsonModule": true,
     "jsx": "react-jsx",
     "strict": false,
     "skipLibCheck": true,
@@ -116,6 +117,9 @@ No `root:` override needed — `index.html`, `main.tsx`, and `public/` all sit a
   "include": ["src", "vendor/webuvisbox/src"]
 }
 ```
+
+`resolveJsonModule` is required: the library's built-in examples import their scenario configs from `.json` files,
+and this project type-checks the library's source (`include`).
 
 ## 6. `index.html`
 
