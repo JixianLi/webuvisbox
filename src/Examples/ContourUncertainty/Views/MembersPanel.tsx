@@ -58,7 +58,7 @@ const Thumbnail = observer(function Thumbnail({ member }: { member: number }) {
 export default observer(function MembersPanel() {
     const context = useScenario().globalContext as ContourUncertaintyGlobalContext;
     return (
-        <Panel panelName="Members">
+        <Panel panelName="Members" scene>
             {/* Thumbnails at least 80px wide, except that a narrow panel (a phone) still gets four per row. */}
             <Box sx={{ width: 1, display: "grid", gap: 1,
                        gridTemplateColumns: "repeat(auto-fill, minmax(min(80px, calc((100% - 24px) / 4)), 1fr))" }}>

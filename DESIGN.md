@@ -39,11 +39,12 @@ panels 10px corners, controls 7px, navbar 44px, panel title row 34px.
 |---|---|---|---|---|
 | `bright` | MUI light | White panels on `#EEF0F0` | The navbar is the accent bar | Lit rooms, slides |
 | `dark` | MUI dark | `#2C2D32` panels on `#232428` (brighter than MUI's default near-black) | Fills only; lighter tint `#E5484D` for lines and focus | Everyday work |
-| `neutral` | MUI light | Hue-free grays: `#7C7C7C` panels with `#505050` title rows and navbar, on a `#303030` canvas | None; dark gray fills, near-black lines | Judging color |
+| `neutral` | MUI light (scenes), MUI dark (other panels) | Hue-free grays: `#7C7C7C` scene panels and `#505050` control panels, `#505050` title rows and navbar, on a `#303030` canvas | None; dark gray fills, near-black lines (white on control panels) | Judging color |
 
-Panels read as blocks: mid gray on a darker canvas (3.2:1), each topped by a dark title row (1.9:1 to its panel; the
-canvas is darker still, 1.6:1, so the title rows stay apart from the gaps). Every render, borderless main views
-included, sits on the same hue-free mid gray. A mid gray gives poor text contrast in both black and white: on `#7C7C7C` white reaches 4.1:1 and
+Panels read as blocks: scenes are mid gray on a darker canvas (3.2:1), each topped by a dark title row (1.9:1 to its
+panel; the canvas is darker still, 1.6:1, so the title rows stay apart from the gaps). Every scene, borderless main
+views included, sits on the same hue-free mid gray; controls, charts and legends are dark gray panels with white text,
+so they stand apart from the scenes. A mid gray gives poor text contrast in both black and white: on `#7C7C7C` white reaches 4.1:1 and
 black 5.0:1, so text there is black (secondary `#0D0D0D`, 4.7:1) and the dark title rows carry the white text (8.1:1).
 Fills are solid; a gradient background (as some renderers use behind 3D content) is not part of the tokens.
 
@@ -79,6 +80,12 @@ is drawn; it can differ per breakpoint like the position:
 | `regular` (default) | A bordered tile | Yes; tiles push each other aside |
 | `borderless` | Unframed on the canvas (on the panel gray in neutral), content edge to edge (for the main view); keeps a thin title row | Yes |
 | `overlay` | Glass, above the grid at its `x`, `y`, `w`; as tall as its content up to `h` rows, then it scrolls | No; it floats over what is under it |
+
+A panel showing a rendering whose colors are judged (a 3D view, a rendered field or image) says so: `<Panel scene>`.
+Other panels (controls, charts, legends) are the default. The two look the same in bright and dark; in neutral, scenes
+are mid gray and the other panels dark gray (`controlPanels` tokens), each with the right text, controls and scrollbar.
+A panel's own theme applies inside `<Panel>`: a view reads `useTheme()` in a component rendered inside its Panel, not
+in the component that renders the Panel.
 
 Dragging a title row moves a panel: grid panels with the grid, overlays freely, snapping to the nearest cell on release.
 

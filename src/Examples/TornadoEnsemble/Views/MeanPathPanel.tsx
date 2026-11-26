@@ -35,7 +35,7 @@ const help = (
 
 export default function MeanPathPanel() {
     return (
-        <Panel panelName="Mean path" helpContent={help}>
+        <Panel panelName="Mean path" scene helpContent={help}>
             <Box sx={{ width: 1, height: 1, minHeight: 0 }}>
                 <LinkedCanvas>
                     <MeanPath />

@@ -6,7 +6,7 @@ import { ChevronDown } from 'lucide-react';
 import { createElement } from 'react';
 import { MODE_TOKENS, SHAPE, TYPE, type DisplayMode, type ModeTokens } from './DesignTokens';
 
-export interface ResolvedTokens extends Omit<ModeTokens, 'accentFill' | 'accentOnSurface'> {
+export interface ResolvedTokens extends Omit<ModeTokens, 'accentFill' | 'accentOnSurface' | 'controlPanels'> {
     mode: DisplayMode;
     accent: string;
     accentFill: string;
@@ -19,15 +19,25 @@ export interface ResolvedTokens extends Omit<ModeTokens, 'accentFill' | 'accentO
 }
 
 declare module '@mui/material/styles' {
-    interface Theme { tokens: ResolvedTokens }
+    // controlPanelTheme: the theme of panels that are not scenes, where the mode gives them their own tokens.
+    interface Theme { tokens: ResolvedTokens; controlPanelTheme?: Theme }
     interface ThemeOptions { tokens?: ResolvedTokens }
 }
 
 export function createAppTheme(mode: DisplayMode, accent: string, uiScale: number): Theme {
     const modeTokens = MODE_TOKENS[mode];
+    const theme = themeFromTokens(modeTokens, mode, accent, uiScale);
+    if (modeTokens.controlPanels) {
+        theme.controlPanelTheme = themeFromTokens(modeTokens.controlPanels, mode, accent, uiScale);
+    }
+    return theme;
+}
+
+function themeFromTokens(modeTokens: ModeTokens, mode: DisplayMode, accent: string, uiScale: number): Theme {
+    const { controlPanels: _controlPanels, ...ownTokens } = modeTokens;
     const px = (size: number) => Math.round(size * uiScale * 100) / 100;
     const tokens: ResolvedTokens = {
-        ...modeTokens,
+        ...ownTokens,
         mode,
         accent,
         accentFill: modeTokens.accentFill(accent),
@@ -60,7 +70,8 @@ export function createAppTheme(mode: DisplayMode, accent: string, uiScale: numbe
         components: {
             MuiCssBaseline: {
                 styleOverrides: {
-                    body: { fontFeatureSettings: '"tnum", "cv11"', backgroundColor: modeTokens.canvas },
+                    body: { fontFeatureSettings: '"tnum", "cv11"', backgroundColor: modeTokens.canvas,
+                            colorScheme: modeTokens.base, scrollbarColor: `${modeTokens.scrollbarThumb} transparent` },
                 },
             },
             MuiPaper: {

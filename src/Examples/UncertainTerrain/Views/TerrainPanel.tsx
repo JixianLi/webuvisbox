@@ -186,7 +186,7 @@ const LayersMenu = observer(function LayersMenu() {
 
 export default function TerrainPanel() {
     return (
-        <Panel panelName="Terrain" appbarContent={<LayersMenu />}>
+        <Panel panelName="Terrain" scene appbarContent={<LayersMenu />}>
             <Box sx={{ width: 1, height: 1, minHeight: 0 }}>
                 <Canvas frameloop="demand" camera={{ position: CAMERA_POSITION.toArray(), fov: 38 }}>
                     <FitCameraToAspect position={CAMERA_POSITION.toArray()} minimumAspect={1.25} />

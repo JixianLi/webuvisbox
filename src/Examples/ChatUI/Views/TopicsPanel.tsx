@@ -14,7 +14,8 @@ import type { ChatUIGlobalContext } from "../ChatUIGlobalContext";
 const FONT_WEIGHT = 500;
 const ASPECT_RATIO = 1.6;
 
-export default observer(function TopicsPanel() {
+// Inside the Panel, so the theme it reads is the panel's (dark in neutral mode).
+const TopicsContent = observer(function TopicsContent() {
     const context = useScenario().globalContext as ChatUIGlobalContext;
     const theme = useTheme();
     const tokens = theme.tokens;
@@ -48,7 +49,7 @@ export default observer(function TopicsPanel() {
     const colorOf = (key: string) => (speakerOf.get(key) === "user" ? tokens.accentOnSurface : tokens.text);
 
     return (
-        <Panel panelName="Topics">
+        <>
             <Box sx={{ width: 1, height: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
                 <Box sx={{ flex: 1, minHeight: 0 }}>
                     {placed.length > 0 &&
@@ -61,6 +62,10 @@ export default observer(function TopicsPanel() {
                     whoever used them more. Point at a word to see the words it shares messages with.
                 </Typography>
             </Box>
-        </Panel>
+        </>
     );
 });
+
+export default function TopicsPanel() {
+    return <Panel panelName="Topics"><TopicsContent /></Panel>;
+}

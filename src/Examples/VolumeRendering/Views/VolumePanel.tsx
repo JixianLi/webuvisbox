@@ -50,7 +50,7 @@ const Volume = observer(function Volume() {
 
 export default function VolumePanel() {
     return (
-        <Panel panelName="Volume">
+        <Panel panelName="Volume" scene>
             <Box sx={{ width: 1, height: 1, minHeight: 0 }}>
                 <Canvas frameloop="demand" performance={{ min: 0.5 }} camera={{ position: CAMERA_POSITION.toArray(), fov: 40 }}>
                     <FitCameraToAspect position={CAMERA_POSITION.toArray()} />

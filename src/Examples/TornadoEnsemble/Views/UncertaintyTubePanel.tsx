@@ -40,7 +40,7 @@ const help = (
 
 export default function UncertaintyTubePanel() {
     return (
-        <Panel panelName="Uncertainty tube" helpContent={help}>
+        <Panel panelName="Uncertainty tube" scene helpContent={help}>
             <Box sx={{ width: 1, height: 1, minHeight: 0 }}>
                 <LinkedCanvas>
                     <UncertaintyTube />

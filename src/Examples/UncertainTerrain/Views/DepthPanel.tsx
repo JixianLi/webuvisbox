@@ -46,7 +46,7 @@ export default function DepthPanel() {
         <Button size="small" onClick={() => saveRef.current?.()} sx={{ mr: 0.5 }}>Save PNG</Button>
     );
     return (
-        <Panel panelName="Depth" appbarContent={saveButton}>
+        <Panel panelName="Depth" scene appbarContent={saveButton}>
             <Box sx={{ width: 1, height: 1, minHeight: 0, aspectRatio: "4 / 3" }}>
                 <Canvas frameloop="demand" camera={{ position: CAMERA_POSITION, fov: 38 }}>
                     <FitCameraToAspect position={CAMERA_POSITION} minimumAspect={1.25} />

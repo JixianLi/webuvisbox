@@ -17,7 +17,8 @@ const WIDTH = 260;
 const HEIGHT = 80;
 const BIN_COUNT = 24;
 
-export default observer(function ProbePanel() {
+// Inside the Panel, so the theme it reads is the panel's (dark in neutral mode).
+const ProbeContent = observer(function ProbeContent() {
     const context = useScenario().globalContext as UncertainTerrainGlobalContext;
     const tokens = useTheme().tokens;
     const { memberHeights, mean, standardDeviation } = context.ensemble;
@@ -46,7 +47,7 @@ export default observer(function ProbePanel() {
     const position = gridPosition(index);
 
     return (
-        <Panel panelName="Probe">
+        <>
             <Box sx={{ width: 1 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
                     <Box sx={{ width: 10, height: 10, borderRadius: "2px", bgcolor: pointColor, flex: "none" }} />
@@ -74,6 +75,10 @@ export default observer(function ProbePanel() {
                     <Typography variant="caption" sx={{ color: "text.secondary" }}>{heightRange[1].toFixed(2)}</Typography>
                 </Box>
             </Box>
-        </Panel>
+        </>
     );
 });
+
+export default function ProbePanel() {
+    return <Panel panelName="Probe"><ProbeContent /></Panel>;
+}

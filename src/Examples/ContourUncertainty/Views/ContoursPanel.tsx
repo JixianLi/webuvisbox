@@ -93,7 +93,7 @@ export default observer(function ContoursPanel() {
     if (highlighted !== null) order.push(highlighted);
 
     return (
-        <Panel panelName="Contours">
+        <Panel panelName="Contours" scene>
             <Box sx={{ width: 1, height: 1, display: "flex", flexDirection: "column", gap: 1 }}>
                 <SquareStage>
                     <svg viewBox={`0 0 ${GRID_SIZE} ${GRID_SIZE}`} role="img"

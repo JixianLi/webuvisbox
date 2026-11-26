@@ -34,7 +34,7 @@ const EnsembleTubes = observer(function EnsembleTubes() {
 
 export default function EnsemblePanel() {
     return (
-        <Panel panelName="Ensemble">
+        <Panel panelName="Ensemble" scene>
             <Box sx={{ width: 1, height: 1, minHeight: 0 }}>
                 <LinkedCanvas>
                     <EnsembleTubes />

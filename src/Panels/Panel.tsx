@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { useTheme } from "@mui/material/styles";
+import { ThemeProvider, useTheme } from "@mui/material/styles";
 import { ChevronDown, ChevronUp, CircleHelp, FoldVertical, X } from "lucide-react";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -17,6 +17,9 @@ import type { PanelType } from "../Types/PanelLayouts";
 
 interface PanelProps {
     panelName: string;
+    // A scene: a rendering whose colors are judged (a 3D view, a rendered field or image), not controls or a chart. In
+    // a mode that sets controlPanels tokens (neutral) scenes keep the mode's surface and the other panels take those.
+    scene?: boolean;
     children?: React.ReactNode;
     appbarContent?: React.ReactNode;
     helpContent?: React.ReactNode;
@@ -28,7 +31,15 @@ function withShortcut(label: string, commandId: string): string {
     return shortcut ? `${label} (${shortcutLabel(shortcut)})` : label;
 }
 
-export const Panel = observer((props: PanelProps) => {
+export function Panel(props: PanelProps) {
+    const controlPanelTheme = useTheme().controlPanelTheme;
+    if (props.scene || !controlPanelTheme) {
+        return <PanelFrame {...props} />;
+    }
+    return <ThemeProvider theme={controlPanelTheme}><PanelFrame {...props} /></ThemeProvider>;
+}
+
+const PanelFrame = observer((props: PanelProps) => {
     const scenario = useScenario();
     const theme = useTheme();
     const tokens = theme.tokens;
@@ -87,7 +98,8 @@ export const Panel = observer((props: PanelProps) => {
                 }}
                 onFocusCapture={() => commandRegistry.setActivePanel(panelName)}
                 sx={{ width: 1, height: type === 'overlay' ? 'auto' : 1, display: 'flex', flexDirection: 'column',
-                      overflow: 'hidden', ...frames[type],
+                      overflow: 'hidden', ...frames[type], color: tokens.text, colorScheme: tokens.base,
+                      scrollbarColor: `${tokens.scrollbarThumb} transparent`,
                       '&:hover .panel-header-action': { opacity: 0.85 }, ...props.sx }}>
         <Box ref={headerRef} className="drag-handle"
              sx={{ height: tokens.px(SHAPE.panelHeaderHeight), flexShrink: 0, display: 'flex', alignItems: 'center',

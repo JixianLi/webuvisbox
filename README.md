@@ -316,7 +316,8 @@ export const MyPanel = observer(() => {
   const globalContext = useScenario().globalContext;
 
   return (
-    <Panel panelName="My Panel">
+    // `scene` for a rendering whose colors are judged (3D view, rendered field); omit it for controls and charts.
+    <Panel panelName="My Panel" scene>
       {/* Your content */}
     </Panel>
   );

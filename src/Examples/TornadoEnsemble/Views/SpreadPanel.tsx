@@ -26,7 +26,8 @@ function formatSpread(value: number) {
     return value.toFixed(3);
 }
 
-export default observer(function SpreadPanel() {
+// Inside the Panel, so the theme it reads is the panel's (dark in neutral mode).
+const SpreadContent = observer(function SpreadContent() {
     const context = useScenario().globalContext as TornadoEnsembleGlobalContext;
     const tokens = useTheme().tokens;
     const { spread } = context.ensemble;
@@ -51,7 +52,7 @@ export default observer(function SpreadPanel() {
     const percentY = (value: number) => `${(y(value) / HEIGHT) * 100}%`;
 
     return (
-        <Panel panelName="Spread">
+        <>
             <Box sx={{ width: 1, pr: 1, boxSizing: "border-box" }}>
                 <Typography variant="body2" sx={{ color: "text.primary", mb: 1 }}>
                     {`t = ${(readoutSample * SAMPLE_INTERVAL).toFixed(2)}: spread ${formatSpread(spread[readoutSample])}`}
@@ -105,6 +106,10 @@ export default observer(function SpreadPanel() {
                     Spread: RMS distance of the paths from their mean. Press or drag to set the time.
                 </Typography>
             </Box>
-        </Panel>
+        </>
     );
 });
+
+export default function SpreadPanel() {
+    return <Panel panelName="Spread"><SpreadContent /></Panel>;
+}

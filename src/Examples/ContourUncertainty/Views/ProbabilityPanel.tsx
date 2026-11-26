@@ -42,7 +42,7 @@ export default observer(function ProbabilityPanel() {
     const line = { fill: "none", vectorEffect: "non-scaling-stroke" as const };
 
     return (
-        <Panel panelName="Probability">
+        <Panel panelName="Probability" scene>
             <Box sx={{ width: 1, height: 1, display: "flex", flexDirection: "column", gap: 1 }}>
                 <SquareStage>
                     {/* Fractions above the level are samples at vertices, so smooth interpolation shows them as the

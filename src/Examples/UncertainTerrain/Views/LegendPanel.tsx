@@ -47,27 +47,23 @@ const Colorbar = observer(function Colorbar() {
     const [low, high] = context.encoding === "mean" ? context.ensemble.meanRange : [0, UNCERTAINTY_REFERENCE];
     const highLabel = context.encoding === "spread" ? `≥ ${high.toFixed(2)}` : high.toFixed(2);
     return (
-        <Panel panelName="Legend">
-            <Box sx={{ width: 1, maxWidth: 320, mx: "auto" }}>
-                <Typography variant="caption" sx={{ display: "block", color: "text.secondary", textAlign: "center" }}>
-                    {ENCODINGS[context.encoding].toLowerCase()}
-                </Typography>
-                <Box sx={{ height: 14, borderRadius: 0.5, background: `linear-gradient(to right, ${stops.join(", ")})` }} />
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography variant="caption" sx={{ color: "text.secondary" }}>{low.toFixed(2)}</Typography>
-                    <Typography variant="caption" sx={{ color: "text.secondary" }}>{highLabel}</Typography>
-                </Box>
+        <Box sx={{ width: 1, maxWidth: 320, mx: "auto" }}>
+            <Typography variant="caption" sx={{ display: "block", color: "text.secondary", textAlign: "center" }}>
+                {ENCODINGS[context.encoding].toLowerCase()}
+            </Typography>
+            <Box sx={{ height: 14, borderRadius: 0.5, background: `linear-gradient(to right, ${stops.join(", ")})` }} />
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>{low.toFixed(2)}</Typography>
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>{highLabel}</Typography>
             </Box>
-        </Panel>
+        </Box>
     );
 });
 
-export default observer(function LegendPanel() {
+// Inside the Panel, so the theme it reads is the panel's (dark in neutral mode).
+const VsupArc = observer(function VsupArc() {
     const context = useScenario().globalContext as UncertainTerrainGlobalContext;
     const tokens = useTheme().tokens;
-    if (context.encoding !== "vsup") {
-        return <Colorbar />;
-    }
     const palette = terrainPalette(context.colormapPreset, context.continuousColors);
     const colorAt = (value: number, uncertainty: number) => terrainColor(palette, value, uncertainty).formatHex();
     const cells = context.continuousColors
@@ -78,25 +74,28 @@ export default observer(function LegendPanel() {
     const caption = { display: "block", color: "text.secondary", textAlign: "center" };
     // Labels are HTML rather than SVG text so they keep the UI's type size however wide the panel scales the arc.
     return (
-        <Panel panelName="Legend">
-            <Box sx={{ width: 1, maxWidth: 320, mx: "auto" }}>
-                <Typography variant="caption" sx={caption}>mean height</Typography>
-                <svg viewBox={`${-OUTER_RADIUS - 2} ${-OUTER_RADIUS - 2} ${2 * OUTER_RADIUS + 4} ${OUTER_RADIUS + 4}`}
-                     width="100%" role="img"
-                     aria-label="Color legend: mean height around the arc, uncertainty from the outer edge inward">
-                    {cells.map((cell, index) => (
-                        <path key={index} d={arc(cell) ?? undefined} fill={cell.color}
-                              stroke={tokens.surface} strokeWidth={context.continuousColors ? 0 : 1} />
-                    ))}
-                </svg>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography variant="caption" sx={{ color: "text.secondary" }}>{low.toFixed(2)}</Typography>
-                    <Typography variant="caption" sx={{ color: "text.secondary" }}>{high.toFixed(2)}</Typography>
-                </Box>
-                <Typography variant="caption" sx={caption}>
-                    {`Certain at the rim, uncertain toward the center; fully faded at σ ≥ ${UNCERTAINTY_REFERENCE}`}
-                </Typography>
+        <Box sx={{ width: 1, maxWidth: 320, mx: "auto" }}>
+            <Typography variant="caption" sx={caption}>mean height</Typography>
+            <svg viewBox={`${-OUTER_RADIUS - 2} ${-OUTER_RADIUS - 2} ${2 * OUTER_RADIUS + 4} ${OUTER_RADIUS + 4}`}
+                 width="100%" role="img"
+                 aria-label="Color legend: mean height around the arc, uncertainty from the outer edge inward">
+                {cells.map((cell, index) => (
+                    <path key={index} d={arc(cell) ?? undefined} fill={cell.color}
+                          stroke={tokens.surface} strokeWidth={context.continuousColors ? 0 : 1} />
+                ))}
+            </svg>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>{low.toFixed(2)}</Typography>
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>{high.toFixed(2)}</Typography>
             </Box>
-        </Panel>
+            <Typography variant="caption" sx={caption}>
+                {`Certain at the rim, uncertain toward the center; fully faded at σ ≥ ${UNCERTAINTY_REFERENCE}`}
+            </Typography>
+        </Box>
     );
+});
+
+export default observer(function LegendPanel() {
+    const context = useScenario().globalContext as UncertainTerrainGlobalContext;
+    return <Panel panelName="Legend">{context.encoding === "vsup" ? <VsupArc /> : <Colorbar />}</Panel>;
 });
