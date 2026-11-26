@@ -8,7 +8,7 @@ through the theme (`theme.tokens`), never as literal colors or sizes.
 - **The content is the loudest thing on screen.** Chrome is neutral, thin and quiet. The accent marks only what you can
   act on or what is selected.
 - **Judging color needs a neutral surround.** A saturated frame next to an image shifts how its colors read
-  (simultaneous contrast), so the neutral mode keeps to low-saturation grays and puts no accent near the content.
+  (simultaneous contrast), so the neutral mode keeps every gray hue-free and puts no accent near the content.
 - **Generic first.** Scenarios differ (renders, maps, charts, chat); a design choice must hold for all of them.
 - **Sharing is by config, not URL.** Everything a view needs (mode, scale, arrangement) is a scenario config entry, so
   links stay short and a downloaded scenario opens as it was seen.
@@ -39,11 +39,12 @@ panels 10px corners, controls 7px, navbar 44px, panel title row 34px.
 |---|---|---|---|---|
 | `bright` | MUI light | White panels on `#EEF0F0` | The navbar is the accent bar | Lit rooms, slides |
 | `dark` | MUI dark | `#2C2D32` panels on `#232428` (brighter than MUI's default near-black) | Fills only; lighter tint `#E5484D` for lines and focus | Everyday work |
-| `neutral` | MUI light | Warm grays: navbar and panel title rows `#544F4B` (84, 79, 75), canvas and panels `#807C76` (128, 124, 118) | None; dark gray fills, near-black lines | Judging color |
+| `neutral` | MUI light | Hue-free grays: navbar and panel title rows `#505050`, canvas and panels `#7C7C7C` | None; dark gray fills, near-black lines | Judging color |
 
-The neutral grays are warm (R > G > B), chosen by eye rather than hue-free. A mid gray gives poor text contrast in both
-black and white: on `#807C76` white reaches 4.15:1 and black 5.06:1, so text there is black (secondary `#0D0C0B`,
-4.7:1) and the dark title rows carry the white text (8.1:1).
+The dark title rows against the mid gray panels (1.9:1) make the panels read as blocks; the content's surround stays a
+hue-free mid gray. A mid gray gives poor text contrast in both black and white: on `#7C7C7C` white reaches 4.1:1 and
+black 5.0:1, so text there is black (secondary `#0D0D0D`, 4.7:1) and the dark title rows carry the white text (8.1:1).
+Fills are solid; a gradient background (as some renderers use behind 3D content) is not part of the tokens.
 
 ### Accent and the University of Utah brand
 

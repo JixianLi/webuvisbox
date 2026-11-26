@@ -66,24 +66,25 @@ export const MODE_TOKENS: Record<DisplayMode, ModeTokens> = {
                  highlight: 'rgba(255, 255, 255, 0.10)' },
         shadowRaised: '0 12px 32px rgba(0, 0, 0, 0.40), 0 1px 3px rgba(0, 0, 0, 0.30)',
     },
-    // For judging color: warm mid grays, a dark gray navbar and panel title rows over a light gray canvas and panels,
-    // no accent near the content, glass without saturation. On the light gray (128, 124, 118) only black text reaches
-    // 4.5:1 (5.06:1), so text, secondary text and the accent as a line are black or nearly.
+    // For judging color: every gray is hue-free (R = G = B), no accent near the content, glass without saturation. The
+    // navbar and panel title rows are dark gray over a mid gray canvas and panels, so the panels read as blocks while the
+    // content's surround stays neutral. On the mid gray only black text reaches 4.5:1 (5.03:1), so text, secondary text
+    // and the accent as a line are black or nearly.
     neutral: {
         base: 'light',
-        canvas: '#807C76',
-        surface: '#807C76',
-        surfaceRaised: '#8C8882',
-        controlFill: '#8A8680',
+        canvas: '#7C7C7C',
+        surface: '#7C7C7C',
+        surfaceRaised: '#888888',
+        controlFill: '#868686',
         border: 'rgba(0, 0, 0, 0.22)',
         text: '#000000',
-        textSecondary: '#0D0C0B',
-        textMuted: '#2A2724',
+        textSecondary: '#0D0D0D',
+        textMuted: '#2A2A2A',
         navbar: 'surface',
-        chrome: { fill: '#544F4B', text: '#FFFFFF' },
-        accentFill: () => '#544F4B',
-        accentOnSurface: () => '#0D0C0B',
-        glass: { fill: 'rgba(128, 124, 118, 0.80)', blur: 24, saturate: 1.0, edge: 'rgba(255, 255, 255, 0.18)',
+        chrome: { fill: '#505050', text: '#FFFFFF' },
+        accentFill: () => '#505050',
+        accentOnSurface: () => '#0D0D0D',
+        glass: { fill: 'rgba(124, 124, 124, 0.80)', blur: 24, saturate: 1.0, edge: 'rgba(255, 255, 255, 0.18)',
                  highlight: 'rgba(255, 255, 255, 0.14)' },
         shadowRaised: '0 12px 32px rgba(0, 0, 0, 0.30), 0 1px 3px rgba(0, 0, 0, 0.25)',
     },

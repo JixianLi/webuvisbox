@@ -7,8 +7,8 @@ has to change, if anything.
 
 ### Look and behavior
 
-- The neutral display mode is redone: warm grays, a dark gray (84, 79, 75) navbar and panel title rows over a light gray
-  (128, 124, 118) canvas and panels, black text. It is built on MUI's light palette now (it was dark), so
+- The neutral display mode is redone: hue-free grays, a dark gray (`#505050`) navbar and panel title rows over a mid
+  gray (`#7C7C7C`) canvas and panels, black text. It is built on MUI's light palette now (it was dark), so
   `palette.mode` is `light` in neutral. New optional token `chrome` (`{ fill, text }`): when a mode sets it, the navbar
   and the title rows of regular and overlay panels use it. **Host action:** a component that picks colors from
   `palette.mode === 'dark'` (rather than the tokens) should check how it looks in neutral.
