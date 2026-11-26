@@ -4,7 +4,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx';
 import { findSmallerIndex } from '../../Helpers/MathHelper';
 
 export class PresetLinearColormap {
-    presetName: string;
+    presetName: string = "Cool to Warm";
     protected _colorCache: Map<string, d3.RGBColor> = new Map();
     protected _cacheSize: number = 1000;
     type: "default" | "vsup" | "linear" = "linear";
@@ -139,7 +139,7 @@ export class PresetLinearColormap {
         };
     }
 
-    static fromObject(obj: any): PresetLinearColormap {
+    static fromObject(obj: Record<string, unknown>): PresetLinearColormap {
         const colormap = new PresetLinearColormap();
         if (obj.type && obj.type !== "linear") {
             console.warn(`Invalid colormap type: ${obj.type}. Expected 'linear'.`);
@@ -150,13 +150,13 @@ export class PresetLinearColormap {
             console.warn("Missing or invalid 'preset_name' in colormap object. Defaulting to 'Cool to Warm'.");
             colormap.presetName = "Cool to Warm";
         }
-        if (Array.isArray(obj.color_control_points) && obj.color_control_points.every((v: any) => typeof v === 'number')) {
+        if (Array.isArray(obj.color_control_points) && obj.color_control_points.every((value: unknown) => typeof value === 'number')) {
             colormap.colorControlPoints = obj.color_control_points;
         } else {
             console.warn("Missing or invalid 'color_control_points' in colormap object. Using default from preset.");
             colormap.colorControlPoints = [...presets[colormap.presetName].control_points];
         }
-        if (Array.isArray(obj.color_points) && obj.color_points.every((arr: any) => Array.isArray(arr) && arr.length === 3 && arr.every((v: any) => typeof v === 'number'))) {
+        if (Array.isArray(obj.color_points) && obj.color_points.every((color: unknown) => Array.isArray(color) && color.length === 3 && color.every((value: unknown) => typeof value === 'number'))) {
             colormap.colorPoints = obj.color_points;
         } else {
             console.warn("Missing or invalid 'color_points' in colormap object. Using default from preset.");

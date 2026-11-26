@@ -9,6 +9,15 @@ import { contourBoxplot, criticalPoints, crossingProbability, exceedanceFraction
 export type ProbabilityMode = "exceedance" | "crossing";
 export type ContourMode = "members" | "boxplot";
 
+interface ContourUncertaintyGlobalData {
+    member_count: number;
+    spread: number;
+    level: number;
+    probability_mode: ProbabilityMode;
+    contour_mode: ContourMode;
+    show_critical_points: boolean;
+}
+
 export class ContourUncertaintyGlobalContext implements GlobalContext {
     memberCount = 20;
     spread = 0.6;
@@ -23,7 +32,7 @@ export class ContourUncertaintyGlobalContext implements GlobalContext {
         makeAutoObservable(this, {}, { autoBind: true });
     }
 
-    initialize(globalData: any): void {
+    initialize(globalData?: Partial<ContourUncertaintyGlobalData>): void {
         this.memberCount = globalData?.member_count ?? this.memberCount;
         this.spread = globalData?.spread ?? this.spread;
         this.level = globalData?.level ?? this.level;
@@ -34,7 +43,7 @@ export class ContourUncertaintyGlobalContext implements GlobalContext {
 
     async asyncInitialize(): Promise<void> {}
 
-    toObject(): any {
+    toObject(): ContourUncertaintyGlobalData {
         return {
             member_count: this.memberCount,
             spread: this.spread,

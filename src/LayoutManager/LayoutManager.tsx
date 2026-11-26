@@ -3,7 +3,7 @@
 
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { Responsive } from "react-grid-layout/legacy";
+import { Responsive, type Layout, type ResponsiveLayouts } from "react-grid-layout/legacy";
 
 import type { AppLayout, AppLayouts, PanelLayouts, RGLBreakpoints } from "../Types/PanelLayouts";
 import { useTheme, type Theme } from "@mui/material/styles";
@@ -174,7 +174,7 @@ const LayoutManager: React.FC = observer(() => {
         </div>;
     }
 
-    const onLayoutChange = (_: AppLayout[], allLayouts: AppLayouts) => {
+    const onLayoutChange = (_: Layout, allLayouts: ResponsiveLayouts) => {
         panelLayouts.setCurrentLayout(allLayouts);
     };
 

@@ -44,11 +44,14 @@ export function createSharedTrackballPerspectiveCamera(
     return camera;
 }
 
-export function useSharedTrackballPerspectiveCamera(globalData:GlobalContext): SharedTrackballPerspectiveCamera {
-    if (!('shared_trackball_perspective_camera' in globalData)) {
-        (globalData as any).shared_trackball_perspective_camera = createSharedTrackballPerspectiveCamera();
+type WithSharedCamera = GlobalContext & { shared_trackball_perspective_camera?: SharedTrackballPerspectiveCamera };
+
+export function useSharedTrackballPerspectiveCamera(globalData: GlobalContext): SharedTrackballPerspectiveCamera {
+    const holder = globalData as WithSharedCamera;
+    if (!holder.shared_trackball_perspective_camera) {
+        holder.shared_trackball_perspective_camera = createSharedTrackballPerspectiveCamera();
     }
-    return (globalData as any).shared_trackball_perspective_camera;
+    return holder.shared_trackball_perspective_camera;
 }
 
 export default SharedTrackballPerspectiveCamera;

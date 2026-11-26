@@ -13,6 +13,14 @@ export type ColorMode = "spread" | "time";
 // starting jitter visibly starts cooler and lower.
 export const SPREAD_DOMAIN: [number, number] = [1e-6, 30];
 
+interface LorenzEnsembleGlobalData {
+    member_count: number;
+    jitter_exponent: number;
+    speed: number;
+    color_mode: ColorMode;
+    colormap_preset: string;
+}
+
 export class LorenzEnsembleGlobalContext implements GlobalContext {
     memberCount = 50;
     jitterExponent = -5;     // starting jitter = 10^jitterExponent
@@ -28,7 +36,7 @@ export class LorenzEnsembleGlobalContext implements GlobalContext {
         makeAutoObservable<this, "lastFrameTimestamp">(this, { lastFrameTimestamp: false }, { autoBind: true });
     }
 
-    initialize(globalData: any): void {
+    initialize(globalData?: Partial<LorenzEnsembleGlobalData>): void {
         this.memberCount = globalData?.member_count ?? this.memberCount;
         this.jitterExponent = globalData?.jitter_exponent ?? this.jitterExponent;
         this.speed = globalData?.speed ?? this.speed;
@@ -38,7 +46,7 @@ export class LorenzEnsembleGlobalContext implements GlobalContext {
 
     async asyncInitialize(): Promise<void> {}
 
-    toObject(): any {
+    toObject(): LorenzEnsembleGlobalData {
         return {
             member_count: this.memberCount,
             jitter_exponent: this.jitterExponent,

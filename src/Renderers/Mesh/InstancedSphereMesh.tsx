@@ -1,8 +1,6 @@
 import { Instances, Instance } from "@react-three/drei"
 import * as THREE from 'three';
-import { useRef } from "react";
-// @ts-ignore
-import { useFrame } from '@react-three/fiber';
+import { useState } from "react";
 
 // Type definitions for point coordinates
 type Point = [number, number, number] | THREE.Vector3;
@@ -62,13 +60,11 @@ export function InstancedSphereMesh(props: SphereMeshProps) {
         shininess = 30                       // Default moderate shininess
     } = props;
 
-    const limitRef = useRef(points.length > 0 ? points.length : 1000);
-
-    if (points.length > limitRef.current) {
-        limitRef.current = points.length;
+    // Grows only: a new limit remounts the instance buffer (key={limit}), so shrinking would rebuild it needlessly.
+    const [limit, setLimit] = useState(points.length > 0 ? points.length : 1000);
+    if (points.length > limit) {
+        setLimit(points.length);
     }
-
-    const limit = limitRef.current;
 
     return (
         <Instances key={limit} limit={limit} frustumCulled={false}>

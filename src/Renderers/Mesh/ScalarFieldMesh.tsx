@@ -73,7 +73,18 @@ const getAttributeLoaderLogic = (n: number): string => {
 // The material depends only on scalarCount (its shader declares that many attributes); everything else is synced onto it
 // by ScalarFieldMesh. Its uniforms exist before the shader compiles and are shared with it, so setting
 // material.userData.uniforms.*.value updates the compiled shader directly.
-export const ScalarFieldPhongMaterial = (props) => {
+interface ScalarFieldPhongMaterialOptions {
+    scalarCount: number;
+    color?: THREE.ColorRepresentation;
+    specular?: THREE.ColorRepresentation;
+    shininess?: number;
+    transparent?: boolean;
+    depthTest?: boolean;
+    depthWrite?: boolean;
+    side?: THREE.Side;
+}
+
+export const ScalarFieldPhongMaterial = (props: ScalarFieldPhongMaterialOptions) => {
     const uniforms = { uLutTexture: { value: null }, cIndex: { value: 0 }, oIndex: { value: 0 } };
     const material = new THREE.MeshPhongMaterial({
         color: props.color ?? '#ffffff',
@@ -197,6 +208,7 @@ export const ScalarFieldMesh = (props: ScalarFieldMeshProps) => {
     useLayoutEffect(() => {
         material.color.set(color);
         material.specular.set(specular);
+        // eslint-disable-next-line react-hooks/immutability -- three.js materials are mutated in place by design; React never reads them back
         material.shininess = shininess;
         material.transparent = transparent;
         material.depthTest = depthTest;
@@ -212,6 +224,7 @@ export const ScalarFieldMesh = (props: ScalarFieldMeshProps) => {
     // A new texture (another colormap) or index is set here.
     useLayoutEffect(() => {
         const uniforms = material.userData.uniforms;
+        // eslint-disable-next-line react-hooks/immutability -- three.js materials are mutated in place by design; React never reads them back
         uniforms.uLutTexture.value = texture;
         uniforms.cIndex.value = cIndex;
         uniforms.oIndex.value = oIndex;

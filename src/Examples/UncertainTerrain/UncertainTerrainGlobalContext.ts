@@ -11,6 +11,14 @@ export const UNCERTAINTY_REFERENCE = 0.25;
 
 export const COLORMAP_PRESETS = ["Viridis (matplotlib)", "Inferno (matplotlib)", "Cool to Warm"];
 
+interface UncertainTerrainGlobalData {
+    member_count: number;
+    spread: number;
+    height_scale: number;
+    colormap_preset: string;
+    continuous_colors: boolean;
+}
+
 export class UncertainTerrainGlobalContext implements GlobalContext {
     memberCount = 20;
     spread = 0.3;
@@ -24,7 +32,7 @@ export class UncertainTerrainGlobalContext implements GlobalContext {
         makeAutoObservable(this);
     }
 
-    initialize(globalData: any): void {
+    initialize(globalData?: Partial<UncertainTerrainGlobalData>): void {
         this.memberCount = globalData?.member_count ?? this.memberCount;
         this.spread = globalData?.spread ?? this.spread;
         this.heightScale = globalData?.height_scale ?? this.heightScale;
@@ -34,7 +42,7 @@ export class UncertainTerrainGlobalContext implements GlobalContext {
 
     async asyncInitialize(): Promise<void> {}
 
-    toObject(): any {
+    toObject(): UncertainTerrainGlobalData {
         return {
             member_count: this.memberCount,
             spread: this.spread,

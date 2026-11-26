@@ -1,4 +1,6 @@
 
+import type { LayoutItem, ResponsiveLayouts } from "react-grid-layout/legacy";
+
 export type AppLayouts = {
   [key: string]: AppLayout[];
 };
@@ -21,19 +23,13 @@ export type FitRows = {
   [key: string]: number;
 };
 
-export interface AppLayout {
-  visible?: boolean; // Optional property to track visibility
+export interface AppLayout extends LayoutItem {
+  visible?: boolean;
   type?: PanelType;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  i: string;
-  minH?: number;
-  minW?: number;
-  maxH?: number;
-  maxW?: number;
-  [key: string]: any;
+  // While collapsed to its title row: the height and minimum height to restore on expand.
+  collapsed?: boolean;
+  expandedH?: number;
+  expandedMinH?: number;
 }
 
 export interface PanelLayouts {
@@ -59,7 +55,7 @@ export interface PanelLayouts {
 
   restorePanel(panelId: string): void;
 
-  setCurrentLayout(layout: AppLayouts): void;
+  setCurrentLayout(layout: ResponsiveLayouts): void;
 
   saveDefaultLayouts(): void;
 

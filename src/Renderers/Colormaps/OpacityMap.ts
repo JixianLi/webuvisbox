@@ -1,6 +1,11 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import { findSmallerIndex } from '../../Helpers/MathHelper';
 
+export interface OpacityMapObject {
+    opacity_control_points: number[];
+    opacity_values: number[];
+}
+
 export class OpacityMap {
     /** Control points for opacity interpolation */
     opacityControlPoints: number[];
@@ -86,14 +91,14 @@ export class OpacityMap {
         return values[leftIndex] + ratio * (values[rightIndex] - values[leftIndex]);
     }
 
-        toObject(): any {
+        toObject(): OpacityMapObject {
         return {
             opacity_control_points: [...this.opacityControlPoints],
             opacity_values: [...this.opacityValues]
         };
     }
 
-    static fromObject(obj: any): OpacityMap {
+    static fromObject(obj: Partial<OpacityMapObject>): OpacityMap {
         const controlPoints = obj.opacity_control_points ? [...obj.opacity_control_points] : [0, 1];
         const values = obj.opacity_values ? [...obj.opacity_values] : [1, 1];
         return new OpacityMap(controlPoints, values);

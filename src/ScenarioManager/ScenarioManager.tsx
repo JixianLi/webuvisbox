@@ -1,25 +1,26 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import type { GlobalContext} from "../Types/GlobalContext";
 import type { PanelLayouts } from "../Types/PanelLayouts";
-import type { Scenario, ScenarioLayoutChoice } from "../Types/Scenario";
+import type { Scenario, ScenarioConfig, ScenarioLayoutChoice } from "../Types/Scenario";
 import PanelLayoutManager from "../LayoutManager/PanelLayoutManager";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getGlobalContext, scenarioRegistry } from "../Scenarios";
 import { DEFAULT_APPEARANCE, type Appearance, type DisplayMode } from "../Theme/DesignTokens";
 
 class ScenarioManager implements Scenario {
-    name: string;
+    name: string = "UVisBox";
     description?: string;
-    globalContext: GlobalContext;
-    views: string[];
-    panelLayouts: PanelLayouts;
+    // Unset until the first config loads; readers check `initialized` first.
+    globalContext!: GlobalContext;
+    views: string[] = [];
+    panelLayouts!: PanelLayouts;
     appearance: Appearance = DEFAULT_APPEARANCE;
     initialized: boolean = false;
     fullyLoaded: boolean = false;
     // Why the last load failed, shown on screen until dismissed; null when it did not.
     loadError: string | null = null;
 
-    constructor(config?: any) {
+    constructor(config?: ScenarioConfig) {
         if (config) {
             this.loadFromObject(config);
         } else {
@@ -34,7 +35,7 @@ class ScenarioManager implements Scenario {
         return this.globalContext.asyncInitialize();
     }
 
-    loadFromObject(config: any): void {
+    loadFromObject(config: ScenarioConfig): void {
         runInAction(() => {
             this.name = config.name || this.name || "UVisBox";
             this.description = config.description || this.description || "A default scenario";
@@ -66,7 +67,7 @@ class ScenarioManager implements Scenario {
         this.loadFromObject(config);
     }
 
-    toObject(layout: ScenarioLayoutChoice = 'default'): any {
+    toObject(layout: ScenarioLayoutChoice = 'default'): ScenarioConfig {
         const layouts = layout === 'current'
             ? this.panelLayouts.snapshotCurrentLayouts()
             : this.panelLayouts.defaultLayouts;
@@ -104,7 +105,7 @@ class ScenarioManager implements Scenario {
         });
     }
 
-    async completeInitialization(config: any): Promise<void> {
+    async completeInitialization(config: ScenarioConfig): Promise<void> {
         // Reset state before loading new scenario
         this.invalidate();
 
@@ -132,7 +133,7 @@ class ScenarioManager implements Scenario {
 // A scenario to load: a config object, or the URL of a config file.
 export type ScenarioSource = object | string;
 
-async function fetchConfig(url: string): Promise<object> {
+async function fetchConfig(url: string): Promise<unknown> {
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`${url}: the server answered ${response.status} ${response.statusText}.`);
@@ -144,15 +145,16 @@ async function fetchConfig(url: string): Promise<object> {
     try {
         return await response.json();
     } catch (error) {
-        throw new Error(`${url} is not valid JSON: ${error instanceof Error ? error.message : error}`);
+        throw new Error(`${url} is not valid JSON: ${error instanceof Error ? error.message : error}`, { cause: error });
     }
 }
 
 // Checked before the current scenario is torn down, so a bad config leaves it running.
-function checkConfig(config: any): void {
-    if (!config || typeof config !== 'object') {
+function checkConfig(value: unknown): asserts value is ScenarioConfig {
+    if (!value || typeof value !== 'object') {
         throw new Error('The config is not a JSON object.');
     }
+    const config = value as Partial<ScenarioConfig>;
     if (!config.name) {
         throw new Error('The config has no "name".');
     }
@@ -166,7 +168,7 @@ function checkConfig(config: any): void {
 
 export async function loadScenario(manager: ScenarioManager, source: ScenarioSource): Promise<void> {
     try {
-        const config = typeof source === 'string' ? await fetchConfig(source) : source;
+        const config: unknown = typeof source === 'string' ? await fetchConfig(source) : source;
         checkConfig(config);
         manager.setLoadError(null);
         await manager.completeInitialization(config);
@@ -178,11 +180,16 @@ export async function loadScenario(manager: ScenarioManager, source: ScenarioSou
 }
 
 export function loadScenarioFromText(manager: ScenarioManager, text: string): Promise<void> {
-    let config: object;
+    let config: unknown;
     try {
         config = JSON.parse(text);
     } catch (error) {
         manager.setLoadError(`The uploaded file is not valid JSON: ${error instanceof Error ? error.message : error}`);
+        return Promise.resolve();
+    }
+    // A string would be taken for a config URL and fetched.
+    if (!config || typeof config !== 'object') {
+        manager.setLoadError('The uploaded file is not a JSON object.');
         return Promise.resolve();
     }
     return loadScenario(manager, config);

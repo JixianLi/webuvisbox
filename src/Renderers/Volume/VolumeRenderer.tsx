@@ -165,6 +165,7 @@ export function VolumeRenderer({ data, dimensions, transferFunction, samplesPerV
     const largest = Math.max(...dimensions);
     useLayoutEffect(() => {
         const uniforms = material.uniforms;
+        // eslint-disable-next-line react-hooks/immutability -- three.js materials are mutated in place by design; React never reads them back
         uniforms.uVolume.value = volumeTexture;
         uniforms.uTransferFunction.value = transferFunction;
         uniforms.uVoxelSize.value.set(1 / dimensions[0], 1 / dimensions[1], 1 / dimensions[2]);
@@ -179,12 +180,14 @@ export function VolumeRenderer({ data, dimensions, transferFunction, samplesPerV
 
     // Per frame: the camera in box coordinates, and the step for the current sampling rate (in box units, where a
     // voxel along the longest side is 1 / largest).
+    // eslint-disable-next-line react-hooks/immutability -- three.js materials are mutated in place by design; React never reads them back
     useFrame(state => {
         const mesh = meshRef.current;
         if (!mesh) return;
         const uniforms = material.uniforms;
         mesh.worldToLocal(uniforms.uCameraPosition.value.copy(state.camera.position));
         const rate = samplesPerVoxel * (state.performance.current < 1 ? INTERACTIVE_SAMPLE_FRACTION : 1);
+        // eslint-disable-next-line react-hooks/immutability -- three.js materials are mutated in place by design; React never reads them back
         uniforms.uStepSize.value = 1 / (largest * rate);
         uniforms.uOpacityExponent.value = 1 / rate;
     });

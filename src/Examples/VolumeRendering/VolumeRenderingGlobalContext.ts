@@ -22,6 +22,12 @@ export const DATASETS: Record<DatasetName, { label: string; generate: () => Volu
 
 export const HISTOGRAM_BINS = 128;
 
+interface VolumeRenderingGlobalData {
+    dataset: DatasetName;
+    lighting: boolean;
+    samples_per_voxel: number;
+}
+
 export class VolumeRenderingGlobalContext implements GlobalContext {
     dataset: DatasetName = "phantom";
     lighting = true;
@@ -31,7 +37,7 @@ export class VolumeRenderingGlobalContext implements GlobalContext {
         makeAutoObservable(this, {}, { autoBind: true });
     }
 
-    initialize(globalData: any): void {
+    initialize(globalData?: Partial<VolumeRenderingGlobalData>): void {
         this.dataset = globalData?.dataset ?? this.dataset;
         this.lighting = globalData?.lighting ?? this.lighting;
         this.samplesPerVoxel = globalData?.samples_per_voxel ?? this.samplesPerVoxel;
@@ -39,7 +45,7 @@ export class VolumeRenderingGlobalContext implements GlobalContext {
 
     async asyncInitialize(): Promise<void> {}
 
-    toObject(): any {
+    toObject(): VolumeRenderingGlobalData {
         return { dataset: this.dataset, lighting: this.lighting, samples_per_voxel: this.samplesPerVoxel };
     }
 

@@ -13,7 +13,7 @@ export const ViewMenuList = observer(() => {
                 <ListItemText>Loading...</ListItemText>
             </MenuItem>;
     }
-    const panelLayouts = scenario?.panelLayouts!;
+    const panelLayouts = scenario.panelLayouts;
     const togglePanel = (panelIndex: number) => {
         panelLayouts.toggleVisibility(panelIndex);
     };

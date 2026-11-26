@@ -1,4 +1,9 @@
-const presets = {
+interface ColormapPreset {
+    control_points: number[];
+    color_points: number[][];
+}
+
+const presets: Record<string, ColormapPreset> = {
     "Cool to Warm": {
         "control_points": [
             0.0,

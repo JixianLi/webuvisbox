@@ -1,5 +1,5 @@
-// @ts-ignore unused import toJS TODO remove
 import { makeAutoObservable, runInAction, toJS } from 'mobx';
+import type { ResponsiveLayouts } from 'react-grid-layout/legacy';
 import type { AppLayouts, FitRows, PanelLayouts, RGLBreakpoints, RGLCols } from '../Types/PanelLayouts';
 import _ from 'lodash';
 
@@ -113,10 +113,11 @@ export class PanelLayoutManager implements PanelLayouts {
         }
     }
 
-    setCurrentLayout(layout: AppLayouts) {
+    setCurrentLayout(layout: ResponsiveLayouts) {
         const breakpoint = this.currentBreakpoint;
         const newLayouts = layout[breakpoint];
         const currentLayout = this.currentLayouts[breakpoint];
+        if (!newLayouts || !currentLayout) return;
 
         // Matched by id, not position: the grid reports only the panels it holds (overlays are not among them).
         newLayouts.forEach(newPanel => {
@@ -186,7 +187,7 @@ export class PanelLayoutManager implements PanelLayouts {
             }
             if (panel.collapsed) {
                 panel.collapsed = false;
-                panel.h = panel.expandedH;
+                panel.h = panel.expandedH ?? panel.h;
                 panel.minH = panel.expandedMinH;
             } else {
                 panel.collapsed = true;

@@ -7,6 +7,11 @@ import type { Actor, TraceMessage } from "../../Renderers/Trace";
 import type { ChatMessage } from "../../Renderers/Chat";
 import { fetchCatDataUrl, runFakeAgent } from "./fakeAgent";
 
+interface ChatUIGlobalData {
+    chat_font_size: number;
+    trace_font_size: number;
+}
+
 export class ChatUIGlobalContext implements GlobalContext {
     actors: Actor[];
     traceMessages: TraceMessage[];
@@ -84,7 +89,7 @@ export class ChatUIGlobalContext implements GlobalContext {
         }
     }
 
-    initialize(globalData: any): void {
+    initialize(globalData?: Partial<ChatUIGlobalData>): void {
         if (typeof globalData?.chat_font_size === "number") {
             this.chatFontSize = globalData.chat_font_size;
         }
@@ -165,11 +170,10 @@ export class ChatUIGlobalContext implements GlobalContext {
         });
     }
 
-    toObject(): any {
+    toObject(): ChatUIGlobalData {
         return {
-            actors: this.actors,
-            trace_messages: this.traceMessages,
-            chat_messages: this.chatMessages,
+            chat_font_size: this.chatFontSize,
+            trace_font_size: this.traceFontSize,
         };
     }
 }

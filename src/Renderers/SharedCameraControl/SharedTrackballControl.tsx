@@ -1,12 +1,15 @@
-import { useRef, useId, useEffect, forwardRef, useImperativeHandle } from "react";
+import { useRef, useId, useEffect, forwardRef, useImperativeHandle, type ComponentRef } from "react";
 import { TrackballControls } from "@react-three/drei";
 import { observer } from "mobx-react-lite";
 import { useSharedTrackballPerspectiveCamera } from "./SharedPerspectiveCamera";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
+import type { GlobalContext } from "../../Types/GlobalContext";
+
+type TrackballControlsImpl = ComponentRef<typeof TrackballControls>;
 
 interface SharedTrackballControlProps {
-    globalData: any;
+    globalData: GlobalContext;
     position0: THREE.Vector3;
     target: THREE.Vector3;
     target0: THREE.Vector3;
@@ -15,7 +18,7 @@ interface SharedTrackballControlProps {
     makeDefault?: boolean;
 }
 
-export const SharedTrackballControl = observer(forwardRef<any, SharedTrackballControlProps>((props, ref) => {
+export const SharedTrackballControl = observer(forwardRef<TrackballControlsImpl, SharedTrackballControlProps>((props, ref) => {
     const {
         globalData,
         position0,
@@ -26,21 +29,17 @@ export const SharedTrackballControl = observer(forwardRef<any, SharedTrackballCo
         makeDefault = false,
     } = props;
 
-    const internalRef = useRef(null);
+    const controlRef = useRef<TrackballControlsImpl>(null);
     const uniqueId = useId();
     const sharedCamera = useSharedTrackballPerspectiveCamera(globalData);
 
-    const controlRef: any = ref || internalRef;
-    useImperativeHandle(ref, () => controlRef.current, []);
+    useImperativeHandle(ref, () => controlRef.current as TrackballControlsImpl, []);
 
-    const handleControlChange = (e) => {
-        sharedCamera.setCamera(
-            e.target.object.position,
-            e.target.target,
-            e.target.object.up,
-            e.target.object.quaternion,
-            uniqueId
-        );
+    const handleControlChange = () => {
+        const control = controlRef.current;
+        if (!control) return;
+        sharedCamera.setCamera(control.object.position, control.target, control.object.up,
+                               control.object.quaternion as THREE.Quaternion, uniqueId);
     };
 
     useFrame(() => {
@@ -61,7 +60,7 @@ export const SharedTrackballControl = observer(forwardRef<any, SharedTrackballCo
             controlRef.current.object.up.copy(sharedCamera.up);
             controlRef.current.update();
         }
-    }, []);
+    }, [sharedCamera]);
 
     return <TrackballControls makeDefault={makeDefault}
         ref={controlRef}
@@ -69,7 +68,7 @@ export const SharedTrackballControl = observer(forwardRef<any, SharedTrackballCo
         target={target}
         maxDistance={maxDistance}
         minDistance={minDistance}
-        // @ts-expect-error
+        // @ts-expect-error -- drei's props omit position0/target0, the pose three's TrackballControls.reset() returns to
         position0={position0} target0={target0}
     />;
 }));

@@ -68,6 +68,7 @@ export function DepthOverride() {
     });
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/immutability -- the scene belongs to three.js; R3F expects it to be mutated
         scene.overrideMaterial = depthMaterial;
         return () => {
             scene.overrideMaterial = null;

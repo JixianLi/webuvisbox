@@ -5,7 +5,7 @@ import * as d3 from 'd3';
 
 export class VSUP extends PresetLinearColormap {
     depth: number;
-    nodes: d3.RGBColor[];
+    nodes: d3.RGBColor[] = [];
     fadingColor: d3.RGBColor = d3.rgb(233, 233, 233)
     continuous: boolean = false;
     flipY: boolean = false;
@@ -47,13 +47,6 @@ export class VSUP extends PresetLinearColormap {
         if (this.depth < 1 || this.depth > 10) {
             console.warn("Depth must be at least 1 and at most 10. Adjusting depth value.");
             this.depth = Math.max(1, Math.min(this.depth, 10));
-        }
-    }
-
-    _validateColorValue(value) {
-        if (typeof value !== 'number' || isNaN(value) || value < 0 || value > 1) {
-            console.warn(`Color value must be a number between 0 and 1. Received: ${value}. Defaulting to 0.`);
-            value = 0;
         }
     }
 
@@ -170,7 +163,7 @@ export class VSUP extends PresetLinearColormap {
         }
     }
 
-    static fromObject(obj: any): VSUP {
+    static fromObject(obj: Record<string, unknown>): VSUP {
         const colormap = new VSUP();
         if (obj.type && obj.type !== "vsup") {
             console.warn(`Invalid colormap type: ${obj.type}. Expected 'vsup'.`);
@@ -181,14 +174,14 @@ export class VSUP extends PresetLinearColormap {
             console.warn("Missing or invalid 'preset_name' in colormap object. Defaulting to 'Cool to Warm'.");
             colormap.presetName = "Cool to Warm";
         }
-        if (Array.isArray(obj.color_control_points) && obj.color_control_points.every((v: any) => typeof v === 'number')) {
+        if (Array.isArray(obj.color_control_points) && obj.color_control_points.every((value: unknown) => typeof value === 'number')) {
             colormap.colorControlPoints = obj.color_control_points;
         } else {
             console.warn("Missing or invalid 'color_control_points' in colormap object. Using default from preset.");
             colormap.colorControlPoints = [...presets[colormap.presetName].control_points];
         }
-        if (Array.isArray(obj.color_points) && obj.color_points.every((arr: any) => Array.isArray(arr) && arr.length === 3 && arr.every((v: any) => typeof v === 'number'))) {
-            colormap.colorPoints = obj.color_points.map(arr => [...arr]);
+        if (Array.isArray(obj.color_points) && obj.color_points.every((color: unknown) => Array.isArray(color) && color.length === 3 && color.every((value: unknown) => typeof value === 'number'))) {
+            colormap.colorPoints = obj.color_points.map((color: number[]) => [...color]);
         } else {
             console.warn("Missing or invalid 'color_points' in colormap object. Using default from preset.");
             colormap.colorPoints = presets[colormap.presetName].color_points.map(arr => [...arr]);
@@ -217,7 +210,8 @@ export class VSUP extends PresetLinearColormap {
             } else if (Array.isArray(obj.fading_color) && obj.fading_color.length === 3) {
                 colormap.fadingColor = d3.rgb(obj.fading_color[0], obj.fading_color[1], obj.fading_color[2]);
             } else if (typeof obj.fading_color === 'object' && 'r' in obj.fading_color && 'g' in obj.fading_color && 'b' in obj.fading_color) {
-                colormap.fadingColor = d3.rgb(obj.fading_color.r, obj.fading_color.g, obj.fading_color.b);
+                const { r, g, b } = obj.fading_color as { r: number; g: number; b: number };
+                colormap.fadingColor = d3.rgb(r, g, b);
             } else {
                 console.warn("Invalid format for 'fading_color' in colormap object. Defaulting to (233, 233, 233).");
                 colormap.fadingColor = d3.rgb(233, 233, 233);
