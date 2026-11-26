@@ -26,7 +26,6 @@
     "lucide-react": "^1.68.0",
     "mobx": "^6.16.1",
     "mobx-react": "^9.2.2",
-    "r3f-perf": "^7.2.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-grid-layout": "^2.2.3",

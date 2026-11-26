@@ -5,6 +5,11 @@ has to change, if anything.
 
 ## Unreleased
 
+### Dependencies
+
+- `r3f-perf` is no longer a dependency (unused by the library; last released 2024-11, still built on drei 9). A host
+  that measures performance with it adds it to its own `package.json`.
+
 ### Types (TypeScript `strict` is now on in the library)
 
 - `GlobalContext.initialize(globalData: unknown)` and `toObject(): object` replace `any`. Existing implementations
