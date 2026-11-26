@@ -4,12 +4,12 @@
 import { observer } from "mobx-react-lite";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { useTheme } from "@mui/material/styles";
 import { Panel } from "../../../Panels/Panel";
 import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import { SingleColorBufferedMesh } from "../../../Renderers/Mesh/SingleColorBufferedMesh";
 import type { TornadoEnsembleGlobalContext } from "../TornadoEnsembleGlobalContext";
 import { TUBE_RADIAL_SEGMENTS } from "../TornadoDataServer";
+import { MEAN_PATH_COLOR, MEMBER_COLOR } from "../TornadoColors";
 import { LinkedCanvas } from "./LinkedCanvas";
 import { MemberPositions } from "./MemberPositions";
 
@@ -18,10 +18,9 @@ const MEMBER_RADIUS = 0.06;
 const MeanPath = observer(function MeanPath() {
     const context = useScenario().globalContext as TornadoEnsembleGlobalContext;
     const tube = context.ensemble.meanPathTube;
-    const color = useTheme().tokens.text;
     const segments = Math.max(0, context.visibleSampleCount - 1);
     return (
-        <SingleColorBufferedMesh vertices={tube.vertices} normals={tube.normals} indices={tube.indices} color={color}
+        <SingleColorBufferedMesh vertices={tube.vertices} normals={tube.normals} indices={tube.indices} color={MEAN_PATH_COLOR}
                                  visibleIndexCount={segments * TUBE_RADIAL_SEGMENTS * 6} shininess={30} />
     );
 });
@@ -35,13 +34,12 @@ const help = (
 );
 
 export default function MeanPathPanel() {
-    const memberColor = useTheme().tokens.textSecondary;
     return (
         <Panel panelName="Mean path" helpContent={help}>
             <Box sx={{ width: 1, height: 1, minHeight: 0 }}>
                 <LinkedCanvas>
                     <MeanPath />
-                    <MemberPositions color={memberColor} radius={MEMBER_RADIUS} />
+                    <MemberPositions color={MEMBER_COLOR} radius={MEMBER_RADIUS} />
                 </LinkedCanvas>
             </Box>
         </Panel>

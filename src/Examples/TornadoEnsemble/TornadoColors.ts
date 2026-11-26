@@ -15,6 +15,12 @@ function colormap(preset: string): PresetLinearColormap {
     return colormaps.get(preset)!;
 }
 
+// Fixed in every display mode, so the mean path and the members look the same whatever the chrome: a blue-gray for
+// the mean path, a warm gray for the members' current positions, apart from each other by hue and from the colormap
+// by their low saturation.
+export const MEAN_PATH_COLOR = "#8FA6BF";
+export const MEMBER_COLOR = "#C2B6A6";
+
 export const spreadScale = d3.scaleLinear().domain(SPREAD_DOMAIN).clamp(true);
 export const timeScale = d3.scaleLinear().domain([0, DURATION]).clamp(true);
 

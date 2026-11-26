@@ -4,12 +4,11 @@
 import { useMemo } from "react";
 import { observer } from "mobx-react-lite";
 import Box from "@mui/material/Box";
-import { useTheme } from "@mui/material/styles";
 import { Panel } from "../../../Panels/Panel";
 import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import { LinearTubeMesh } from "../../../Renderers/Mesh/LinearTubeMesh";
 import type { TornadoEnsembleGlobalContext } from "../TornadoEnsembleGlobalContext";
-import { sampleColors } from "../TornadoColors";
+import { MEMBER_COLOR, sampleColors } from "../TornadoColors";
 import { LinkedCanvas } from "./LinkedCanvas";
 import { MemberPositions } from "./MemberPositions";
 
@@ -34,13 +33,12 @@ const EnsembleTubes = observer(function EnsembleTubes() {
 });
 
 export default function EnsemblePanel() {
-    const markerColor = useTheme().tokens.text;
     return (
         <Panel panelName="Ensemble">
             <Box sx={{ width: 1, height: 1, minHeight: 0 }}>
                 <LinkedCanvas>
                     <EnsembleTubes />
-                    <MemberPositions color={markerColor} radius={MARKER_RADIUS} />
+                    <MemberPositions color={MEMBER_COLOR} radius={MARKER_RADIUS} />
                 </LinkedCanvas>
             </Box>
         </Panel>
