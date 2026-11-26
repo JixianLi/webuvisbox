@@ -7,6 +7,8 @@ has to change, if anything.
 
 ### Glyphs, depth images, helpers
 
+- `WordCloudLayoutRunner` takes an optional `onError(message)` (default: logged); a layout that failed in the worker
+  used to leave the cloud silently unchanged.
 - `InstancedConeMesh` writes instance matrices and colors directly (one draw call, no React element per glyph), and its
   orientation is fixed and documented: in a Z-up frame, tilt by `vRotation` about +X (toward +Z), then turn by
   `hRotation` about +Z. Before, `vRotation` was applied about both X and Y; with `vRotation = 0` (as the archived
@@ -37,6 +39,10 @@ has to change, if anything.
 
 ### Examples
 
+- ChatUI adds a Topics panel (`WordCloud`, laid out in its worker): the conversation's words, linked when they share a
+  message. Its seeded conversation uses a bundled cat image, so loading it waits on no network request; asking the
+  scripted agent for a cat still fetches a live one (bundled one when offline). Its actions stay actions when called
+  detached (they were rebound after `makeAutoObservable`).
 - Uncertain terrain shows the paper's Wildfire setup on generated data: colors by VSUP or by one field through
   `ScalarFieldMesh` and TextureManager, wind glyphs (`InstancedConeMesh`) fading where the members disagree, toggled
   from a Layers menu (`CheckMenuItem`), a Depth panel (`DepthOverride`, PNG export), controls laid out with `FormGrid`;

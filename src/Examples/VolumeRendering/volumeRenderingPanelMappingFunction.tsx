@@ -11,9 +11,9 @@ const ControlsPanel = lazy(() => import("./Views/ControlsPanel"));
 
 const loading = <Typography variant="caption" sx={{ p: 1.5, color: "text.secondary" }}>Loading…</Typography>;
 
-export function volumeRenderingPanelMappingFunction(viewname: string): React.ReactNode {
+export function volumeRenderingPanelMappingFunction(viewName: string): React.ReactNode {
     const view = (() => {
-        switch (viewname) {
+        switch (viewName) {
             case "Volume":
                 return <VolumePanel />;
             case "Transfer function":
@@ -21,7 +21,7 @@ export function volumeRenderingPanelMappingFunction(viewname: string): React.Rea
             case "Controls":
                 return <ControlsPanel />;
             default:
-                throw new Error(`Unknown view name: ${viewname}`);
+                throw new Error(`Unknown view name: ${viewName}`);
         }
     })();
     return <Suspense fallback={loading}>{view}</Suspense>;

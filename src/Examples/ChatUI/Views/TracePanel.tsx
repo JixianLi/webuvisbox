@@ -15,7 +15,7 @@ import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import type ChatUIGlobalContext from "../ChatUIGlobalContext";
 
 const TracePanel = observer(() => {
-    const ctx = useScenario().globalContext as ChatUIGlobalContext;
+    const context = useScenario().globalContext as ChatUIGlobalContext;
     const [anchor, setAnchor] = useState<null | HTMLElement>(null);
 
     const appbarContent = (
@@ -26,22 +26,22 @@ const TracePanel = observer(() => {
                 color="inherit"
                 aria-label="settings"
                 sx={{ mr: 1 }}
-                onClick={(e) => setAnchor(e.currentTarget)}
+                onClick={(event) => setAnchor(event.currentTarget)}
             >
                 <MenuIcon fontSize="small" />
             </IconButton>
             <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}>
-                <Box sx={{ px: 2, py: 1, width: 200 }} onKeyDown={(e) => e.stopPropagation()}>
+                <Box sx={{ px: 2, py: 1, width: 200 }} onKeyDown={(event) => event.stopPropagation()}>
                     <Typography variant="caption" color="text.secondary">
-                        Font size: {ctx.traceFontSize}px
+                        Font size: {context.traceFontSize}px
                     </Typography>
                     <Slider
                         size="small"
                         min={10}
                         max={24}
                         step={1}
-                        value={ctx.traceFontSize}
-                        onChange={(_, v) => ctx.setTraceFontSize(v as number)}
+                        value={context.traceFontSize}
+                        onChange={(_, value) => context.setTraceFontSize(value as number)}
                     />
                 </Box>
             </Menu>
@@ -51,11 +51,11 @@ const TracePanel = observer(() => {
     return (
         <Panel panelName="Trace" appbarContent={appbarContent}>
             <Trace
-                actors={ctx.actors.slice()}
-                messages={ctx.traceMessages.slice()}
-                selectedId={ctx.selectedTraceId}
-                onSelect={(id) => ctx.selectTrace(id)}
-                fontSize={ctx.traceFontSize}
+                actors={context.actors.slice()}
+                messages={context.traceMessages.slice()}
+                selectedId={context.selectedTraceId}
+                onSelect={(id) => context.selectTrace(id)}
+                fontSize={context.traceFontSize}
             />
         </Panel>
     );

@@ -4,9 +4,9 @@
 import type { TraceMessage } from "../../Renderers/Trace";
 import type { ChatMessage, ContentPart } from "../../Renderers/Chat";
 
-type FakeAgentCtx = {
-    appendTrace: (msg: Omit<TraceMessage, "id">) => void;
-    appendChat: (msg: Omit<ChatMessage, "id">) => void;
+type FakeAgentContext = {
+    appendTrace: (message: Omit<TraceMessage, "id">) => void;
+    appendChat: (message: Omit<ChatMessage, "id">) => void;
 };
 
 const STEP_DELAY_MS = 350;
@@ -33,14 +33,15 @@ const PATHS: Invocation[][] = [
     ],
 ];
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const pickRandom = <T,>(items: T[]): T => items[Math.floor(Math.random() * items.length)];
 
 const CAT_FETCH_TIMEOUT_MS = 4000;
 
-// Fallback SVG cat used if cataas.com is unreachable or times out.
-const FALLBACK_CAT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200">
+// A cat drawn in SVG, bundled: the seeded conversation shows it, and a live cat falls back to it when cataas.com is
+// unreachable or slow.
+const BUNDLED_CAT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200">
   <rect width="300" height="200" rx="12" fill="#f4efe6"/>
   <polygon points="95,88 106,38 142,68" fill="#d98a4e"/>
   <polygon points="103,80 110,48 134,68" fill="#f2b8a2"/>
@@ -59,17 +60,17 @@ const FALLBACK_CAT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="300" he
   <line x1="186" y1="128" x2="220" y2="128" stroke="#6b5647" stroke-width="2"/>
 </svg>`;
 
-const FALLBACK_CAT_DATA_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(FALLBACK_CAT_SVG)}`;
+export const BUNDLED_CAT_DATA_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(BUNDLED_CAT_SVG)}`;
 
 export async function fetchCatDataUrl(): Promise<string> {
     try {
-        const r = await fetch(`https://cataas.com/cat?width=300&height=200&t=${Date.now()}`, {
+        const response = await fetch(`https://cataas.com/cat?width=300&height=200&t=${Date.now()}`, {
             signal: AbortSignal.timeout(CAT_FETCH_TIMEOUT_MS),
         });
-        if (!r.ok) {
-            return FALLBACK_CAT_DATA_URL;
+        if (!response.ok) {
+            return BUNDLED_CAT_DATA_URL;
         }
-        const blob = await r.blob();
+        const blob = await response.blob();
         return await new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
             reader.onloadend = () => resolve(reader.result as string);
@@ -77,7 +78,7 @@ export async function fetchCatDataUrl(): Promise<string> {
             reader.readAsDataURL(blob);
         });
     } catch {
-        return FALLBACK_CAT_DATA_URL;
+        return BUNDLED_CAT_DATA_URL;
     }
 }
 
@@ -97,14 +98,14 @@ function tracePayloadForResult(tool: string, attempt: number, result: ToolResult
 async function invokeTool(
     tool: string,
     resultTo: string,
-    ctx: FakeAgentCtx,
+    context: FakeAgentContext,
 ): Promise<{ outcome: "success"; result: ToolResult } | { outcome: "failure" }> {
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
         await sleep(STEP_DELAY_MS);
         const failed = Math.random() < FAILURE_PROB;
         if (!failed) {
             const result = await produceResult(tool);
-            ctx.appendTrace({
+            context.appendTrace({
                 from: tool,
                 to: resultTo,
                 kind: "tool_result",
@@ -113,7 +114,7 @@ async function invokeTool(
             return { outcome: "success", result };
         }
         if (attempt < MAX_ATTEMPTS) {
-            ctx.appendTrace({
+            context.appendTrace({
                 from: tool,
                 to: tool,
                 kind: "retry",
@@ -121,7 +122,7 @@ async function invokeTool(
             });
         }
     }
-    ctx.appendTrace({
+    context.appendTrace({
         from: tool,
         to: "model",
         kind: "error",
@@ -138,40 +139,40 @@ function resultToContent(tool: string, result: ToolResult): string | ContentPart
     ];
 }
 
-export async function runFakeAgent(_prompt: string, ctx: FakeAgentCtx): Promise<void> {
+export async function runFakeAgent(_prompt: string, context: FakeAgentContext): Promise<void> {
     const invocations = pickRandom(PATHS);
     let lastResult: ToolResult | undefined;
 
-    for (const inv of invocations) {
+    for (const invocation of invocations) {
         await sleep(STEP_DELAY_MS);
-        ctx.appendTrace({
+        context.appendTrace({
             from: "model",
-            to: inv.tool,
+            to: invocation.tool,
             kind: "tool_call",
-            payload: { tool: inv.tool, args: { /* opaque */ } },
+            payload: { tool: invocation.tool, args: {} },
         });
-        const r = await invokeTool(inv.tool, inv.resultTo, ctx);
-        if (r.outcome === "failure") {
+        const outcome = await invokeTool(invocation.tool, invocation.resultTo, context);
+        if (outcome.outcome === "failure") {
             await sleep(STEP_DELAY_MS);
-            const apology = `Sorry, ${TOOL_LABELS[inv.tool]} failed after ${MAX_ATTEMPTS} attempts.`;
-            ctx.appendTrace({
+            const apology = `Sorry, ${TOOL_LABELS[invocation.tool]} failed after ${MAX_ATTEMPTS} attempts.`;
+            context.appendTrace({
                 from: "model",
                 to: "user",
                 kind: "error",
                 payload: apology,
             });
-            ctx.appendChat({
+            context.appendChat({
                 role: "assistant",
                 authorName: "Model",
                 content: apology,
             });
             return;
         }
-        lastResult = r.result;
+        lastResult = outcome.result;
     }
 
     const last = invocations[invocations.length - 1];
-    ctx.appendChat({
+    context.appendChat({
         role: "assistant",
         authorName: TOOL_LABELS[last.tool],
         content: resultToContent(last.tool, lastResult ?? { type: "text", text: "ok" }),

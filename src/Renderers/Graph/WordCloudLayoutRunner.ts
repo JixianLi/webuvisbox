@@ -8,12 +8,18 @@ export class WordCloudLayoutRunner {
     private worker: Worker;
     private latestRequestId = 0;
 
-    constructor(onLayout: (placed: PlacedWord[]) => void) {
+    // onError hears of a layout that failed in the worker (else the cloud would silently keep its last layout).
+    constructor(onLayout: (placed: PlacedWord[]) => void, onError: (message: string) => void = message =>
+        console.error("Word cloud layout failed:", message)) {
         this.worker = new Worker(new URL("./WordCloudLayoutWorker.ts", import.meta.url), { type: "module" });
         this.worker.onmessage = (event: MessageEvent<{ requestId: number; placed: PlacedWord[] }>) => {
             if (event.data.requestId === this.latestRequestId) {
                 onLayout(event.data.placed);
             }
+        };
+        this.worker.onerror = (event: ErrorEvent) => {
+            event.preventDefault();
+            onError(event.message);
         };
     }
 

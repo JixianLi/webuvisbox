@@ -9,8 +9,8 @@ import { chatUIPanelMappingFunction } from "./chatUIPanelMappingFunction";
 import CHAT_UI_CONFIG from "./ChatUIConfig.json";
 
 scenarioRegistry.register({
-  name: "chatUI",
-  description: "Two-panel sandbox for testing new rendering components",
+  name: CHAT_UI_CONFIG.name,
+  description: CHAT_UI_CONFIG.description,
   createGlobalContext: () => new ChatUIGlobalContext(),
   panelMapping: chatUIPanelMappingFunction,
   defaultConfig: CHAT_UI_CONFIG,

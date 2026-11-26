@@ -13,9 +13,9 @@ const DepthPanel = lazy(() => import("./Views/DepthPanel"));
 
 const loading = <Typography variant="caption" sx={{ p: 1.5, color: "text.secondary" }}>Loading…</Typography>;
 
-export function uncertainTerrainPanelMappingFunction(viewname: string): React.ReactNode {
+export function uncertainTerrainPanelMappingFunction(viewName: string): React.ReactNode {
     const view = (() => {
-        switch (viewname) {
+        switch (viewName) {
             case "Terrain":
                 return <TerrainPanel />;
             case "Controls":
@@ -27,7 +27,7 @@ export function uncertainTerrainPanelMappingFunction(viewname: string): React.Re
             case "Depth":
                 return <DepthPanel />;
             default:
-                throw new Error(`Unknown view name: ${viewname}`);
+                throw new Error(`Unknown view name: ${viewName}`);
         }
     })();
     return <Suspense fallback={loading}>{view}</Suspense>;

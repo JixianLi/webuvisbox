@@ -1,7 +1,7 @@
 {
     "name": "chatUI",
-    "description": "Two-panel sandbox for testing new rendering components",
-    "views": ["Trace", "Chat"],
+    "description": "Sandbox for the chat, trace and word-cloud renderers, driven by a scripted agent",
+    "views": ["Trace", "Chat", "Topics"],
     "panel_layouts": {
         "default_layouts": {
             "xl": [
@@ -9,7 +9,7 @@
                     "i": "Trace",
                     "x": 0,
                     "y": 0,
-                    "w": 11,
+                    "w": 8,
                     "h": 16,
                     "minW": 3,
                     "minH": 3,
@@ -20,9 +20,9 @@
                 },
                 {
                     "i": "Chat",
-                    "x": 11,
+                    "x": 14,
                     "y": 0,
-                    "w": 11,
+                    "w": 8,
                     "h": 16,
                     "minW": 3,
                     "minH": 3,
@@ -30,6 +30,16 @@
                     "visible": true,
                     "moved": false,
                     "static": false
+                },
+                {
+                    "i": "Topics",
+                    "x": 8,
+                    "y": 0,
+                    "w": 6,
+                    "h": 16,
+                    "minW": 3,
+                    "minH": 3,
+                    "visible": true
                 }
             ],
             "lg": [
@@ -38,7 +48,7 @@
                     "x": 0,
                     "y": 0,
                     "w": 6,
-                    "h": 12,
+                    "h": 7,
                     "minW": 3,
                     "minH": 3,
                     "resizeHandles": ["sw", "se"],
@@ -58,6 +68,16 @@
                     "visible": true,
                     "moved": false,
                     "static": false
+                },
+                {
+                    "i": "Topics",
+                    "x": 0,
+                    "y": 7,
+                    "w": 6,
+                    "h": 5,
+                    "minW": 3,
+                    "minH": 3,
+                    "visible": true
                 }
             ],
             "sm": [
@@ -86,11 +106,32 @@
                     "visible": true,
                     "moved": false,
                     "static": false
+                },
+                {
+                    "i": "Topics",
+                    "x": 0,
+                    "y": 16,
+                    "w": 6,
+                    "h": 6,
+                    "minW": 3,
+                    "minH": 3,
+                    "visible": true
                 }
             ]
         },
-        "breakpoints": {"xl": 1440, "lg": 800, "sm": 400},
-        "cols": {"xl": 22, "lg": 12, "sm": 6}
+        "breakpoints": {
+            "xl": 1440,
+            "lg": 800,
+            "sm": 400
+        },
+        "cols": {
+            "xl": 22,
+            "lg": 12,
+            "sm": 6
+        }
     },
-    "global_data": {"chat_font_size": 14, "trace_font_size": 13}
+    "global_data": {
+        "chat_font_size": 14,
+        "trace_font_size": 13
+    }
 }

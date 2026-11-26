@@ -14,9 +14,9 @@ const MeanPathPanel = lazy(() => import("./Views/MeanPathPanel"));
 
 const loading = <Typography variant="caption" sx={{ p: 1.5, color: "text.secondary" }}>Loading…</Typography>;
 
-export function lorenzEnsemblePanelMappingFunction(viewname: string): React.ReactNode {
+export function lorenzEnsemblePanelMappingFunction(viewName: string): React.ReactNode {
     const view = (() => {
-        switch (viewname) {
+        switch (viewName) {
             case "Trajectories":
                 return <TrajectoriesPanel />;
             case "Controls":
@@ -30,7 +30,7 @@ export function lorenzEnsemblePanelMappingFunction(viewname: string): React.Reac
             case "Mean path":
                 return <MeanPathPanel />;
             default:
-                throw new Error(`Unknown view name: ${viewname}`);
+                throw new Error(`Unknown view name: ${viewName}`);
         }
     })();
     return <Suspense fallback={loading}>{view}</Suspense>;

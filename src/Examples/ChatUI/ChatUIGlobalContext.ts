@@ -5,7 +5,8 @@ import { makeAutoObservable, runInAction } from "mobx";
 import type { GlobalContext } from "../../Types/GlobalContext";
 import type { Actor, TraceMessage } from "../../Renderers/Trace";
 import type { ChatMessage } from "../../Renderers/Chat";
-import { fetchCatDataUrl, runFakeAgent } from "./fakeAgent";
+import { BUNDLED_CAT_DATA_URL, runFakeAgent } from "./FakeAgent";
+import { conversationTopics } from "./ConversationTopics";
 
 interface ChatUIGlobalData {
     chat_font_size: number;
@@ -35,28 +36,24 @@ export class ChatUIGlobalContext implements GlobalContext {
         this.chatFontSize = 14;
         this.traceFontSize = 13;
 
-        makeAutoObservable(this);
-
-        this.appendTrace = this.appendTrace.bind(this);
-        this.appendChat = this.appendChat.bind(this);
-        this.setChatFontSize = this.setChatFontSize.bind(this);
-        this.setTraceFontSize = this.setTraceFontSize.bind(this);
+        // autoBind: the fake agent calls these detached, after awaits; bound here they stay actions.
+        makeAutoObservable(this, {}, { autoBind: true });
     }
 
-    setChatFontSize(px: number) {
-        this.chatFontSize = px;
+    setChatFontSize(size: number) {
+        this.chatFontSize = size;
     }
 
-    setTraceFontSize(px: number) {
-        this.traceFontSize = px;
+    setTraceFontSize(size: number) {
+        this.traceFontSize = size;
     }
 
-    appendTrace(msg: Omit<TraceMessage, "id">) {
-        this.traceMessages.push({ id: crypto.randomUUID(), ...msg });
+    appendTrace(message: Omit<TraceMessage, "id">) {
+        this.traceMessages.push({ id: crypto.randomUUID(), ...message });
     }
 
-    appendChat(msg: Omit<ChatMessage, "id">) {
-        this.chatMessages.push({ id: crypto.randomUUID(), ...msg });
+    appendChat(message: Omit<ChatMessage, "id">) {
+        this.chatMessages.push({ id: crypto.randomUUID(), ...message });
     }
 
     selectTrace(id: string | null) {
@@ -99,7 +96,12 @@ export class ChatUIGlobalContext implements GlobalContext {
     }
 
     async asyncInitialize(): Promise<void> {
-        // Round 1: text conversation via Tool 1.
+        this.seedTextRound();
+        this.seedImageRound();
+    }
+
+    // A question answered with text by Tool 1.
+    private seedTextRound() {
         this.appendChat({
             role: "user",
             content: "What's the weather in NYC?",
@@ -127,47 +129,51 @@ export class ChatUIGlobalContext implements GlobalContext {
             authorName: "Tool 1",
             content: "Sunny, 72°F in NYC",
         });
+    }
 
-        // Round 2: multimodal conversation with a cat image via Tool 2.
-        const catUrl = await fetchCatDataUrl();
-        runInAction(() => {
-            this.appendChat({
-                role: "user",
-                content: "Can you show me a cat picture?",
-            });
-            this.appendTrace({
-                from: "user",
-                to: "model",
-                kind: "prompt",
-                payload: "Can you show me a cat picture?",
-            });
-            this.appendTrace({
-                from: "model",
-                to: "tool2",
-                kind: "tool_call",
-                payload: { tool: "tool2", args: { query: "cat" } },
-            });
-            this.appendTrace({
-                from: "tool2",
-                to: "tool2",
-                kind: "retry",
-                payload: { tool: "tool2", attempt: 1, error: "transient failure" },
-            });
-            this.appendTrace({
-                from: "tool2",
-                to: "user",
-                kind: "tool_result",
-                payload: { tool: "tool2", attempt: 2, result: `[image ${catUrl.length} chars]` },
-            });
-            this.appendChat({
-                role: "assistant",
-                authorName: "Tool 2",
-                content: [
-                    { type: "text", text: "Here is a cat for you:" },
-                    { type: "image", url: catUrl, alt: "Cat image from Tool 2" },
-                ],
-            });
+    // A question answered with the bundled cat by Tool 2, after a retry (asking again fetches a live cat).
+    private seedImageRound() {
+        const catUrl = BUNDLED_CAT_DATA_URL;
+        this.appendChat({
+            role: "user",
+            content: "Can you show me a cat picture?",
         });
+        this.appendTrace({
+            from: "user",
+            to: "model",
+            kind: "prompt",
+            payload: "Can you show me a cat picture?",
+        });
+        this.appendTrace({
+            from: "model",
+            to: "tool2",
+            kind: "tool_call",
+            payload: { tool: "tool2", args: { query: "cat" } },
+        });
+        this.appendTrace({
+            from: "tool2",
+            to: "tool2",
+            kind: "retry",
+            payload: { tool: "tool2", attempt: 1, error: "transient failure" },
+        });
+        this.appendTrace({
+            from: "tool2",
+            to: "user",
+            kind: "tool_result",
+            payload: { tool: "tool2", attempt: 2, result: `[image ${catUrl.length} chars]` },
+        });
+        this.appendChat({
+            role: "assistant",
+            authorName: "Tool 2",
+            content: [
+                { type: "text", text: "Here is a cat for you:" },
+                { type: "image", url: catUrl, alt: "Cat image from Tool 2" },
+            ],
+        });
+    }
+
+    get topics() {
+        return conversationTopics(this.chatMessages);
     }
 
     toObject(): ChatUIGlobalData {

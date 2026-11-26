@@ -15,7 +15,7 @@ import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import type ChatUIGlobalContext from "../ChatUIGlobalContext";
 
 const ChatPanel = observer(() => {
-    const ctx = useScenario().globalContext as ChatUIGlobalContext;
+    const context = useScenario().globalContext as ChatUIGlobalContext;
     const [anchor, setAnchor] = useState<null | HTMLElement>(null);
 
     const appbarContent = (
@@ -26,22 +26,22 @@ const ChatPanel = observer(() => {
                 color="inherit"
                 aria-label="settings"
                 sx={{ mr: 1 }}
-                onClick={(e) => setAnchor(e.currentTarget)}
+                onClick={(event) => setAnchor(event.currentTarget)}
             >
                 <MenuIcon fontSize="small" />
             </IconButton>
             <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}>
-                <Box sx={{ px: 2, py: 1, width: 200 }} onKeyDown={(e) => e.stopPropagation()}>
+                <Box sx={{ px: 2, py: 1, width: 200 }} onKeyDown={(event) => event.stopPropagation()}>
                     <Typography variant="caption" color="text.secondary">
-                        Font size: {ctx.chatFontSize}px
+                        Font size: {context.chatFontSize}px
                     </Typography>
                     <Slider
                         size="small"
                         min={10}
                         max={24}
                         step={1}
-                        value={ctx.chatFontSize}
-                        onChange={(_, v) => ctx.setChatFontSize(v as number)}
+                        value={context.chatFontSize}
+                        onChange={(_, value) => context.setChatFontSize(value as number)}
                     />
                 </Box>
             </Menu>
@@ -51,10 +51,10 @@ const ChatPanel = observer(() => {
     return (
         <Panel panelName="Chat" appbarContent={appbarContent}>
             <Chat
-                messages={ctx.chatMessages.slice()}
-                onSubmit={(text) => ctx.submitUserPrompt(text)}
-                busy={ctx.busy}
-                fontSize={ctx.chatFontSize}
+                messages={context.chatMessages.slice()}
+                onSubmit={(text) => context.submitUserPrompt(text)}
+                busy={context.busy}
+                fontSize={context.chatFontSize}
             />
         </Panel>
     );
