@@ -37,15 +37,48 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const pickRandom = <T,>(items: T[]): T => items[Math.floor(Math.random() * items.length)];
 
-async function fetchCatDataUrl(): Promise<string> {
-    const r = await fetch(`https://cataas.com/cat?width=300&height=200&t=${Date.now()}`);
-    const blob = await r.blob();
-    return await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(blob);
-    });
+const CAT_FETCH_TIMEOUT_MS = 4000;
+
+// Fallback SVG cat used if cataas.com is unreachable or times out.
+const FALLBACK_CAT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200">
+  <rect width="300" height="200" rx="12" fill="#f4efe6"/>
+  <polygon points="95,88 106,38 142,68" fill="#d98a4e"/>
+  <polygon points="103,80 110,48 134,68" fill="#f2b8a2"/>
+  <polygon points="205,88 194,38 158,68" fill="#d98a4e"/>
+  <polygon points="197,80 190,48 166,68" fill="#f2b8a2"/>
+  <ellipse cx="150" cy="116" rx="60" ry="52" fill="#e59b5c"/>
+  <circle cx="128" cy="108" r="7" fill="#2b2623"/>
+  <circle cx="172" cy="108" r="7" fill="#2b2623"/>
+  <circle cx="126" cy="106" r="2.2" fill="#ffffff"/>
+  <circle cx="170" cy="106" r="2.2" fill="#ffffff"/>
+  <polygon points="144,122 156,122 150,129" fill="#d96b6b"/>
+  <path d="M138,134 Q144,140 150,132 Q156,140 162,134" fill="none" stroke="#2b2623" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="82" y1="118" x2="114" y2="122" stroke="#6b5647" stroke-width="2"/>
+  <line x1="80" y1="128" x2="114" y2="128" stroke="#6b5647" stroke-width="2"/>
+  <line x1="186" y1="122" x2="218" y2="118" stroke="#6b5647" stroke-width="2"/>
+  <line x1="186" y1="128" x2="220" y2="128" stroke="#6b5647" stroke-width="2"/>
+</svg>`;
+
+const FALLBACK_CAT_DATA_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(FALLBACK_CAT_SVG)}`;
+
+export async function fetchCatDataUrl(): Promise<string> {
+    try {
+        const r = await fetch(`https://cataas.com/cat?width=300&height=200&t=${Date.now()}`, {
+            signal: AbortSignal.timeout(CAT_FETCH_TIMEOUT_MS),
+        });
+        if (!r.ok) {
+            return FALLBACK_CAT_DATA_URL;
+        }
+        const blob = await r.blob();
+        return await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(blob);
+        });
+    } catch {
+        return FALLBACK_CAT_DATA_URL;
+    }
 }
 
 async function produceResult(tool: string): Promise<ToolResult> {

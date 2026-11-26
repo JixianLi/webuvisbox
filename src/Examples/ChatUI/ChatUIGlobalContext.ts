@@ -5,7 +5,7 @@ import { makeAutoObservable, runInAction } from "mobx";
 import type { GlobalContext } from "../../Types/GlobalContext";
 import type { Actor, TraceMessage } from "../../Renderers/Trace";
 import type { ChatMessage } from "../../Renderers/Chat";
-import { runFakeAgent } from "./fakeAgent";
+import { fetchCatDataUrl, runFakeAgent } from "./fakeAgent";
 
 export class ChatUIGlobalContext implements GlobalContext {
     actors: Actor[];
@@ -94,6 +94,7 @@ export class ChatUIGlobalContext implements GlobalContext {
     }
 
     async asyncInitialize(): Promise<void> {
+        // Round 1: text conversation via Tool 1.
         this.appendChat({
             role: "user",
             content: "What's the weather in NYC?",
@@ -120,6 +121,47 @@ export class ChatUIGlobalContext implements GlobalContext {
             role: "assistant",
             authorName: "Tool 1",
             content: "Sunny, 72°F in NYC",
+        });
+
+        // Round 2: multimodal conversation with a cat image via Tool 2.
+        const catUrl = await fetchCatDataUrl();
+        runInAction(() => {
+            this.appendChat({
+                role: "user",
+                content: "Can you show me a cat picture?",
+            });
+            this.appendTrace({
+                from: "user",
+                to: "model",
+                kind: "prompt",
+                payload: "Can you show me a cat picture?",
+            });
+            this.appendTrace({
+                from: "model",
+                to: "tool2",
+                kind: "tool_call",
+                payload: { tool: "tool2", args: { query: "cat" } },
+            });
+            this.appendTrace({
+                from: "tool2",
+                to: "tool2",
+                kind: "retry",
+                payload: { tool: "tool2", attempt: 1, error: "transient failure" },
+            });
+            this.appendTrace({
+                from: "tool2",
+                to: "user",
+                kind: "tool_result",
+                payload: { tool: "tool2", attempt: 2, result: `[image ${catUrl.length} chars]` },
+            });
+            this.appendChat({
+                role: "assistant",
+                authorName: "Tool 2",
+                content: [
+                    { type: "text", text: "Here is a cat for you:" },
+                    { type: "image", url: catUrl, alt: "Cat image from Tool 2" },
+                ],
+            });
         });
     }
 
