@@ -1,4 +1,4 @@
-// ABOUTME: Builds the Lorenz example's tube meshes around the ensemble mean path: the uncertainty tube (an elliptical
+// ABOUTME: Builds the tornado example's tube meshes around the ensemble mean path: the uncertainty tube (an elliptical
 // ABOUTME: cross-section sized by the members' spread in each direction) and the plain mean-path tube. Pure math.
 
 // Frames along the path: tangent t_i by central differences of the centers; normal n_i by parallel transport
@@ -11,6 +11,10 @@
 // so an ensemble spread more one way than the other gives an elliptical, asymmetric tube (Li, Ouermi and Johnson,
 // "Uncertainty Tube Visualization of Particle Trajectories", 2025, use superellipses for the same purpose).
 // The ellipse's outward normal at θ is normalize(b_i' cos θ n_i + a_i sin θ b_i).
+//
+// One mean path and one cross-section summarize a unimodal ensemble only: members that split into groups (paths going
+// different ways) put the mean where no member is, and spread along the path (members ahead of or behind each other)
+// does not show in a cross-section.
 
 type Vector = [number, number, number];
 

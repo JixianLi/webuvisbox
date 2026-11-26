@@ -1,17 +1,17 @@
-// ABOUTME: State of the Lorenz ensemble example: ensemble settings and the ensemble fetched from its data server,
+// ABOUTME: State of the tornado ensemble example: ensemble settings and the ensemble fetched from its data server,
 // ABOUTME: playback (time, play/pause, speed) and colors. No rendering code, so registering it does not pull in three.js.
 
 import { makeAutoObservable, observable, runInAction } from "mobx";
 import type { GlobalContext } from "../../Types/GlobalContext";
 import { decode64 } from "../../Helpers/DataHelper";
-import { DURATION, SAMPLE_COUNT, SAMPLE_INTERVAL } from "./LorenzSystem";
-import { fetchLorenz, type EnsembleQuery, type EnsembleResponse, type TubeResponse } from "./LorenzDataServer";
+import { DURATION, SAMPLE_COUNT, SAMPLE_INTERVAL } from "./TornadoFlow";
+import { fetchTornado, type EnsembleQuery, type EnsembleResponse, type TubeResponse } from "./TornadoDataServer";
 
 export const COLORMAP_PRESETS = ["Plasma (matplotlib)", "Viridis (matplotlib)", "Inferno (matplotlib)"];
 
 export type ColorMode = "spread" | "time";
 
-export { SPREAD_DOMAIN } from "./LorenzSystem";
+export { SPREAD_DOMAIN } from "./TornadoFlow";
 
 export interface TubeData {
     vertices: Float32Array;
@@ -20,7 +20,7 @@ export interface TubeData {
     indices: Uint32Array;
 }
 
-export interface LorenzEnsembleData {
+export interface TornadoEnsembleData {
     paths: Float32Array[];
     mean: Float32Array;
     spread: Float32Array;
@@ -34,7 +34,7 @@ function decodeTube(tube: TubeResponse): TubeData {
              uv: decode64(tube.uv) as Float32Array, indices: decode64(tube.indices, "uint32") as Uint32Array };
 }
 
-function decodeEnsemble(response: EnsembleResponse): LorenzEnsembleData {
+function decodeEnsemble(response: EnsembleResponse): TornadoEnsembleData {
     const allPaths = decode64(response.paths) as Float32Array;
     const pointsPerPath = response.sample_count * 3;
     return {
@@ -49,26 +49,26 @@ function decodeEnsemble(response: EnsembleResponse): LorenzEnsembleData {
     };
 }
 
-interface LorenzEnsembleGlobalData {
+interface TornadoEnsembleGlobalData {
     member_count: number;
-    jitter_exponent: number;
+    variability_growth: number;
     seed: number;
     speed: number;
     color_mode: ColorMode;
     colormap_preset: string;
 }
 
-export class LorenzEnsembleGlobalContext implements GlobalContext {
+export class TornadoEnsembleGlobalContext implements GlobalContext {
     memberCount = 50;
-    jitterExponent = -5;     // starting jitter = 10^jitterExponent
+    variabilityGrowth = 0.015;   // how fast the axes' wandering grows (TornadoFlow)
     seed = 0;
     time = DURATION;
     playing = false;
-    speed = 1.5;             // model time units per second
+    speed = 1;               // model time units per second
     colorMode: ColorMode = "spread";
     colormapPreset = COLORMAP_PRESETS[0];
     // Set by asyncInitialize before any view shows; replaced when an answer to a newer query arrives.
-    ensemble!: LorenzEnsembleData;
+    ensemble!: TornadoEnsembleData;
     private lastFrameTimestamp: number | null = null;
     private latestRequest = 0;
     private disposed = false;
@@ -79,9 +79,9 @@ export class LorenzEnsembleGlobalContext implements GlobalContext {
         }, { autoBind: true });
     }
 
-    initialize(globalData?: Partial<LorenzEnsembleGlobalData>): void {
+    initialize(globalData?: Partial<TornadoEnsembleGlobalData>): void {
         this.memberCount = globalData?.member_count ?? this.memberCount;
-        this.jitterExponent = globalData?.jitter_exponent ?? this.jitterExponent;
+        this.variabilityGrowth = globalData?.variability_growth ?? this.variabilityGrowth;
         this.seed = globalData?.seed ?? this.seed;
         this.speed = globalData?.speed ?? this.speed;
         this.colorMode = globalData?.color_mode ?? this.colorMode;
@@ -102,10 +102,11 @@ export class LorenzEnsembleGlobalContext implements GlobalContext {
     async requestEnsemble(): Promise<void> {
         this.latestRequest += 1;
         const request = this.latestRequest;
-        const query: EnsembleQuery = { member_count: this.memberCount, jitter: this.jitter, seed: this.seed };
-        const response = await fetchLorenz("/ensemble", { method: "POST", body: JSON.stringify(query) });
+        const query: EnsembleQuery = { member_count: this.memberCount, variability_growth: this.variabilityGrowth,
+                                      seed: this.seed };
+        const response = await fetchTornado("/ensemble", { method: "POST", body: JSON.stringify(query) });
         if (!response.ok) {
-            throw new Error(`The Lorenz data server answered ${response.status}.`);
+            throw new Error(`The tornado data server answered ${response.status}.`);
         }
         const ensemble = decodeEnsemble(await response.json());
         if (request !== this.latestRequest || this.disposed) {
@@ -117,22 +118,18 @@ export class LorenzEnsembleGlobalContext implements GlobalContext {
     }
 
     private refreshEnsemble() {
-        this.requestEnsemble().catch(error => console.error("The Lorenz ensemble could not be loaded:", error));
+        this.requestEnsemble().catch(error => console.error("The tornado ensemble could not be loaded:", error));
     }
 
-    toObject(): LorenzEnsembleGlobalData {
+    toObject(): TornadoEnsembleGlobalData {
         return {
             member_count: this.memberCount,
-            jitter_exponent: this.jitterExponent,
+            variability_growth: this.variabilityGrowth,
             seed: this.seed,
             speed: this.speed,
             color_mode: this.colorMode,
             colormap_preset: this.colormapPreset,
         };
-    }
-
-    get jitter() {
-        return 10 ** this.jitterExponent;
     }
 
     // How many samples of each path are drawn at the current time (at least the starting point).
@@ -145,12 +142,12 @@ export class LorenzEnsembleGlobalContext implements GlobalContext {
         this.refreshEnsemble();
     }
 
-    setJitterExponent(jitterExponent: number) {
-        this.jitterExponent = jitterExponent;
+    setVariabilityGrowth(variabilityGrowth: number) {
+        this.variabilityGrowth = variabilityGrowth;
         this.refreshEnsemble();
     }
 
-    newRandomStart() {
+    newRandomEnsemble() {
         this.seed += 1;
         this.refreshEnsemble();
     }

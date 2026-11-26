@@ -1,4 +1,4 @@
-// ABOUTME: The Lorenz ensemble example's main view: every member's trajectory as a tube, grown up to the current time
+// ABOUTME: The tornado ensemble example's main view: every member's pathline as a tube, grown up to the current time
 // ABOUTME: and colored by the ensemble's spread (or by time), with a marker at each member's current position.
 
 import { useMemo } from "react";
@@ -8,17 +8,17 @@ import { useTheme } from "@mui/material/styles";
 import { Panel } from "../../../Panels/Panel";
 import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import { LinearTubeMesh } from "../../../Renderers/Mesh/LinearTubeMesh";
-import type { LorenzEnsembleGlobalContext } from "../LorenzEnsembleGlobalContext";
-import { sampleColors } from "../LorenzColors";
+import type { TornadoEnsembleGlobalContext } from "../TornadoEnsembleGlobalContext";
+import { sampleColors } from "../TornadoColors";
 import { LinkedCanvas } from "./LinkedCanvas";
 import { MemberPositions } from "./MemberPositions";
 
-// In Lorenz units.
-const TUBE_RADIUS = 0.12;
-const MARKER_RADIUS = 0.45;
+// In the flow's units.
+const TUBE_RADIUS = 0.012;
+const MARKER_RADIUS = 0.06;
 
 const EnsembleTubes = observer(function EnsembleTubes() {
-    const context = useScenario().globalContext as LorenzEnsembleGlobalContext;
+    const context = useScenario().globalContext as TornadoEnsembleGlobalContext;
     const { paths, spread } = context.ensemble;
     const preset = context.colormapPreset;
     const colorMode = context.colorMode;
@@ -33,10 +33,10 @@ const EnsembleTubes = observer(function EnsembleTubes() {
     );
 });
 
-export default function TrajectoriesPanel() {
+export default function EnsemblePanel() {
     const markerColor = useTheme().tokens.text;
     return (
-        <Panel panelName="Trajectories">
+        <Panel panelName="Ensemble">
             <Box sx={{ width: 1, height: 1, minHeight: 0 }}>
                 <LinkedCanvas>
                     <EnsembleTubes />

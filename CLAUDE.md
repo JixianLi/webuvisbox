@@ -30,7 +30,7 @@ src/                      # Library — no scenario-specific code, except the bu
 ├── ScenarioManager/      # Loads config, drives scenario lifecycle
 ├── LayoutManager/        # Navbar; the responsive panel grid, with overlay panels above it
 ├── Panels/               # Base Panel component (frame by panel type, fit, collapse) + grid container
-├── Examples/             # Built-in examples (ChatUI, Uncertain terrain, Lorenz ensemble, Contour uncertainty, Volume rendering): config in a JSON file imported (bundled), registered by App, in every host's menu
+├── Examples/             # Built-in examples (ChatUI, Uncertain terrain, Tornado ensemble, Contour uncertainty, Volume rendering): config in a JSON file imported (bundled), registered by App, in every host's menu
 ├── Renderers/            # Reusable renderers: Chat, Trace (swim lanes), Graph (word-cloud force layout + SVG view), Mesh, Colormaps, Volume (ray marching), TransferFunction (editor)
 ├── Scenarios/
 │   ├── ScenarioRegistry.ts   # Registry singleton + ScenarioDefinition type
@@ -117,7 +117,7 @@ examples import theirs (`src/Examples/*/*Config.json`) so no file has to be serv
 | Component files (.tsx) | PascalCase | `Panel.tsx`, `HeaderBar.tsx` |
 | Non-component files (.ts) | PascalCase | `DataHelper.ts`, `MathHelper.ts` |
 | React components | PascalCase | `FormGrid`, `CheckMenuItem` |
-| Classes | PascalCase | `LorenzEnsembleGlobalContext`, `PanelLayoutManager` |
+| Classes | PascalCase | `TornadoEnsembleGlobalContext`, `PanelLayoutManager` |
 | Interfaces / Types | PascalCase, no `I` prefix | `Scenario`, `PanelProps` |
 | Variables and properties | camelCase | `currentTimeIndex`, `ensembleNames` |
 | Functions | camelCase | `computeHistogram()`, `timeInSecondsToString()` |

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildTube, tubeFrames, uncertaintyTube } from './LorenzTube';
+import { buildTube, tubeFrames, uncertaintyTube } from './EnsembleTube';
 
 // A straight path along x: 5 samples at x = 0..4.
 const CENTERS = new Float32Array([0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0]);

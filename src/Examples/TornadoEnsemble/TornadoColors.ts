@@ -1,12 +1,12 @@
-// ABOUTME: Colors of the Lorenz ensemble example, shared by the 3D view, the colorbar and the chart: a sequential
-// ABOUTME: colormap over log spread or over time. Imported only by lazily loaded views (the colormap presets are large).
+// ABOUTME: Colors of the tornado ensemble example, shared by the 3D views, the colorbar and the chart: a sequential
+// ABOUTME: colormap over spread or over time. Imported only by lazily loaded views (the colormap presets are large).
 
 import * as d3 from "d3";
 import type * as THREE from "three";
 import { getTextureManager } from "../../Renderers/Colormaps/TextureManager";
 import { PresetLinearColormap } from "../../Renderers/Colormaps/PresetLinearColormap";
-import { SPREAD_DOMAIN, type ColorMode } from "./LorenzEnsembleGlobalContext";
-import { DURATION, SAMPLE_COUNT, SAMPLE_INTERVAL } from "./LorenzSystem";
+import { SPREAD_DOMAIN, type ColorMode } from "./TornadoEnsembleGlobalContext";
+import { DURATION, SAMPLE_COUNT, SAMPLE_INTERVAL } from "./TornadoFlow";
 
 const colormaps = new Map<string, PresetLinearColormap>();
 
@@ -15,7 +15,7 @@ function colormap(preset: string): PresetLinearColormap {
     return colormaps.get(preset)!;
 }
 
-export const spreadScale = d3.scaleLog().domain(SPREAD_DOMAIN).clamp(true);
+export const spreadScale = d3.scaleLinear().domain(SPREAD_DOMAIN).clamp(true);
 export const timeScale = d3.scaleLinear().domain([0, DURATION]).clamp(true);
 
 export function colorAt(preset: string, normalizedValue: number): d3.RGBColor {
@@ -35,7 +35,7 @@ export function sampleColors(preset: string, colorMode: ColorMode, spread: Float
         linear.r = toLinear(rgb.r); linear.g = toLinear(rgb.g); linear.b = toLinear(rgb.b);
     };
     for (let sample = 0; sample < SAMPLE_COUNT; sample++) {
-        const value = colorMode === "spread" ? spreadScale(Math.max(spread[sample], 1e-12)) : timeScale(sample * SAMPLE_INTERVAL);
+        const value = colorMode === "spread" ? spreadScale(spread[sample]) : timeScale(sample * SAMPLE_INTERVAL);
         convert(colorAt(preset, value));
         colors.set([linear.r, linear.g, linear.b], sample * 3);
     }
@@ -44,7 +44,7 @@ export function sampleColors(preset: string, colorMode: ColorMode, spread: Float
 
 // The uncertainty tube's colormap, a texture in TextureManager (sampled by the tube's u coordinate): one registered
 // colormap whose preset follows the example's.
-const TUBE_COLORMAP = "lorenz-ensemble-spread";
+const TUBE_COLORMAP = "tornado-ensemble-spread";
 
 // Registers the colormap on first use; idempotent, so safe while rendering.
 export function tubeColormapTexture(): THREE.DataTexture {

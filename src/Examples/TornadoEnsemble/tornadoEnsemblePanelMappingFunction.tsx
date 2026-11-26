@@ -1,11 +1,11 @@
-// ABOUTME: Maps the Lorenz ensemble example's panel IDs to their views. Views load lazily: three.js and the colormap
+// ABOUTME: Maps the tornado ensemble example's panel IDs to their views. Views load lazily: three.js and the colormap
 // ABOUTME: presets download only when the example is opened, not with every host app.
 
 import { lazy, Suspense } from "react";
 import type React from "react";
 import Typography from "@mui/material/Typography";
 
-const TrajectoriesPanel = lazy(() => import("./Views/TrajectoriesPanel"));
+const EnsemblePanel = lazy(() => import("./Views/EnsemblePanel"));
 const ControlsPanel = lazy(() => import("./Views/ControlsPanel"));
 const SpreadPanel = lazy(() => import("./Views/SpreadPanel"));
 const ColorbarPanel = lazy(() => import("./Views/ColorbarPanel"));
@@ -14,11 +14,11 @@ const MeanPathPanel = lazy(() => import("./Views/MeanPathPanel"));
 
 const loading = <Typography variant="caption" sx={{ p: 1.5, color: "text.secondary" }}>Loading…</Typography>;
 
-export function lorenzEnsemblePanelMappingFunction(viewName: string): React.ReactNode {
+export function tornadoEnsemblePanelMappingFunction(viewName: string): React.ReactNode {
     const view = (() => {
         switch (viewName) {
-            case "Trajectories":
-                return <TrajectoriesPanel />;
+            case "Ensemble":
+                return <EnsemblePanel />;
             case "Controls":
                 return <ControlsPanel />;
             case "Spread":
@@ -36,4 +36,4 @@ export function lorenzEnsemblePanelMappingFunction(viewName: string): React.Reac
     return <Suspense fallback={loading}>{view}</Suspense>;
 }
 
-export default lorenzEnsemblePanelMappingFunction;
+export default tornadoEnsemblePanelMappingFunction;

@@ -1,4 +1,4 @@
-// ABOUTME: The Lorenz example's mean path, the ensemble's single "prediction", with every member's position around it at
+// ABOUTME: The tornado example's mean path, the ensemble's single "prediction", with every member's position around it at
 // ABOUTME: the current time. Linked to the other 3D views.
 
 import { observer } from "mobx-react-lite";
@@ -8,15 +8,15 @@ import { useTheme } from "@mui/material/styles";
 import { Panel } from "../../../Panels/Panel";
 import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import { SingleColorBufferedMesh } from "../../../Renderers/Mesh/SingleColorBufferedMesh";
-import type { LorenzEnsembleGlobalContext } from "../LorenzEnsembleGlobalContext";
-import { TUBE_RADIAL_SEGMENTS } from "../LorenzDataServer";
+import type { TornadoEnsembleGlobalContext } from "../TornadoEnsembleGlobalContext";
+import { TUBE_RADIAL_SEGMENTS } from "../TornadoDataServer";
 import { LinkedCanvas } from "./LinkedCanvas";
 import { MemberPositions } from "./MemberPositions";
 
-const MEMBER_RADIUS = 0.45;
+const MEMBER_RADIUS = 0.06;
 
 const MeanPath = observer(function MeanPath() {
-    const context = useScenario().globalContext as LorenzEnsembleGlobalContext;
+    const context = useScenario().globalContext as TornadoEnsembleGlobalContext;
     const tube = context.ensemble.meanPathTube;
     const color = useTheme().tokens.text;
     const segments = Math.max(0, context.visibleSampleCount - 1);
@@ -29,8 +29,8 @@ const MeanPath = observer(function MeanPath() {
 const help = (
     <Typography variant="body2">
         The mean of the members' positions at each time: what a single forecast would show. The spheres are the members
-        at the current time; once they spread over the attractor, the mean path runs where no member is. Moving the view
-        moves the other 3D views; a double click or double tap goes back to the start view.
+        at the current time, gathered around it. Moving the view moves the other 3D views; a double click or double tap
+        goes back to the start view.
     </Typography>
 );
 

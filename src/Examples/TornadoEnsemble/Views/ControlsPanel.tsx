@@ -1,5 +1,5 @@
-// ABOUTME: Controls of the Lorenz ensemble example: playback (play/pause, time, speed), ensemble size and starting
-// ABOUTME: jitter, a new random start, and what the colors show.
+// ABOUTME: Controls of the tornado ensemble example: playback (play/pause, time, speed), ensemble size, how fast the
+// ABOUTME: members' variability grows, a new random ensemble, and what the colors show.
 
 import { observer } from "mobx-react-lite";
 import Box from "@mui/material/Box";
@@ -12,13 +12,13 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 import { Panel } from "../../../Panels/Panel";
 import { useScenario } from "../../../ScenarioManager/ScenarioManager";
-import { COLORMAP_PRESETS, type ColorMode, type LorenzEnsembleGlobalContext } from "../LorenzEnsembleGlobalContext";
-import { DURATION, SAMPLE_INTERVAL } from "../LorenzSystem";
+import { COLORMAP_PRESETS, type ColorMode, type TornadoEnsembleGlobalContext } from "../TornadoEnsembleGlobalContext";
+import { DURATION, SAMPLE_INTERVAL, VARIABILITY_GROWTH_RANGE } from "../TornadoFlow";
 import { SliderOnRelease } from "../../../Panels/SliderOnRelease";
 
 
 export default observer(function ControlsPanel() {
-    const context = useScenario().globalContext as LorenzEnsembleGlobalContext;
+    const context = useScenario().globalContext as TornadoEnsembleGlobalContext;
     const label = { display: "block", color: "text.secondary" };
     return (
         <Panel panelName="Controls">
@@ -29,8 +29,8 @@ export default observer(function ControlsPanel() {
                             onClick={() => (context.playing ? context.pause() : context.play())}>
                         {context.playing ? "Pause" : "Play"}
                     </Button>
-                    <Button size="small" variant="outlined" sx={{ flex: 1 }} onClick={() => context.newRandomStart()}>
-                        New random start
+                    <Button size="small" variant="outlined" sx={{ flex: 1 }} onClick={() => context.newRandomEnsemble()}>
+                        New random ensemble
                     </Button>
                 </Box>
                 <Box>
@@ -40,14 +40,15 @@ export default observer(function ControlsPanel() {
                 </Box>
                 <Box>
                     <Typography variant="caption" sx={label}>{`Speed: ${context.speed.toFixed(2)} time units per second`}</Typography>
-                    <Slider size="small" min={0.25} max={5} step={0.25} value={context.speed}
+                    <Slider size="small" min={0.25} max={3} step={0.25} value={context.speed}
                             onChange={(_, value) => context.setSpeed(value as number)} />
                 </Box>
                 <SliderOnRelease min={10} max={200} step={10} value={context.memberCount}
                                  label={value => `Paths: ${value}`} onRelease={context.setMemberCount} />
-                <SliderOnRelease min={-6} max={-1} step={0.5} value={context.jitterExponent}
-                                 label={value => `Starting jitter: ${(10 ** value).toExponential(0)}`}
-                                 onRelease={context.setJitterExponent} />
+                <SliderOnRelease min={VARIABILITY_GROWTH_RANGE[0]} max={VARIABILITY_GROWTH_RANGE[1]} step={0.0025}
+                                 value={context.variabilityGrowth}
+                                 label={value => `Variability growth: ${value.toFixed(4)}`}
+                                 onRelease={context.setVariabilityGrowth} />
                 <Box>
                     <Typography variant="caption" sx={label}>Color by</Typography>
                     <ToggleButtonGroup size="small" exclusive fullWidth value={context.colorMode}

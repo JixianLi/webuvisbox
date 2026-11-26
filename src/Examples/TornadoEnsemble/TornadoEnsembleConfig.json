@@ -1,11 +1,11 @@
 {
-    "name": "Lorenz ensemble",
-    "description": "Chaos as uncertainty: paths of the Lorenz system from nearly the same start, colored as they diverge",
-    "views": ["Trajectories", "Uncertainty tube", "Mean path", "Controls", "Spread", "Colorbar"],
+    "name": "Tornado ensemble",
+    "description": "Pathlines through an ensemble of tornado-like flows whose axes wander more over time, summarized by an uncertainty tube",
+    "views": ["Ensemble", "Uncertainty tube", "Mean path", "Controls", "Spread", "Colorbar"],
     "panel_layouts": {
         "default_layouts": {
             "xl": [
-                {"i": "Trajectories", "x": 0, "y": 0, "w": 8, "h": 9, "visible": true},
+                {"i": "Ensemble", "x": 0, "y": 0, "w": 8, "h": 9, "visible": true},
                 {"i": "Uncertainty tube", "x": 8, "y": 0, "w": 8, "h": 9, "visible": true},
                 {"i": "Mean path", "x": 16, "y": 0, "w": 8, "h": 9, "visible": true},
                 {"i": "Controls", "x": 0, "y": 9, "w": 8, "h": 7, "visible": true},
@@ -13,7 +13,7 @@
                 {"i": "Colorbar", "type": "overlay", "x": 0, "y": 6, "w": 5, "h": 3, "visible": true}
             ],
             "lg": [
-                {"i": "Trajectories", "x": 0, "y": 0, "w": 6, "h": 8, "visible": true},
+                {"i": "Ensemble", "x": 0, "y": 0, "w": 6, "h": 8, "visible": true},
                 {"i": "Uncertainty tube", "x": 6, "y": 0, "w": 6, "h": 8, "visible": true},
                 {"i": "Mean path", "x": 0, "y": 8, "w": 6, "h": 6, "visible": false},
                 {"i": "Controls", "x": 0, "y": 8, "w": 6, "h": 6, "visible": true},
@@ -21,7 +21,7 @@
                 {"i": "Colorbar", "type": "overlay", "x": 0, "y": 5, "w": 4, "h": 3, "visible": true}
             ],
             "sm": [
-                {"i": "Trajectories", "x": 0, "y": 0, "w": 4, "h": 9, "visible": true},
+                {"i": "Ensemble", "x": 0, "y": 0, "w": 4, "h": 9, "visible": true},
                 {"i": "Colorbar", "x": 0, "y": 9, "w": 4, "h": 2, "visible": true},
                 {"i": "Spread", "x": 0, "y": 11, "w": 4, "h": 5, "visible": true},
                 {"i": "Controls", "x": 0, "y": 16, "w": 4, "h": 10, "visible": true},
@@ -33,5 +33,5 @@
         "cols": {"xl": 24, "lg": 12, "sm": 4},
         "fit_rows": {"sm": 13}
     },
-    "global_data": {"member_count": 50, "jitter_exponent": -5, "seed": 0, "speed": 1.5, "color_mode": "spread", "colormap_preset": "Plasma (matplotlib)"}
+    "global_data": {"member_count": 50, "variability_growth": 0.015, "seed": 0, "speed": 1, "color_mode": "spread", "colormap_preset": "Plasma (matplotlib)"}
 }

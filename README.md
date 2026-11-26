@@ -100,7 +100,7 @@ webuvisbox/
 └── package.json
 ```
 
-The library contains the framework and its built-in examples (`src/Examples/`: ChatUI, Uncertain terrain, Lorenz
+The library contains the framework and its built-in examples (`src/Examples/`: ChatUI, Uncertain terrain, Tornado
 ensemble, Contour uncertainty, Volume rendering). They run entirely in the browser with generated data, and each imports
 its scenario config from a JSON file beside it, which bundles it, so every app built on the library offers them in the
 Scenario menu without serving a file or running a server. The dev app
@@ -118,7 +118,7 @@ so the examples double as its demonstration and its integration test:
 |---|---|
 | ChatUI (default) | A scripted tool-calling agent: chat, a swim-lane trace, and a word cloud of the conversation's topics |
 | Uncertain terrain | An ensemble of terrains, after the paper's Wildfire case study: VSUP or single-field coloring, wind glyphs where the members agree or not, a depth image |
-| Lorenz ensemble | Chaotic divergence, after the paper's Uncertainty Tube case study: three linked 3D views, an uncertainty tube, data from an in-browser server speaking base64 binary |
+| Tornado ensemble | Pathlines through an ensemble of tornado-like flows, after the paper's Uncertainty Tube case study: three linked 3D views (pathlines, uncertainty tube, mean path), data from an in-browser server speaking base64 binary |
 | Contour uncertainty | Contour boxplots, crossing probability and critical points of a 2D ensemble |
 | Volume rendering | Ray-marched volumes with an editable transfer function |
 
@@ -126,52 +126,52 @@ so the examples double as its demonstration and its integration test:
 |---|---|
 | `Renderers/Chat`, `Renderers/Trace` | ChatUI |
 | `Renderers/Graph` (`WordCloud`, `WordCloudLayoutRunner`) | ChatUI (Topics) |
-| `Renderers/Mesh/LinearTubeMesh` | Lorenz (Trajectories) |
-| `Renderers/Mesh/TexturedBufferedMesh` | Lorenz (Uncertainty tube) |
-| `Renderers/Mesh/SingleColorBufferedMesh` | Lorenz (Mean path) |
-| `Renderers/Mesh/InstancedSphereMesh` | Lorenz (member positions) |
-| `Renderers/Mesh/BoxOutlineMesh` | Lorenz (bounding box) |
+| `Renderers/Mesh/LinearTubeMesh` | Tornado (Ensemble) |
+| `Renderers/Mesh/TexturedBufferedMesh` | Tornado (Uncertainty tube) |
+| `Renderers/Mesh/SingleColorBufferedMesh` | Tornado (Mean path) |
+| `Renderers/Mesh/InstancedSphereMesh` | Tornado (member positions) |
+| `Renderers/Mesh/BoxOutlineMesh` | Tornado (bounding box) |
 | `Renderers/Mesh/ScalarFieldMesh` | Uncertain terrain (single-field coloring) |
 | `Renderers/Mesh/InstancedConeMesh` | Uncertain terrain (wind glyphs) |
-| `Renderers/SharedCameraControl` | Lorenz (linked views) |
-| `Renderers/Camera` (`FitCameraToAspect`, `DoublePressToReset`) | Terrain, Volume, Lorenz |
+| `Renderers/SharedCameraControl` | Tornado (linked views) |
+| `Renderers/Camera` (`FitCameraToAspect`, `DoublePressToReset`) | Terrain, Volume, Tornado |
 | `Renderers/DepthRenderer` | Uncertain terrain (Depth) |
 | `Renderers/Volume`, `Renderers/TransferFunction` | Volume rendering |
-| `Renderers/Colormaps` (`PresetLinearColormap`, `VSUP`, `OpacityMap`, `TextureManager`) | Terrain, Lorenz, Contour, Volume |
-| `Helpers/DataHelper` (`decode64`, `encode64`) | Lorenz (data server) |
-| `Helpers/Random`, `Helpers/DoublePress`, `Helpers/SaveGrayscalePng`, `Helpers/ColorParser`, `Helpers/InputChecks` | Lorenz, Contour, Terrain |
-| `Panels/SliderOnRelease`, `Panels/FormGrid`, `Panels/CheckMenuItem` | Lorenz, Contour, Terrain |
+| `Renderers/Colormaps` (`PresetLinearColormap`, `VSUP`, `OpacityMap`, `TextureManager`) | Terrain, Tornado, Contour, Volume |
+| `Helpers/DataHelper` (`decode64`, `encode64`) | Tornado (data server) |
+| `Helpers/Random`, `Helpers/DoublePress`, `Helpers/SaveGrayscalePng`, `Helpers/ColorParser`, `Helpers/InputChecks` | Tornado, Contour, Terrain |
+| `Panels/SliderOnRelease`, `Panels/FormGrid`, `Panels/CheckMenuItem` | Tornado, Contour, Terrain |
 | `Panels/Lazyfields` (`LazyTextField`) | Volume rendering, through the transfer function editor |
 
-The Lorenz example's `LorenzDataServer.ts` is a template for a scenario with a data server: it answers like a Python
+The tornado example's `TornadoDataServer.ts` is a template for a scenario with a data server: it answers like a Python
 server (a `Response` with base64-encoded arrays), so moving to a real one means replacing its fetch with `fetch(url)`.
 
 ## Configuration
 
 Every scenario is specified by a **scenario config**: a JSON file that names the scenario, lists its panels (views),
 lays them out per screen size, and gives its initial state. The built-in examples' configs are good references:
-`src/Examples/LorenzEnsemble/LorenzEnsembleConfig.json`, `src/Examples/VolumeRendering/VolumeRenderingConfig.json`, and
+`src/Examples/TornadoEnsemble/TornadoEnsembleConfig.json`, `src/Examples/VolumeRendering/VolumeRenderingConfig.json`, and
 the others beside each example.
 
 ### The format
 
 ```json
 {
-  "name": "Lorenz ensemble",
-  "description": "Chaos as uncertainty: paths of the Lorenz system from nearly the same start",
-  "views": ["Trajectories", "Controls"],
+  "name": "Tornado ensemble",
+  "description": "Pathlines through an ensemble of tornado-like flows",
+  "views": ["Ensemble", "Controls"],
   "panel_layouts": {
     "default_layouts": {
       "xl": [
-        { "i": "Trajectories", "type": "borderless", "x": 0, "y": 0, "w": 18, "h": 16, "visible": true },
+        { "i": "Ensemble", "type": "borderless", "x": 0, "y": 0, "w": 18, "h": 16, "visible": true },
         { "i": "Controls", "x": 18, "y": 0, "w": 6, "h": 16, "visible": true }
       ],
       "lg": [
-        { "i": "Trajectories", "type": "borderless", "x": 0, "y": 0, "w": 8, "h": 14, "visible": true },
+        { "i": "Ensemble", "type": "borderless", "x": 0, "y": 0, "w": 8, "h": 14, "visible": true },
         { "i": "Controls", "x": 8, "y": 0, "w": 4, "h": 14, "visible": true }
       ],
       "sm": [
-        { "i": "Trajectories", "type": "borderless", "x": 0, "y": 0, "w": 4, "h": 9, "visible": true },
+        { "i": "Ensemble", "type": "borderless", "x": 0, "y": 0, "w": 4, "h": 9, "visible": true },
         { "i": "Controls", "x": 0, "y": 9, "w": 4, "h": 10, "visible": true }
       ]
     },
@@ -180,7 +180,7 @@ the others beside each example.
     "fit_rows": { "sm": 13 }
   },
   "appearance": { "default_mode": "dark" },
-  "global_data": { "member_count": 50, "speed": 1.5 }
+  "global_data": { "member_count": 50, "speed": 1 }
 }
 ```
 

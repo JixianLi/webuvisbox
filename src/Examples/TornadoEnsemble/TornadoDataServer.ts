@@ -1,14 +1,14 @@
-// ABOUTME: The Lorenz example's data server, run in the browser: answers an ensemble query the way a Python server
-// ABOUTME: (UVisBox) would, with a JSON Response whose arrays are base64-encoded binary. Swap fetchLorenz for fetch(url).
+// ABOUTME: The tornado example's data server, run in the browser: answers an ensemble query the way a Python server
+// ABOUTME: (UVisBox) would, with a JSON Response whose arrays are base64-encoded binary. Swap fetchTornado for fetch(url).
 
 import { encode64 } from "../../Helpers/DataHelper";
-import { generateEnsemble, normalizedSpread, SAMPLE_COUNT } from "./LorenzSystem";
-import { buildTube, uncertaintyTube } from "./LorenzTube";
+import { generateEnsemble, normalizedSpread, SAMPLE_COUNT } from "./TornadoFlow";
+import { buildTube, uncertaintyTube } from "./EnsembleTube";
 
 // Request body of POST /ensemble.
 export interface EnsembleQuery {
     member_count: number;
-    jitter: number;
+    variability_growth: number;
     seed: number;
 }
 
@@ -34,9 +34,9 @@ export interface TubeResponse {
 }
 
 export const TUBE_RADIAL_SEGMENTS = 16;
-// In Lorenz units (the attractor spans about 40 × 40 × 50).
-const MINIMUM_TUBE_RADIUS = 0.15;
-const MEAN_PATH_RADIUS = 0.3;
+// In the flow's units (the paths span about 5 × 5 × 5).
+const MINIMUM_TUBE_RADIUS = 0.02;
+const MEAN_PATH_RADIUS = 0.04;
 
 function encodeTube(tube: ReturnType<typeof buildTube>): TubeResponse {
     return { vertices: encode64(tube.vertices), normals: encode64(tube.normals), uv: encode64(tube.uv),
@@ -57,7 +57,7 @@ function boundsOf(paths: Float32Array[]): EnsembleResponse["bounds"] {
 }
 
 function answer(query: EnsembleQuery): EnsembleResponse {
-    const { paths, mean, spread } = generateEnsemble(query.member_count, query.jitter, query.seed);
+    const { paths, mean, spread } = generateEnsemble(query.member_count, query.variability_growth, query.seed);
     const allPaths = new Float32Array(paths.length * SAMPLE_COUNT * 3);
     paths.forEach((path, member) => allPaths.set(path, member * SAMPLE_COUNT * 3));
     const spreadValue = (sample: number) => normalizedSpread(spread[sample]);
@@ -75,7 +75,7 @@ function answer(query: EnsembleQuery): EnsembleResponse {
 }
 
 // Takes what fetch takes and answers with a Response, so the client reads it exactly as it would a remote server's.
-export async function fetchLorenz(endpoint: string, init: { method: "POST"; body: string }): Promise<Response> {
+export async function fetchTornado(endpoint: string, init: { method: "POST"; body: string }): Promise<Response> {
     // Answered on a later task, as a network response would be, so the caller's code does not run synchronously.
     await new Promise(resolve => setTimeout(resolve, 0));
     if (endpoint !== "/ensemble") {

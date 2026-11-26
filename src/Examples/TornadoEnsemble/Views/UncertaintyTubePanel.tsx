@@ -1,4 +1,4 @@
-// ABOUTME: The Lorenz example's uncertainty tube: around the mean path, as wide in each direction as the members are
+// ABOUTME: The tornado example's uncertainty tube: around the mean path, as wide in each direction as the members are
 // ABOUTME: spread that way (so elliptical where the spread is lopsided), colored by the spread. Linked to the other views.
 
 import { useEffect, useMemo } from "react";
@@ -8,13 +8,13 @@ import Typography from "@mui/material/Typography";
 import { Panel } from "../../../Panels/Panel";
 import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import { TexturedBufferedMesh } from "../../../Renderers/Mesh/TexturedBufferedMesh";
-import type { LorenzEnsembleGlobalContext } from "../LorenzEnsembleGlobalContext";
-import { TUBE_RADIAL_SEGMENTS } from "../LorenzDataServer";
-import { setTubeColormapPreset, tubeColormapTexture } from "../LorenzColors";
+import type { TornadoEnsembleGlobalContext } from "../TornadoEnsembleGlobalContext";
+import { TUBE_RADIAL_SEGMENTS } from "../TornadoDataServer";
+import { setTubeColormapPreset, tubeColormapTexture } from "../TornadoColors";
 import { LinkedCanvas } from "./LinkedCanvas";
 
 const UncertaintyTube = observer(function UncertaintyTube() {
-    const context = useScenario().globalContext as LorenzEnsembleGlobalContext;
+    const context = useScenario().globalContext as TornadoEnsembleGlobalContext;
     const tube = context.ensemble.uncertaintyTube;
     const preset = context.colormapPreset;
     const texture = useMemo(() => tubeColormapTexture(), []);
