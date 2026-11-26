@@ -1,7 +1,7 @@
 // ABOUTME: Command registry: named actions with optional keyboard shortcuts, registered by the framework and by
 // ABOUTME: scenarios, run from keys, buttons or a list. Panel commands act on the active panel (last hovered or focused).
 
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, observable } from 'mobx';
 
 // A shortcut is modifiers plus a KeyboardEvent.code, written "Alt+KeyF", "Alt+Shift+KeyR", "Shift+Slash".
 // event.code names the physical key, so Alt on macOS (which turns "f" into "ƒ" in event.key) still matches.
@@ -62,7 +62,8 @@ export class CommandRegistry {
     panelActions: Map<string, Map<string, () => void>> = new Map();
 
     constructor() {
-        makeAutoObservable(this, { handleKeyDown: false });
+        // Shallow: a deep map would store observable copies, and unregistering compares by identity.
+        makeAutoObservable(this, { handleKeyDown: false, commands: observable.shallow, panelActions: observable.shallow });
     }
 
     // Returns the unregister function, for a React effect's cleanup.

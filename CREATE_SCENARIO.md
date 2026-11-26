@@ -184,17 +184,23 @@ export class MyScenarioGlobalContext implements GlobalContext {
     makeAutoObservable(this);
   }
 
-  initialize(globalData: any): void {
+  initialize(globalData?: { message?: string }): void {
     this.message = globalData?.message ?? "hello";
   }
 
   async asyncInitialize(): Promise<void> { /* fetch data, etc. */ }
 
-  toObject(): any {
+  toObject(): { message: string } {
     return { message: this.message };
   }
+
+  // Optional: called when another scenario replaces this one. Stop timers, animation loops and requests here.
+  dispose(): void {}
 }
 ```
+
+`toObject()` is what a downloaded config stores under `global_data`, and `initialize()` reads it back, so
+`initialize(toObject())` must restore what the user sees (seeds and edited settings included).
 
 `src/Scenarios/MyScenario/myScenarioPanelMappingFunction.tsx`:
 
@@ -249,11 +255,13 @@ Note the import pattern: **`@core/...` for library code, relative paths for sibl
 }
 ```
 
-Layout rules the loader does not check (breaking them leaves a blank page with no error on screen):
+The loader checks the config before it replaces the running scenario, and shows what is wrong on screen: a missing
+`name` or layout, a panel without `i`, `x`, `y`, `w`, `h`, an unknown `default_mode`, a `ui_scale` outside the menu's
+range, an `accent` that is not a CSS color. `breakpoints` may be left out (default: `xl` 1440, `lg` 800, `sm` 0), and a
+breakpoint without a layout uses the nearest one that has one, the next wider first.
 
-- **Every size in `breakpoints` needs a layout in `default_layouts`, and one of them must be `xl`.** The layout manager
-  starts at `xl` and learns the window's size only after its first render, so a config without an `xl` layout fails
-  in that render (`Cannot read properties of undefined (reading 'filter')`).
+Layout rules the loader does not check:
+
 - **Each size needs at least one panel with `"visible": true`.** A panel is shown only when `visible` is `true`; a
   missing `visible` counts as hidden.
 - **`fit_rows` defaults to each layout's own height** (the bottom edge of its lowest non-overlay panel), so every

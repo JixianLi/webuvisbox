@@ -5,4 +5,7 @@ export interface GlobalContext {
     initialize(globalData: unknown): void;
     asyncInitialize(): Promise<void>;
     toObject(): object;
+    // Called once when this context is replaced (another scenario loaded) or a load of it is abandoned: stop timers,
+    // animation loops and requests, and free what the context holds.
+    dispose?(): void;
 }

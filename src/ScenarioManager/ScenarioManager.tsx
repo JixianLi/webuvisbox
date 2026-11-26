@@ -1,13 +1,49 @@
-import { makeAutoObservable, runInAction } from "mobx";
-import type { GlobalContext} from "../Types/GlobalContext";
+import { makeAutoObservable } from "mobx";
+import type { GlobalContext } from "../Types/GlobalContext";
 import type { PanelLayouts } from "../Types/PanelLayouts";
 import type { Scenario, ScenarioConfig, ScenarioLayoutChoice } from "../Types/Scenario";
 import PanelLayoutManager from "../LayoutManager/PanelLayoutManager";
 import { createContext, useContext, useEffect, useState } from "react";
-import { getGlobalContext, scenarioRegistry } from "../Scenarios";
+import { trackPromise } from "react-promise-tracker";
+import { getGlobalContext } from "../Scenarios";
 import { DEFAULT_APPEARANCE, type Appearance, type DisplayMode } from "../Theme/DesignTokens";
+import { checkConfig } from "./ScenarioConfigCheck";
 
-class ScenarioManager implements Scenario {
+interface PreparedScenario {
+    name: string;
+    description?: string;
+    views: string[];
+    panelLayouts: PanelLayouts;
+    appearance: Appearance;
+    globalContext: GlobalContext;
+}
+
+// Builds everything a scenario needs without touching the running one.
+function prepareScenario(config: ScenarioConfig): PreparedScenario {
+    const layouts = config.panel_layouts;
+    const panelLayouts = new PanelLayoutManager(layouts.default_layouts, layouts.breakpoints, layouts.cols, layouts.fit_rows);
+    const globalContext = getGlobalContext(config.name);
+    try {
+        globalContext.initialize(config.global_data);
+    } catch (error) {
+        globalContext.dispose?.();
+        throw error;
+    }
+    return {
+        name: config.name,
+        description: config.description,
+        views: config.views ?? [],
+        panelLayouts,
+        appearance: {
+            accent: config.appearance?.accent ?? DEFAULT_APPEARANCE.accent,
+            defaultMode: config.appearance?.default_mode,
+            uiScale: config.appearance?.ui_scale ?? DEFAULT_APPEARANCE.uiScale,
+        },
+        globalContext,
+    };
+}
+
+export class ScenarioManager implements Scenario {
     name: string = "UVisBox";
     description?: string;
     // Unset until the first config loads; readers check `initialized` first.
@@ -19,38 +55,21 @@ class ScenarioManager implements Scenario {
     fullyLoaded: boolean = false;
     // Why the last load failed, shown on screen until dismissed; null when it did not.
     loadError: string | null = null;
+    // Counts the scenarios swapped in. The grid remounts on each, so no panel outlives the context it was built with.
+    generation: number = 0;
+    private latestLoad: number = 0;
 
-    constructor(config?: ScenarioConfig) {
-        if (config) {
-            this.loadFromObject(config);
-        } else {
-            this.name = "UVisBox";
-            this.description = "A default scenario";
-        }
-
-        makeAutoObservable(this);
+    constructor() {
+        makeAutoObservable<ScenarioManager, 'latestLoad'>(this, { latestLoad: false });
     }
 
     async asyncInitialization(): Promise<void> {
         return this.globalContext.asyncInitialize();
     }
 
+    // Swaps the scenario in at once, without its asyncInitialize (completeInitialization runs that first).
     loadFromObject(config: ScenarioConfig): void {
-        runInAction(() => {
-            this.name = config.name || this.name || "UVisBox";
-            this.description = config.description || this.description || "A default scenario";
-            this.views = config.views || this.views || [];
-            const panelLayoutsConfig = config.panel_layouts;
-            this.panelLayouts = new PanelLayoutManager(panelLayoutsConfig.default_layouts, panelLayoutsConfig.breakpoints, panelLayoutsConfig.cols,
-                                                       panelLayoutsConfig.fit_rows);
-            this.appearance = {
-                accent: config.appearance?.accent ?? DEFAULT_APPEARANCE.accent,
-                defaultMode: config.appearance?.default_mode,
-                uiScale: config.appearance?.ui_scale ?? DEFAULT_APPEARANCE.uiScale,
-            };
-            this.globalContext = getGlobalContext(this.name);
-            this.globalContext.initialize(config.global_data);
-        });
+        this.swapIn(prepareScenario(config));
     }
 
     // The display mode and UI scale the user picks become the scenario's, so a saved or downloaded config opens as seen.
@@ -98,35 +117,47 @@ class ScenarioManager implements Scenario {
         this.loadError = message;
     }
 
-    invalidate(): void {
-        runInAction(() => {
-            this.initialized = false;
-            this.fullyLoaded = false;
-        });
+    // Loads are numbered; only the latest one may swap its scenario in.
+    beginLoad(): number {
+        this.latestLoad += 1;
+        return this.latestLoad;
     }
 
-    async completeInitialization(config: ScenarioConfig): Promise<void> {
-        // Reset state before loading new scenario
-        this.invalidate();
+    isLatestLoad(load: number): boolean {
+        return load === this.latestLoad;
+    }
 
-        // Load base configuration
-        this.loadFromObject(config);
+    // The new scenario is built and initialized beside the running one and swapped in only when ready, so a load that
+    // fails, or that a newer load overtakes, leaves the running scenario as it was.
+    async completeInitialization(config: ScenarioConfig, load: number = this.beginLoad()): Promise<void> {
+        const prepared = prepareScenario(config);
+        try {
+            await prepared.globalContext.asyncInitialize();
+        } catch (error) {
+            prepared.globalContext.dispose?.();
+            throw error;
+        }
+        if (!this.isLatestLoad(load)) {
+            prepared.globalContext.dispose?.();
+            return;
+        }
+        this.swapIn(prepared);
+    }
 
-        // Perform async operations
-        await this.asyncInitialization();
-
-        // Ensure layouts are properly initialized
-        // NOTE: Commented out to fix visible:false panel initialization
-        // This was originally added to solve a race condition in built mode
-        // Needs additional testing before re-enabling
-        // if (this.panelLayouts && config.panel_layouts) {
-        //     this.panelLayouts.reinitializeLayouts(config.panel_layouts.default_layouts);
-        // }
-
-        runInAction(() => {
-            this.initialized = true;
-            this.fullyLoaded = true;
-        });
+    private swapIn(prepared: PreparedScenario): void {
+        const previous: GlobalContext | undefined = this.globalContext;
+        this.name = prepared.name;
+        this.description = prepared.description;
+        this.views = prepared.views;
+        this.panelLayouts = prepared.panelLayouts;
+        this.appearance = prepared.appearance;
+        this.globalContext = prepared.globalContext;
+        this.initialized = true;
+        this.fullyLoaded = true;
+        this.generation += 1;
+        if (previous && previous !== prepared.globalContext) {
+            previous.dispose?.();
+        }
     }
 }
 
@@ -149,34 +180,29 @@ async function fetchConfig(url: string): Promise<unknown> {
     }
 }
 
-// Checked before the current scenario is torn down, so a bad config leaves it running.
-function checkConfig(value: unknown): asserts value is ScenarioConfig {
-    if (!value || typeof value !== 'object') {
-        throw new Error('The config is not a JSON object.');
-    }
-    const config = value as Partial<ScenarioConfig>;
-    if (!config.name) {
-        throw new Error('The config has no "name".');
-    }
-    if (!scenarioRegistry.has(config.name)) {
-        throw new Error(`No scenario named "${config.name}" is registered in this app (registered: ${scenarioRegistry.list().join(', ')}).`);
-    }
-    if (!config.panel_layouts?.default_layouts) {
-        throw new Error(`The config of "${config.name}" has no panel_layouts.default_layouts.`);
-    }
-}
-
-export async function loadScenario(manager: ScenarioManager, source: ScenarioSource): Promise<void> {
-    try {
-        const config: unknown = typeof source === 'string' ? await fetchConfig(source) : source;
-        checkConfig(config);
-        manager.setLoadError(null);
-        await manager.completeInitialization(config);
-    } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        console.error('Failed to load scenario:', error);
-        manager.setLoadError(message);
-    }
+// The progress bar (LayoutManager's LoadingIndicator) shows while a load runs; the running scenario stays on screen.
+export function loadScenario(manager: ScenarioManager, source: ScenarioSource): Promise<void> {
+    const load = manager.beginLoad();
+    const run = async () => {
+        try {
+            const config: unknown = typeof source === 'string' ? await fetchConfig(source) : source;
+            if (!manager.isLatestLoad(load)) {
+                return;
+            }
+            checkConfig(config);
+            manager.setLoadError(null);
+            await manager.completeInitialization(config, load);
+        } catch (error) {
+            // A newer load is under way: this one's failure no longer describes what the user asked for.
+            if (!manager.isLatestLoad(load)) {
+                return;
+            }
+            const message = error instanceof Error ? error.message : String(error);
+            console.error('Failed to load scenario:', error);
+            manager.setLoadError(message);
+        }
+    };
+    return trackPromise(run());
 }
 
 export function loadScenarioFromText(manager: ScenarioManager, text: string): Promise<void> {
@@ -198,7 +224,7 @@ export function loadScenarioFromText(manager: ScenarioManager, text: string): Pr
 const scenario = createContext<ScenarioManager | null>(null);
 
 export function ScenarioProvider({ children, initialConfig }: { children: React.ReactNode; initialConfig: ScenarioSource }) {
-    const [scenarioManager] = useState<ScenarioManager>(new ScenarioManager());
+    const [scenarioManager] = useState(() => new ScenarioManager());
 
     useEffect(() => {
         loadScenario(scenarioManager, initialConfig);

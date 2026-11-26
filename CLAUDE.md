@@ -66,7 +66,7 @@ A scenario folder looks like:
 To add a new example scenario:
 1. Create `examples/YourScenario/` matching the layout above
 2. In `index.ts`, call `scenarioRegistry.register({...})` — import the registry from `@/Scenarios/ScenarioRegistry`
-3. Implement the `GlobalContext` interface (`initialize()`, `asyncInitialize()`, `toObject()`)
+3. Implement the `GlobalContext` interface (`initialize()`, `asyncInitialize()`, `toObject()`, optionally `dispose()`)
 4. Add `examples/public/ScenarioConfigs/YourScenario.json`
 5. Add `import "./YourScenario"` to `examples/main.tsx`
 

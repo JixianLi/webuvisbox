@@ -11,7 +11,8 @@ export interface ScenarioConfig {
     views?: string[];
     panel_layouts: {
         default_layouts: AppLayouts;
-        breakpoints: RGLBreakpoints;
+        // Default: xl 1440, lg 800, sm 0 (minimum grid width in px).
+        breakpoints?: RGLBreakpoints;
         cols?: RGLCols;
         fit_rows?: FitRows;
     };

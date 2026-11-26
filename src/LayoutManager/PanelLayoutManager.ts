@@ -1,7 +1,39 @@
-import { makeAutoObservable, runInAction, toJS } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import type { ResponsiveLayouts } from 'react-grid-layout/legacy';
-import type { AppLayouts, FitRows, PanelLayouts, RGLBreakpoints, RGLCols } from '../Types/PanelLayouts';
+import type { AppLayout, AppLayouts, FitRows, PanelLayouts, RGLBreakpoints, RGLCols } from '../Types/PanelLayouts';
 import _ from 'lodash';
+
+// The breakpoints of the built-in examples (minimum grid width in px): wide desktop, laptop or tablet, phone.
+export const DEFAULT_BREAKPOINTS: RGLBreakpoints = { xl: 1440, lg: 800, sm: 0 };
+
+// A hidden panel stays in the layout, at zero size and pinned, so the grid keeps its place in the list.
+function hiddenPanel(panelId: string): AppLayout {
+    return { i: panelId, x: 0, y: 0, w: 0, h: 0, minH: 0, minW: 0, maxH: 0, maxW: 0, visible: false,
+             isResizable: false, isDraggable: false, static: true };
+}
+
+function withHiddenPanelsCollapsed(layouts: AppLayouts): AppLayouts {
+    return _.mapValues(layouts, layout => layout.map(panel => panel.visible === false ? hiddenPanel(panel.i) : _.cloneDeep(panel)));
+}
+
+// A breakpoint the config gives no layout borrows the layout of the nearest one that has one, the next wider first.
+export function layoutsForEveryBreakpoint(layouts: AppLayouts, breakpoints: RGLBreakpoints): AppLayouts {
+    const completed = _.cloneDeep(layouts);
+    const withLayout = Object.keys(breakpoints).filter(name => layouts[name]);
+    for (const name of Object.keys(breakpoints)) {
+        if (completed[name]) {
+            continue;
+        }
+        const width = breakpoints[name];
+        const wider = withLayout.filter(other => breakpoints[other] > width).sort((a, b) => breakpoints[a] - breakpoints[b]);
+        const narrower = withLayout.filter(other => breakpoints[other] < width).sort((a, b) => breakpoints[b] - breakpoints[a]);
+        const source = wider[0] ?? narrower[0];
+        if (source) {
+            completed[name] = _.cloneDeep(layouts[source]);
+        }
+    }
+    return completed;
+}
 
 
 export class PanelLayoutManager implements PanelLayouts {
@@ -10,53 +42,28 @@ export class PanelLayoutManager implements PanelLayouts {
     cacheLayouts: AppLayouts;
     breakpoints: RGLBreakpoints;
     cols: RGLCols;
-    currentBreakpoint: string = 'xl';
+    currentBreakpoint: string;
     fitRows: FitRows;
     rowHeight: number = 0;
 
     constructor(
         defaultLayouts: AppLayouts,
-        breakpoints: RGLBreakpoints,
+        breakpoints: RGLBreakpoints = DEFAULT_BREAKPOINTS,
         cols?: RGLCols,
         fitRows?: FitRows
     ) {
         this.fitRows = _.cloneDeep(fitRows ?? {});
-        this.defaultLayouts = _.cloneDeep(defaultLayouts);
-        this.currentLayouts = _.cloneDeep(defaultLayouts);
-        this.cacheLayouts = _.cloneDeep(defaultLayouts);
         this.breakpoints = _.cloneDeep(breakpoints);
+        // Until the layout manager has measured the grid, the widest breakpoint applies.
+        this.currentBreakpoint = _.maxBy(Object.keys(this.breakpoints), name => this.breakpoints[name]) ?? 'xl';
         this.cols = cols ? _.cloneDeep(cols) : Object.keys(this.breakpoints).reduce((acc, key) => {
             acc[key] = 12;
             return acc;
         }, {} as RGLCols);
-
-        // Initialize panels with visible: false
-        // Move their full layout to cache and set them to zero-size in currentLayouts
-        Object.keys(this.currentLayouts).forEach(breakpoint => {
-            this.currentLayouts[breakpoint].forEach((panel, index) => {
-                if (panel.visible === false) {
-                    // Store the full layout in cache
-                    this.cacheLayouts[breakpoint][index] = _.cloneDeep(panel);
-                    // Set to zero-size in currentLayouts
-                    this.currentLayouts[breakpoint][index] = {
-                        i: panel.i,
-                        x: 0,
-                        y: 0,
-                        w: 0,
-                        h: 0,
-                        minH: 0,
-                        minW: 0,
-                        maxH: 0,
-                        maxW: 0,
-                        visible: false,
-                        isResizable: false,
-                        isDraggable: false,
-                        static: true
-                    };
-                }
-            });
-        });
-        console.log('Initialized PanelLayoutManager:', toJS(this.currentLayouts), toJS(this.cacheLayouts));
+        // The cache keeps every panel's full geometry, so a hidden panel reopens where its layout puts it.
+        this.defaultLayouts = layoutsForEveryBreakpoint(defaultLayouts, this.breakpoints);
+        this.currentLayouts = withHiddenPanelsCollapsed(this.defaultLayouts);
+        this.cacheLayouts = _.cloneDeep(this.defaultLayouts);
         makeAutoObservable(this);
     }
 
@@ -73,9 +80,9 @@ export class PanelLayoutManager implements PanelLayouts {
 
     reinitializeLayouts(newLayouts: AppLayouts) {
         runInAction(() => {
-            this.defaultLayouts = _.cloneDeep(newLayouts);
-            this.currentLayouts = _.cloneDeep(newLayouts);
-            this.cacheLayouts = _.cloneDeep(newLayouts);
+            this.defaultLayouts = layoutsForEveryBreakpoint(newLayouts, this.breakpoints);
+            this.currentLayouts = withHiddenPanelsCollapsed(this.defaultLayouts);
+            this.cacheLayouts = _.cloneDeep(this.defaultLayouts);
         });
     }
 
@@ -87,7 +94,6 @@ export class PanelLayoutManager implements PanelLayouts {
             const selectedCached = _.findIndex(this.cacheLayouts[breakpoint], { i: panelId });
             this.currentLayouts[breakpoint][selectedPanelIndex] = _.cloneDeep(this.cacheLayouts[breakpoint][selectedCached]);
             this.currentLayouts[breakpoint][selectedPanelIndex].visible = true;
-            delete this.cacheLayouts[panelId];
         });
     }
 
@@ -99,7 +105,7 @@ export class PanelLayoutManager implements PanelLayouts {
             const selectedPanel = this.currentLayouts[breakpoint][selectedPanelIndex];
             const selectedCached = _.findIndex(this.cacheLayouts[breakpoint], { i: panelId });
             this.cacheLayouts[breakpoint][selectedCached] = _.cloneDeep(selectedPanel);
-            this.currentLayouts[breakpoint][selectedPanelIndex] = { i: panelId, x: 0, y: 0, w: 0, h: 0, minH: 0, minW: 0, maxH: 0, maxW: 0, visible: false, isResizable: false, isDraggable: false, static: true };
+            this.currentLayouts[breakpoint][selectedPanelIndex] = hiddenPanel(panelId);
         });
     }
 
@@ -153,7 +159,8 @@ export class PanelLayoutManager implements PanelLayouts {
 
     resetToDefault() {
         runInAction(() => {
-            this.currentLayouts = _.cloneDeep(this.defaultLayouts);
+            this.currentLayouts = withHiddenPanelsCollapsed(this.defaultLayouts);
+            this.cacheLayouts = _.cloneDeep(this.defaultLayouts);
         });
     }
 

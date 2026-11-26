@@ -150,8 +150,8 @@ the others beside each example.
 | `name` | Must equal the name the scenario registers under (`scenarioRegistry.register({ name, ... })`). |
 | `description` | Shown next to the name in the navbar. |
 | `views` | The panel IDs; each must be known to the scenario's panel mapping function. |
-| `panel_layouts.default_layouts` | One layout per breakpoint (`xl` is required). Each entry places a view `i` on the grid (`x`, `y`, `w`, `h` in columns and rows) and may set `type` (`regular`, `borderless`, `overlay`), `visible`, `minW`, `minH`. |
-| `panel_layouts.breakpoints`, `cols` | The window width at which each layout applies, and its number of grid columns. |
+| `panel_layouts.default_layouts` | A layout per breakpoint (a breakpoint without one uses the nearest wider one). Each entry places a view `i` on the grid (`x`, `y`, `w`, `h` in columns and rows) and may set `type` (`regular`, `borderless`, `overlay`), `visible`, `minW`, `minH`. |
+| `panel_layouts.breakpoints`, `cols` | Optional: the grid width at which each layout applies (default `xl` 1440, `lg` 800, `sm` 0), and its number of grid columns (default 12). |
 | `panel_layouts.fit_rows` | Optional, per breakpoint: how many rows fill the window height. |
 | `appearance` | Optional: `accent` color, `default_mode` (`bright`, `dark`, `neutral`), `ui_scale`. |
 | `global_data` | The scenario's own initial state, passed to its GlobalContext's `initialize()`. Keys are snake_case. |
@@ -245,9 +245,10 @@ Within the scenario folder, use relative imports for sibling files. Use the `@/`
 3. Implement the `GlobalContext` interface in your GlobalContext class:
 ```typescript
 interface GlobalContext {
-  initialize(globalDataObject: any): void;
+  initialize(globalData: unknown): void;  // the config's global_data; declare your own type for it
   asyncInitialize(): Promise<void>;
-  toObject(): any;
+  toObject(): object;                     // what a downloaded config stores as global_data
+  dispose?(): void;                       // optional: called when another scenario replaces this one
 }
 ```
 

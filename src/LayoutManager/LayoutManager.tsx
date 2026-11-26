@@ -1,7 +1,7 @@
 // ABOUTME: Manages the responsive grid layout of scenario panels: regular and borderless panels in the grid, overlay
 // ABOUTME: panels floating above it on the same grid coordinates. Renders the header bar and loading indicator.
 
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Responsive, type Layout, type ResponsiveLayouts } from "react-grid-layout/legacy";
 
@@ -14,6 +14,7 @@ import { scenarioRegistry } from "../Scenarios";
 import { usePromiseTracker } from "react-promise-tracker";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
+import { ErrorBoundary, ErrorFallback } from "../Panels/ErrorBoundary";
 
 const LoadingIndicator = observer(function LoadingIndicator() {
     const { promiseInProgress } = usePromiseTracker()
@@ -69,6 +70,8 @@ const OverlayLayer = observer(({ panelLayouts, geometry, cols }:
     const tokens = useTheme().tokens;
     const panelMapping = scenarioRegistry.get(scenario.name).panelMapping;
     const [drag, setDrag] = useState<{ panelId: string; dx: number; dy: number; height: number } | null>(null);
+    const endDragRef = useRef<(() => void) | null>(null);
+    useEffect(() => () => endDragRef.current?.(), []);
     const overlays = panelLayouts.currentLayouts[panelLayouts.currentBreakpoint]
         .filter(panel => panel.visible && panel.type === 'overlay');
 
@@ -88,16 +91,29 @@ const OverlayLayer = observer(({ panelLayouts, geometry, cols }:
         const offsetOf = (clientX: number, clientY: number) => ({ dx: clientX - start.x, dy: clientY - start.y });
         const move = (moveEvent: PointerEvent) => setDrag({ panelId: panel.i, height,
                                                                        ...offsetOf(moveEvent.clientX, moveEvent.clientY) });
-        const release = (upEvent: PointerEvent) => {
+        const stopListening = () => {
             window.removeEventListener('pointermove', move);
             window.removeEventListener('pointerup', release);
+            window.removeEventListener('pointercancel', cancel);
+            endDragRef.current = null;
+        };
+        const release = (upEvent: PointerEvent) => {
+            stopListening();
             const { dx, dy } = offsetOf(upEvent.clientX, upEvent.clientY);
             const target = snappedCell(panel, dx, dy);
             panelLayouts.movePanel(panel.i, target.x, target.y);
             setDrag(null);
         };
+        // The browser cancels the pointer when it takes the gesture over (a touch turning into a scroll): the panel
+        // goes back to where it was.
+        const cancel = () => {
+            stopListening();
+            setDrag(null);
+        };
         window.addEventListener('pointermove', move);
         window.addEventListener('pointerup', release);
+        window.addEventListener('pointercancel', cancel);
+        endDragRef.current = stopListening;
         event.preventDefault();
     };
 
@@ -118,7 +134,10 @@ const OverlayLayer = observer(({ panelLayouts, geometry, cols }:
                            width: box.width, maxHeight: box.height, display: 'flex', flexDirection: 'column',
                            zIndex: dragged ? 3 : 2, opacity: dragged ? 0.85 : 1,
                            '& .drag-handle': { cursor: dragged ? 'grabbing' : 'grab' } }}>
-                    {panelMapping(panel.i)}
+                    <ErrorBoundary resetKey={scenario.generation}
+                                   fallback={error => <ErrorFallback title={`Panel "${panel.i}" failed`} error={error} />}>
+                        {panelMapping(panel.i)}
+                    </ErrorBoundary>
                 </Box>
             );
         })}
@@ -154,7 +173,7 @@ const LayoutManager: React.FC = observer(() => {
             observer.disconnect();
             window.removeEventListener('resize', measure);
         };
-    }, [scenario.fullyLoaded]);
+    }, [scenario.fullyLoaded, scenario.generation]);
 
     const gap = theme.tokens.px(SHAPE.panelGap);
     const breakpoint = panelLayouts && viewport.width > 0 ? breakpointForWidth(panelLayouts.breakpoints, viewport.width) : null;
@@ -171,6 +190,7 @@ const LayoutManager: React.FC = observer(() => {
     if (!scenario.fullyLoaded) {
         return <div style={{ width: '100vw', height: '100vh', backgroundColor: theme.palette.background.default }}>
             <HeaderBar />
+            <LoadingIndicator />
         </div>;
     }
 
@@ -188,9 +208,10 @@ const LayoutManager: React.FC = observer(() => {
 
     return <div style={{ width: '100%', minHeight: '100vh', backgroundColor: theme.palette.background.default }}>
         <HeaderBar />
-        <Box ref={gridRef} sx={{ position: 'relative',
+        <Box key={scenario.generation} ref={gridRef} sx={{ position: 'relative',
                                  '& .react-grid-item.react-grid-placeholder': { ...dropOutline(theme.tokens), opacity: 1 } }}>
-            {ready && <>
+            {ready && <ErrorBoundary resetKey={scenario.generation}
+                                     fallback={error => <ErrorFallback title={`The layout of "${scenario.name}" failed`} error={error} />}>
                 <Responsive
                     className="layout"
                     width={viewport.width}
@@ -205,11 +226,16 @@ const LayoutManager: React.FC = observer(() => {
                     containerPadding={[gap, gap]}
                 >
                     {gridLayouts[breakpoint].map(panel => panel.visible
-                        ? <div key={panel.i}>{panelMapping(panel.i)}</div>
+                        ? <div key={panel.i}>
+                              <ErrorBoundary resetKey={scenario.generation}
+                                             fallback={error => <ErrorFallback title={`Panel "${panel.i}" failed`} error={error} />}>
+                                  {panelMapping(panel.i)}
+                              </ErrorBoundary>
+                          </div>
                         : <div key={panel.i} />)}
                 </Responsive>
                 <OverlayLayer panelLayouts={panelLayouts} geometry={geometry} cols={cols} />
-            </>}
+            </ErrorBoundary>}
         </Box>
         <LoadingIndicator />
     </div>
