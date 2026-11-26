@@ -1,5 +1,5 @@
-// ABOUTME: The tornado example's uncertainty tube: around the mean path, as wide in each direction as the members are
-// ABOUTME: spread that way (so elliptical where the spread is lopsided), colored by the spread. Linked to the other views.
+// ABOUTME: The tornado example's uncertainty tube: around the mean path, a rounded-square cross-section turned and sized
+// ABOUTME: to the members' spread (so its twist shows), colored by the spread. Linked to the other views.
 
 import { useEffect, useMemo } from "react";
 import { observer } from "mobx-react-lite";
@@ -29,9 +29,11 @@ const UncertaintyTube = observer(function UncertaintyTube() {
 
 const help = (
     <Typography variant="body2">
-        The tube follows the ensemble's mean path. Its cross-section is an ellipse whose half-widths are the members'
-        root-mean-square distances from the mean in the two directions across the path, so where the members spread
-        more one way than the other, the tube flattens. Colored by the spread, on the colorbar's scale. Moving the view
+        The tube follows the ensemble's mean path. Its cross-section is a superellipse (a rounded square) turned to the
+        two directions in which the members spread most and least across the path, with half-widths their
+        root-mean-square spread in each: where the members spread more one way than the other, the tube flattens, and
+        where that direction turns about the path, the corners show the tube twisting. Colored by the spread, on the
+        colorbar's scale. Moving the view
         moves the other 3D views; a double click or double tap goes back to the start view.
     </Typography>
 );

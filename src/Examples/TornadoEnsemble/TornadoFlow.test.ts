@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { generateEnsemble, SAMPLE_COUNT, VARIABILITY_GROWTH_RANGE } from './TornadoFlow';
-import { tubeFrames, uncertaintyTube } from './EnsembleTube';
+import { tubeFrames, uncertaintyCrossSections } from './EnsembleTube';
 
 const MEMBER_COUNT = 50;
-const RADIAL_SEGMENTS = 8;
 const LATE_SAMPLES = [Math.floor(SAMPLE_COUNT / 2), Math.floor(SAMPLE_COUNT * 0.75), SAMPLE_COUNT - 1];
 
 const point = (points: Float32Array, sample: number) =>
@@ -47,28 +46,25 @@ describe.each(VARIABILITY_GROWTH_RANGE)('the tornado ensemble at variability gro
         }
     });
 
-    it('has a tube holding about as many members as a one-standard-deviation ellipse would', () => {
-        // For offsets normally distributed across the path, the ellipse with the RMS offsets as half-widths holds
-        // 1 − e^{−1/2} ≈ 39% of them.
-        const tube = uncertaintyTube(paths, mean, () => 0, RADIAL_SEGMENTS, 0);
+    it('has a tube holding about as many members as a one-standard-deviation superellipse would', () => {
+        // For offsets normally distributed across the path, the superellipse |x/a|⁴ + |y/b|⁴ ≤ 1 with the RMS spreads
+        // along the principal directions as a and b holds about 44% of them (by Monte Carlo).
+        const sections = uncertaintyCrossSections(paths, mean, 0);
         const frames = tubeFrames(mean);
-        const ring = RADIAL_SEGMENTS + 1;
         for (const sample of LATE_SAMPLES) {
             const { normal, binormal } = frames[sample];
+            const { angle, halfWidths: [halfWidthU, halfWidthV] } = sections[sample];
             const center = point(mean, sample);
-            // Ring vertex 0 is at angle 0 (along the normal), vertex RADIAL_SEGMENTS / 4 at π/2 (along the binormal).
-            const halfWidth = (step: number) => {
-                const vertex = point(tube.vertices, sample * ring + step);
-                return Math.hypot(vertex[0] - center[0], vertex[1] - center[1], vertex[2] - center[2]);
-            };
-            const [alongNormal, alongBinormal] = [halfWidth(0), halfWidth(RADIAL_SEGMENTS / 4)];
             const inside = paths.filter(path => {
                 const offset = point(path, sample).map((value, axis) => value - center[axis]);
                 const dot = (direction: number[]) => offset[0] * direction[0] + offset[1] * direction[1] + offset[2] * direction[2];
-                return (dot(normal) / alongNormal) ** 2 + (dot(binormal) / alongBinormal) ** 2 <= 1;
+                const [x, y] = [dot(normal), dot(binormal)];
+                const alongU = Math.cos(angle) * x + Math.sin(angle) * y;
+                const alongV = -Math.sin(angle) * x + Math.cos(angle) * y;
+                return (alongU / halfWidthU) ** 4 + (alongV / halfWidthV) ** 4 <= 1;
             }).length;
-            expect(inside / MEMBER_COUNT).toBeGreaterThan(0.2);
-            expect(inside / MEMBER_COUNT).toBeLessThan(0.6);
+            expect(inside / MEMBER_COUNT).toBeGreaterThan(0.25);
+            expect(inside / MEMBER_COUNT).toBeLessThan(0.65);
         }
     });
 });

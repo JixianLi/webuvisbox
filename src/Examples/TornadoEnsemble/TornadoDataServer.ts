@@ -33,7 +33,9 @@ export interface TubeResponse {
     indices: string;            // uint32
 }
 
-export const TUBE_RADIAL_SEGMENTS = 16;
+// Enough segments for the superellipse's corners to read as corners.
+export const TUBE_RADIAL_SEGMENTS = 32;
+const SUPERELLIPSE_EXPONENT = 4;
 // In the flow's units (the paths span about 5 × 5 × 5).
 const MINIMUM_TUBE_RADIUS = 0.02;
 const MEAN_PATH_RADIUS = 0.04;
@@ -68,9 +70,10 @@ function answer(query: EnsembleQuery): EnsembleResponse {
         mean: encode64(mean),
         spread: encode64(spread),
         bounds: boundsOf(paths),
-        uncertainty_tube: encodeTube(uncertaintyTube(paths, mean, spreadValue, TUBE_RADIAL_SEGMENTS, MINIMUM_TUBE_RADIUS)),
-        mean_path_tube: encodeTube(buildTube(mean, () => [MEAN_PATH_RADIUS, MEAN_PATH_RADIUS], spreadValue,
-                                             TUBE_RADIAL_SEGMENTS)),
+        uncertainty_tube: encodeTube(uncertaintyTube(paths, mean, spreadValue, TUBE_RADIAL_SEGMENTS, MINIMUM_TUBE_RADIUS,
+                                                     SUPERELLIPSE_EXPONENT)),
+        mean_path_tube: encodeTube(buildTube(mean, () => ({ angle: 0, halfWidths: [MEAN_PATH_RADIUS, MEAN_PATH_RADIUS] }),
+                                             spreadValue, TUBE_RADIAL_SEGMENTS)),
     };
 }
 

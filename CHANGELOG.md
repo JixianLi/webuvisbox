@@ -64,7 +64,9 @@ has to change, if anything.
 - The Lorenz ensemble example is replaced by **Tornado ensemble**, after the paper's Uncertainty Tube setup on
   generated data: pathlines traced through an ensemble of Burgers vortices whose axes wander more and more over time,
   in three views linked by one camera (Ensemble, Uncertainty tube, Mean path), with the ensemble's bounding box and a
-  double press to reset. Lorenz members split between the attractor's two lobes, and the tube (one mean path, one
+  double press to reset. The uncertainty tube's cross-section is a superellipse (exponent 4) on the members' principal
+  directions across the path, sized by the square roots of the two eigenvalues and aligned sample to sample, so its
+  twist shows (it was an ellipse on the path's own frame, which a diagonal spread fooled). Lorenz members split between the attractor's two lobes, and the tube (one mean path, one
   cross-section) misrepresents an ensemble that splits; this one stays unimodal, which its tests check. Its ensemble
   comes from an in-browser data server answering like a Python one (JSON with base64 binary arrays), and its
   downloaded config stores the seed and the variability growth. **Host action:** `LORENZ_ENSEMBLE_CONFIG` is now
