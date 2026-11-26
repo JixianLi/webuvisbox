@@ -1,5 +1,5 @@
-// ABOUTME: The Uncertain terrain example's color legend: the VSUP arc. Around the arc runs the mean height; from the
-// ABOUTME: outer edge (certain, eight bins) inward (uncertain, bins merge until one faded color remains).
+// ABOUTME: The Uncertain terrain example's color legend: the VSUP arc (around it the mean height; from the outer edge,
+// ABOUTME: certain, inward, uncertain, bins merge until one faded color remains), or a colorbar for a single field.
 
 import { observer } from "mobx-react-lite";
 import * as d3 from "d3";
@@ -8,7 +8,8 @@ import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import { Panel } from "../../../Panels/Panel";
 import { useScenario } from "../../../ScenarioManager/ScenarioManager";
-import { UNCERTAINTY_REFERENCE, type UncertainTerrainGlobalContext } from "../UncertainTerrainGlobalContext";
+import { ENCODINGS, UNCERTAINTY_REFERENCE, type UncertainTerrainGlobalContext } from "../UncertainTerrainGlobalContext";
+import { PresetLinearColormap } from "../../../Renderers/Colormaps/PresetLinearColormap";
 import { terrainColor, terrainPalette, VSUP_DEPTH } from "../TerrainColors";
 
 const HALF_ANGLE = Math.PI / 3;
@@ -36,9 +37,37 @@ function arcCells(rings: number, sectorsInRing: (ring: number) => number,
     });
 }
 
+const COLORBAR_STOPS = 32;
+
+// A single field: the colormap as a bar, from the field's low to its high end.
+const Colorbar = observer(function Colorbar() {
+    const context = useScenario().globalContext as UncertainTerrainGlobalContext;
+    const colormap = new PresetLinearColormap(context.colormapPreset);
+    const stops = d3.range(COLORBAR_STOPS + 1).map(stop => colormap.getColorByValue(stop / COLORBAR_STOPS).formatHex());
+    const [low, high] = context.encoding === "mean" ? context.ensemble.meanRange : [0, UNCERTAINTY_REFERENCE];
+    const highLabel = context.encoding === "spread" ? `≥ ${high.toFixed(2)}` : high.toFixed(2);
+    return (
+        <Panel panelName="Legend">
+            <Box sx={{ width: 1, maxWidth: 320, mx: "auto" }}>
+                <Typography variant="caption" sx={{ display: "block", color: "text.secondary", textAlign: "center" }}>
+                    {ENCODINGS[context.encoding].toLowerCase()}
+                </Typography>
+                <Box sx={{ height: 14, borderRadius: 0.5, background: `linear-gradient(to right, ${stops.join(", ")})` }} />
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="caption" sx={{ color: "text.secondary" }}>{low.toFixed(2)}</Typography>
+                    <Typography variant="caption" sx={{ color: "text.secondary" }}>{highLabel}</Typography>
+                </Box>
+            </Box>
+        </Panel>
+    );
+});
+
 export default observer(function LegendPanel() {
     const context = useScenario().globalContext as UncertainTerrainGlobalContext;
     const tokens = useTheme().tokens;
+    if (context.encoding !== "vsup") {
+        return <Colorbar />;
+    }
     const palette = terrainPalette(context.colormapPreset, context.continuousColors);
     const colorAt = (value: number, uncertainty: number) => terrainColor(palette, value, uncertainty).formatHex();
     const cells = context.continuousColors

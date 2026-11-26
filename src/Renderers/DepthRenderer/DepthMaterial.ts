@@ -1,4 +1,4 @@
-// ABOUTME: Custom shader material for linear depth visualization.
+// ABOUTME: Custom shader material for logarithmic depth visualization.
 // ABOUTME: Outputs inverted grayscale where near is bright (white) and far is dark (black).
 
 import * as THREE from "three";

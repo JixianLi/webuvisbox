@@ -5,6 +5,20 @@ has to change, if anything.
 
 ## Unreleased
 
+### Glyphs, depth images, helpers
+
+- `InstancedConeMesh` writes instance matrices and colors directly (one draw call, no React element per glyph), and its
+  orientation is fixed and documented: in a Z-up frame, tilt by `vRotation` about +X (toward +Z), then turn by
+  `hRotation` about +Z. Before, `vRotation` was applied about both X and Y; with `vRotation = 0` (as the archived
+  Wildfire used it) nothing changes. `keyPrefix` is removed; `color` now multiplies each instance's color (default
+  white). **Host action:** drop `keyPrefix`; check any glyphs with a nonzero `vRotation`.
+- `DepthOverride` measures only visible objects, and instanced meshes by their instances; it allocates nothing per
+  frame and disposes its material. `computeSceneDepthRange` is exported. (Its shader is logarithmic, as before; the
+  comments said linear.)
+- `Helpers/saveGrayscalePng.ts` is renamed `Helpers/SaveGrayscalePng.ts` (the project's file naming); the function
+  keeps its name. **Host action:** update the import path. Call it right after a render in the same task (a WebGL
+  canvas keeps no copy of what it drew), as the terrain example's Depth panel does.
+
 ### Meshes and linked cameras
 
 - `InstancedSphereMesh` writes the instance matrices directly (one draw call, no React element per point). The
@@ -23,6 +37,11 @@ has to change, if anything.
 
 ### Examples
 
+- Uncertain terrain shows the paper's Wildfire setup on generated data: colors by VSUP or by one field through
+  `ScalarFieldMesh` and TextureManager, wind glyphs (`InstancedConeMesh`) fading where the members disagree, toggled
+  from a Layers menu (`CheckMenuItem`), a Depth panel (`DepthOverride`, PNG export), controls laid out with `FormGrid`;
+  the seed, encoding and wind settings are stored in its config (`wind_color` read with `parseColor`,
+  `wind_glyph_scale` checked with `numberBetween`).
 - Lorenz ensemble shows the paper's Uncertainty Tube setup on generated data: three views linked by one camera
   (Trajectories, Uncertainty tube, Mean path), the attractor's bounding box, double press to reset. Its ensemble comes
   from an in-browser data server answering like a Python one (JSON with base64 binary arrays), and its downloaded

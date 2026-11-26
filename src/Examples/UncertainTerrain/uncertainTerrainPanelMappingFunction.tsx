@@ -9,6 +9,7 @@ const TerrainPanel = lazy(() => import("./Views/TerrainPanel"));
 const ControlsPanel = lazy(() => import("./Views/ControlsPanel"));
 const LegendPanel = lazy(() => import("./Views/LegendPanel"));
 const ProbePanel = lazy(() => import("./Views/ProbePanel"));
+const DepthPanel = lazy(() => import("./Views/DepthPanel"));
 
 const loading = <Typography variant="caption" sx={{ p: 1.5, color: "text.secondary" }}>Loading…</Typography>;
 
@@ -23,6 +24,8 @@ export function uncertainTerrainPanelMappingFunction(viewname: string): React.Re
                 return <LegendPanel />;
             case "Probe":
                 return <ProbePanel />;
+            case "Depth":
+                return <DepthPanel />;
             default:
                 throw new Error(`Unknown view name: ${viewname}`);
         }
