@@ -41,7 +41,9 @@ export function createAppTheme(mode: DisplayMode, accent: string, uiScale: numbe
         tokens,
         palette: {
             mode: modeTokens.base,
-            primary: { main: tokens.accentFill, contrastText: accentText },
+            // Lines and text (outlined and text buttons, sliders, focus, checkboxes) need the accent's on-surface tint
+            // for contrast; fills (contained buttons, switch tracks) take accentFill through their overrides below.
+            primary: { main: tokens.accentOnSurface, contrastText: accentText },
             background: { default: modeTokens.canvas, paper: modeTokens.surface },
             text: { primary: modeTokens.text, secondary: modeTokens.textSecondary, disabled: modeTokens.textMuted },
             divider: modeTokens.border,
@@ -124,6 +126,19 @@ export function createAppTheme(mode: DisplayMode, accent: string, uiScale: numbe
                         },
                         '& .MuiSwitch-thumb': { width: px(16), height: px(16), boxShadow: '0 1px 2px rgba(0, 0, 0, 0.25)' },
                         '& .MuiSwitch-track': { opacity: 1, borderRadius: px(10), backgroundColor: modeTokens.textMuted },
+                    },
+                },
+            },
+            MuiButton: {
+                styleOverrides: {
+                    root: {
+                        variants: [{
+                            props: { variant: 'contained', color: 'primary' },
+                            style: {
+                                backgroundColor: tokens.accentFill,
+                                '&:hover': { backgroundColor: tokens.accentFill, filter: 'brightness(1.12)' },
+                            },
+                        }],
                     },
                 },
             },

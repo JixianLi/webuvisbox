@@ -13,7 +13,7 @@ export interface DragBoxProps {
 const DragBox = styled(Box, {
     shouldForwardProp: (prop) => prop !== 'isDragging'
 })<{ isDragging?: boolean }>(({ theme, isDragging }) => ({
-    border: isDragging ? '2px dashed #aaa' : '2px dashed #ddd',
+    border: `1.5px dashed ${isDragging ? theme.tokens.textMuted : theme.tokens.border}`,
     borderRadius: theme.shape.borderRadius,
     padding: theme.spacing(4),
     display: 'flex',
@@ -21,11 +21,12 @@ const DragBox = styled(Box, {
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    backgroundColor: isDragging ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
-    transition: 'all 0.3s ease',
+    color: theme.tokens.textSecondary,
+    backgroundColor: isDragging ? theme.tokens.controlFill : 'transparent',
+    transition: 'background-color 0.15s ease, border-color 0.15s ease',
     '&:hover': {
-        backgroundColor: 'rgba(0, 0, 0, 0.04)',
-        borderColor: theme.palette.primary.light
+        backgroundColor: theme.tokens.controlFill,
+        borderColor: theme.tokens.textMuted,
     },
     minHeight: '150px'
 }));

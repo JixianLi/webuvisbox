@@ -1,7 +1,7 @@
 // ABOUTME: Root application component. Sets up the theme from the display settings (mode, UI scale) and the scenario's
 // ABOUTME: appearance (accent, default mode), the framework's commands and shortcuts, and the layout manager.
 
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import '@fontsource-variable/inter';
@@ -27,10 +27,22 @@ interface AppProps {
     initialConfig: ScenarioSource;
 }
 
+const DARK_SCHEME_QUERY = '(prefers-color-scheme: dark)';
+
+function subscribeToSystemMode(onChange: () => void): () => void {
+    const query = window.matchMedia?.(DARK_SCHEME_QUERY);
+    query?.addEventListener('change', onChange);
+    return () => query?.removeEventListener('change', onChange);
+}
+
+function systemModeNow(): DisplayMode {
+    return window.matchMedia?.(DARK_SCHEME_QUERY).matches ? 'dark' : 'bright';
+}
+
 const ThemedApp = observer(() => {
     const scenario = useScenario();
-    const systemMode: DisplayMode =
-        window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'bright';
+    // Follows the operating system's light or dark setting as it changes.
+    const systemMode = useSyncExternalStore(subscribeToSystemMode, systemModeNow);
     // The scenario's appearance holds the mode and UI scale (picks in the navbar write them back); without a mode in
     // the config, the system's light or dark preference applies.
     const mode = scenario.appearance.defaultMode ?? systemMode;

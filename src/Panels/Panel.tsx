@@ -80,6 +80,10 @@ export const Panel = observer((props: PanelProps) => {
 
     return <Box key={"panel_" + panelName}
                 onPointerEnter={() => commandRegistry.setActivePanel(panelName)}
+                // Panel commands act on the panel under the pointer; keyboard focus inside keeps the panel active.
+                onPointerLeave={event => {
+                    if (!event.currentTarget.contains(document.activeElement)) commandRegistry.clearActivePanel(panelName);
+                }}
                 onFocusCapture={() => commandRegistry.setActivePanel(panelName)}
                 sx={{ width: 1, height: type === 'overlay' ? 'auto' : 1, display: 'flex', flexDirection: 'column',
                       overflow: 'hidden', ...frames[type],

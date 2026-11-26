@@ -31,4 +31,14 @@ describe('CommandRegistry', () => {
         registry.runPanelAction('Viewport', 'fit');
         expect(fit).not.toHaveBeenCalled();
     });
+
+    it('clears the active panel when the pointer leaves it, but not one that became active since', () => {
+        const registry = new CommandRegistry();
+        registry.setActivePanel('Viewport');
+        registry.setActivePanel('Settings');
+        registry.clearActivePanel('Viewport');
+        expect(registry.activePanelId).toBe('Settings');
+        registry.clearActivePanel('Settings');
+        expect(registry.activePanelId).toBeNull();
+    });
 });

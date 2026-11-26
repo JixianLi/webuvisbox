@@ -5,6 +5,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import { useTheme, type SxProps, type Theme } from '@mui/material/styles';
 import { CloudUpload } from 'lucide-react';
 import FileUploadDragBox from './DragBox';
 
@@ -25,6 +26,7 @@ const ScenarioUploadDialog: React.FC<ScenarioUploadDialogProps> = ({
     
     // Create a ref for the file input
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const tokens = useTheme().tokens;
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
@@ -68,17 +70,13 @@ const ScenarioUploadDialog: React.FC<ScenarioUploadDialogProps> = ({
         }
 
         const reader = new FileReader();
+        // The text is parsed and checked by the loader, which shows any error on screen.
         reader.onload = (event) => {
-            try {
-                const jsonString = event.target?.result;
-                if (typeof jsonString === "string") {
-                    onUpload(jsonString);
-                } else {
-                    setErrorMessage('Error reading file content.');
-                }
-            } catch (error) {
-                console.error('Error parsing JSON:', error);
-                setErrorMessage('Invalid JSON format. Please check the file content.');
+            const jsonString = event.target?.result;
+            if (typeof jsonString === "string") {
+                onUpload(jsonString);
+            } else {
+                setErrorMessage('Error reading file content.');
             }
         };
 
@@ -95,15 +93,25 @@ const ScenarioUploadDialog: React.FC<ScenarioUploadDialogProps> = ({
         setErrorMessage('');
     };
 
+    const dialogSx: SxProps<Theme> = {
+        '& .MuiDialog-paper': {
+            backgroundColor: tokens.surfaceRaised,
+            border: `1px solid ${tokens.border}`,
+            borderRadius: `${tokens.px(12)}px`,
+        },
+    };
+
     return (
-        <Dialog 
-            open={open} 
-            onClose={handleCloseDialog} 
-            maxWidth="sm" 
+        <Dialog
+            open={open}
+            onClose={handleCloseDialog}
+            onKeyDown={event => event.stopPropagation()}
+            maxWidth="xs"
             fullWidth
+            sx={dialogSx}
         >
-            <DialogTitle>Upload Scenario</DialogTitle>
-            <DialogContent>
+            <DialogTitle sx={{ fontSize: tokens.px(15), fontWeight: 600, pb: 1 }}>Upload Scenario</DialogTitle>
+            <DialogContent sx={{ pt: 0.5 }}>
                 <input
                     accept=".json"
                     style={{ display: 'none' }}
@@ -123,16 +131,16 @@ const ScenarioUploadDialog: React.FC<ScenarioUploadDialogProps> = ({
                         }
                     }}
                 >
-                    <CloudUpload size={36} strokeWidth={1.5} style={{ marginBottom: 16 }} />
-                    <Typography variant="body1" align="center" gutterBottom>
-                        Drag and drop your scenario file here or click to browse
+                    <CloudUpload size={28} strokeWidth={1.75} style={{ marginBottom: 12 }} />
+                    <Typography align="center" sx={{ fontSize: tokens.px(13), fontWeight: 500, color: tokens.text }}>
+                        Drop a scenario file here, or click to choose one
                     </Typography>
-                    <Typography variant="body2" align="center" color="textSecondary">
-                        Supports JSON files only
+                    <Typography align="center" sx={{ fontSize: tokens.px(12), color: tokens.textSecondary }}>
+                        A .json scenario config
                     </Typography>
                     {selectedFile && (
-                        <Typography variant="body2" style={{ marginTop: 16 }} color="primary">
-                            Selected: {selectedFile.name}
+                        <Typography sx={{ fontSize: tokens.px(13), mt: 1.5, color: tokens.accentOnSurface }}>
+                            {selectedFile.name}
                         </Typography>
                     )}
                 </FileUploadDragBox>
@@ -143,19 +151,11 @@ const ScenarioUploadDialog: React.FC<ScenarioUploadDialogProps> = ({
                     </Typography>
                 )}
             </DialogContent>
-            <DialogActions>
-                <Button 
-                    onClick={handleCloseDialog} 
-                    color="primary"
-                >
+            <DialogActions sx={{ px: 3, pb: 2 }}>
+                <Button onClick={handleCloseDialog} color="inherit" sx={{ color: tokens.textSecondary }}>
                     Cancel
                 </Button>
-                <Button 
-                    onClick={handleUpload} 
-                    color="primary" 
-                    variant="contained" 
-                    disabled={!selectedFile}
-                >
+                <Button onClick={handleUpload} color="primary" variant="contained" disabled={!selectedFile}>
                     Upload
                 </Button>
             </DialogActions>

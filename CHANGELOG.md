@@ -5,6 +5,19 @@ has to change, if anything.
 
 ## Unreleased
 
+### Look and behavior
+
+- The theme's `primary.main` is the accent's on-surface tint (`tokens.accentOnSurface`), so lines and text drawn in
+  the primary color (sliders, outlined and text buttons, focus rings, checkboxes) reach readable contrast in dark mode;
+  contained buttons and switch tracks keep the fill (`tokens.accentFill`). Bright mode is unchanged (both are the
+  accent). **Host action:** a component that used `palette.primary.main` as a fill should use `tokens.accentFill`.
+- The navbar logo follows `accentFill`: hue-free in neutral mode, as DESIGN.md says.
+- The upload dialog and its drop zone use the design tokens (it had fixed grays that looked wrong in dark and neutral).
+- Panel shortcuts (⌥F, ⌥C, ⌥W) act on the panel under the pointer: leaving a panel stops it being their target unless
+  keyboard focus is inside it. `CommandRegistry.clearActivePanel(panelId)` is new.
+- Without `appearance.default_mode`, the display mode follows the operating system's light or dark setting live.
+- The dev app's page no longer loads Google's Material Icons font (unused; a third-party request on every load).
+
 ### Glyphs, depth images, helpers
 
 - `WordCloudLayoutRunner` takes an optional `onError(message)` (default: logged); a layout that failed in the worker

@@ -99,6 +99,13 @@ export class CommandRegistry {
         this.activePanelId = panelId;
     }
 
+    // Only if it is still the active one: another panel may have become active first.
+    clearActivePanel(panelId: string) {
+        if (this.activePanelId === panelId) {
+            this.activePanelId = null;
+        }
+    }
+
     run(id: string, panelId?: string) {
         const command = this.commands.get(id);
         if (!command) {
