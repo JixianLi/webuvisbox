@@ -13,6 +13,7 @@ import Typography from "@mui/material/Typography";
 import { Panel } from "../../../Panels/Panel";
 import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import { COLORMAP_PRESETS, type UncertainTerrainGlobalContext } from "../UncertainTerrainGlobalContext";
+import { SliderOnRelease } from "../../../Panels/SliderOnRelease";
 
 export default observer(function ControlsPanel() {
     const context = useScenario().globalContext as UncertainTerrainGlobalContext;
@@ -20,16 +21,10 @@ export default observer(function ControlsPanel() {
     return (
         <Panel panelName="Controls">
             <Box sx={{ width: 1, display: "flex", flexDirection: "column", gap: 1.5 }}>
-                <Box>
-                    <Typography variant="caption" sx={label}>{`Ensemble members: ${context.memberCount}`}</Typography>
-                    <Slider size="small" min={5} max={50} step={1} value={context.memberCount}
-                            onChange={(_, value) => context.setMemberCount(value as number)} />
-                </Box>
-                <Box>
-                    <Typography variant="caption" sx={label}>{`Spread between members: ${context.spread.toFixed(2)}`}</Typography>
-                    <Slider size="small" min={0} max={1} step={0.05} value={context.spread}
-                            onChange={(_, value) => context.setSpread(value as number)} />
-                </Box>
+                <SliderOnRelease min={5} max={50} step={1} value={context.memberCount}
+                                 label={value => `Ensemble members: ${value}`} onRelease={value => context.setMemberCount(value)} />
+                <SliderOnRelease min={0} max={1} step={0.05} value={context.spread}
+                                 label={value => `Spread between members: ${value.toFixed(2)}`} onRelease={value => context.setSpread(value)} />
                 <Box>
                     <Typography variant="caption" sx={label}>{`Height scale: ${context.heightScale.toFixed(2)}`}</Typography>
                     <Slider size="small" min={0.1} max={1} step={0.05} value={context.heightScale}

@@ -1,7 +1,7 @@
 // ABOUTME: The Lorenz ensemble example's main view: every member's trajectory as a tube, grown up to the current time
 // ABOUTME: and colored by the ensemble's spread (or by time), with a marker at each member's current position.
 
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
@@ -13,6 +13,8 @@ import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import { LinearTubeMesh } from "../../../Renderers/Mesh/LinearTubeMesh";
 import type { LorenzEnsembleGlobalContext } from "../LorenzEnsembleGlobalContext";
 import { sampleColors } from "../LorenzColors";
+import { FitCameraToAspect } from "../../../Renderers/Camera/FitCameraToAspect";
+import { DoublePressToReset } from "../../../Renderers/Camera/DoublePressToReset";
 
 // Lorenz coordinates span about x, y ∈ [−20, 20], z ∈ [0, 50]. The group shows Lorenz z as up, scaled to about unit
 // size and centered: rotating −90° about x maps (x, y, z) to (x, z, −y).
@@ -21,17 +23,6 @@ const TUBE_RADIUS = 0.12;
 const MARKER_RADIUS = 0.45;
 const CAMERA_POSITION = new THREE.Vector3(0.4, 0.5, 3.1);
 
-// Framed for a landscape view; a portrait one (phones) moves back by the inverse aspect so the attractor's width fits.
-function FitCameraToAspect() {
-    const camera = useThree(state => state.camera);
-    const invalidate = useThree(state => state.invalidate);
-    const aspect = useThree(state => state.size.width / Math.max(1, state.size.height));
-    useEffect(() => {
-        camera.position.copy(CAMERA_POSITION).multiplyScalar(Math.max(1, 1.0 / aspect));
-        invalidate();
-    }, [camera, aspect, invalidate]);
-    return null;
-}
 
 const MemberMarkers = observer(function MemberMarkers() {
     const context = useScenario().globalContext as LorenzEnsembleGlobalContext;
@@ -81,7 +72,8 @@ export default function TrajectoriesPanel() {
         <Panel panelName="Trajectories">
             <Box sx={{ width: 1, height: 1, minHeight: 0 }}>
                 <Canvas frameloop="demand" camera={{ position: CAMERA_POSITION.toArray(), fov: 40 }}>
-                    <FitCameraToAspect />
+                    <FitCameraToAspect position={CAMERA_POSITION.toArray()} />
+                    <DoublePressToReset />
                     <hemisphereLight args={["#ffffff", "#808080", 1.4]} />
                     <directionalLight position={[2, 3, 2]} intensity={1.2} />
                     <group scale={SCENE_SCALE} rotation={[-Math.PI / 2, 0, 0]} position={[0, -25 * SCENE_SCALE, 0]}>

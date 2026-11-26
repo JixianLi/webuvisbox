@@ -1,6 +1,8 @@
 // ABOUTME: Generates the Lorenz ensemble example's data: trajectories of the Lorenz system from nearly identical
 // ABOUTME: starting points, and the ensemble's spread over time. Pure math, no rendering (loaded with the scenario).
 
+import { seededRandom, standardNormal } from "../../Helpers/Random";
+
 // The Lorenz system (Lorenz 1963, "Deterministic nonperiodic flow"), with the classic chaotic parameters:
 //     dx/dt = σ (y − x),    dy/dt = x (ρ − z) − y,    dz/dt = x y − β z,    σ = 10, ρ = 28, β = 8/3.
 // Integrated with classic fourth-order Runge–Kutta at a fixed step DT; every SAMPLE_STRIDE-th state is kept.
@@ -43,23 +45,6 @@ const START: State = (() => {
     return state;
 })();
 
-// Seeded uniform random numbers in [0, 1) (mulberry32), so one seed always gives the same ensemble.
-function seededRandom(seed: number): () => number {
-    let value = seed >>> 0;
-    return () => {
-        value = (value + 0x6d2b79f5) >>> 0;
-        let mixed = Math.imul(value ^ (value >>> 15), value | 1);
-        mixed ^= mixed + Math.imul(mixed ^ (mixed >>> 7), mixed | 61);
-        return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
-    };
-}
-
-// Standard normal samples by the Box–Muller transform.
-function seededGaussian(seed: number): () => number {
-    const random = seededRandom(seed);
-    return () => Math.sqrt(-2 * Math.log(1 - random())) * Math.cos(2 * Math.PI * random());
-}
-
 export interface LorenzEnsemble {
     paths: Float32Array[];   // one per member: SAMPLE_COUNT points, x y z each
     spread: Float32Array;    // per sample: RMS distance of the members from the ensemble mean
@@ -68,7 +53,7 @@ export interface LorenzEnsemble {
 // Member m starts at START + jitter · (g_x, g_y, g_z) with g standard normal, so the starting spread is about
 // jitter · √3.
 export function generateEnsemble(memberCount: number, jitter: number, seed: number): LorenzEnsemble {
-    const gaussian = seededGaussian(seed + 1);
+    const gaussian = standardNormal(seededRandom(seed + 1));
     const paths = Array.from({ length: memberCount }, () => {
         let state: State = [START[0] + jitter * gaussian(), START[1] + jitter * gaussian(), START[2] + jitter * gaussian()];
         const path = new Float32Array(SAMPLE_COUNT * 3);

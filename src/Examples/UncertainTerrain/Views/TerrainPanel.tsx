@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo } from "react";
 import { observer } from "mobx-react-lite";
-import { Canvas, useThree, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import Box from "@mui/material/Box";
@@ -12,6 +12,8 @@ import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import type { UncertainTerrainGlobalContext } from "../UncertainTerrainGlobalContext";
 import { GRID_SIZE, gridPosition, nearestGridIndex } from "../TerrainEnsemble";
 import { terrainColor, terrainPalette } from "../TerrainColors";
+import { FitCameraToAspect } from "../../../Renderers/Camera/FitCameraToAspect";
+import { DoublePressToReset } from "../../../Renderers/Camera/DoublePressToReset";
 
 function surfaceGeometry(mean: Float32Array, heightScale: number): THREE.BufferGeometry {
     const geometry = new THREE.PlaneGeometry(2, 2, GRID_SIZE - 1, GRID_SIZE - 1);
@@ -25,20 +27,9 @@ function surfaceGeometry(mean: Float32Array, heightScale: number): THREE.BufferG
     return geometry;
 }
 
-// The camera is framed for a landscape view; on a portrait one (phones) it moves back so the terrain's width still fits,
-// by the inverse of the aspect ratio (the horizontal field of view shrinks roughly with it).
+// Framed for a landscape view; the terrain is wider than tall, so the camera backs off below an aspect of 1.25.
 const CAMERA_POSITION = new THREE.Vector3(1.7, 1.3, 1.9);
 
-function FitCameraToAspect() {
-    const camera = useThree(state => state.camera);
-    const invalidate = useThree(state => state.invalidate);
-    const aspect = useThree(state => state.size.width / Math.max(1, state.size.height));
-    useEffect(() => {
-        camera.position.copy(CAMERA_POSITION).multiplyScalar(Math.max(1, 1.25 / aspect));
-        invalidate();
-    }, [camera, aspect, invalidate]);
-    return null;
-}
 
 const ProbeWhisker = observer(function ProbeWhisker() {
     const context = useScenario().globalContext as UncertainTerrainGlobalContext;
@@ -101,7 +92,8 @@ export default function TerrainPanel() {
         <Panel panelName="Terrain">
             <Box sx={{ width: 1, height: 1, minHeight: 0 }}>
                 <Canvas frameloop="demand" camera={{ position: CAMERA_POSITION.toArray(), fov: 38 }}>
-                    <FitCameraToAspect />
+                    <FitCameraToAspect position={CAMERA_POSITION.toArray()} minimumAspect={1.25} />
+                    <DoublePressToReset />
                     <hemisphereLight args={["#ffffff", "#808080", 1.6]} />
                     <directionalLight position={[2, 3, 1]} intensity={1.1} />
                     <TerrainSurface />

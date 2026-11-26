@@ -13,6 +13,7 @@ import Typography from "@mui/material/Typography";
 import { Panel } from "../../../Panels/Panel";
 import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import type { ContourMode, ContourUncertaintyGlobalContext, ProbabilityMode } from "../ContourUncertaintyGlobalContext";
+import { SliderOnRelease } from "../../../Panels/SliderOnRelease";
 
 export default observer(function ControlsPanel() {
     const context = useScenario().globalContext as ContourUncertaintyGlobalContext;
@@ -27,16 +28,10 @@ export default observer(function ControlsPanel() {
                     <Slider size="small" min={Math.ceil(minimum * 100) / 100} max={Math.floor(maximum * 100) / 100}
                             step={0.01} value={context.level} onChange={(_, value) => context.setLevel(value as number)} />
                 </Box>
-                <Box>
-                    <Typography variant="caption" sx={label}>{`Members: ${context.memberCount}`}</Typography>
-                    <Slider size="small" min={5} max={50} step={1} value={context.memberCount}
-                            onChange={(_, value) => context.setMemberCount(value as number)} />
-                </Box>
-                <Box>
-                    <Typography variant="caption" sx={label}>{`Spread between members: ${context.spread.toFixed(2)}`}</Typography>
-                    <Slider size="small" min={0} max={1} step={0.05} value={context.spread}
-                            onChange={(_, value) => context.setSpread(value as number)} />
-                </Box>
+                <SliderOnRelease min={5} max={50} step={1} value={context.memberCount}
+                                 label={value => `Members: ${value}`} onRelease={value => context.setMemberCount(value)} />
+                <SliderOnRelease min={0} max={1} step={0.05} value={context.spread}
+                                 label={value => `Spread between members: ${value.toFixed(2)}`} onRelease={value => context.setSpread(value)} />
                 <Button size="small" variant="outlined" onClick={() => context.newRandomSeed()}>New random ensemble</Button>
                 <Box>
                     <Typography variant="caption" sx={label}>Contours</Typography>

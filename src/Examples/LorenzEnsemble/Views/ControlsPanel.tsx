@@ -1,7 +1,6 @@
 // ABOUTME: Controls of the Lorenz ensemble example: playback (play/pause, time, speed), ensemble size and starting
 // ABOUTME: jitter, a new random start, and what the colors show.
 
-import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -15,24 +14,8 @@ import { Panel } from "../../../Panels/Panel";
 import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import { COLORMAP_PRESETS, type ColorMode, type LorenzEnsembleGlobalContext } from "../LorenzEnsembleGlobalContext";
 import { DURATION, SAMPLE_INTERVAL } from "../LorenzSystem";
+import { SliderOnRelease } from "../../../Panels/SliderOnRelease";
 
-// A slider that applies its value on release: each value regenerates the ensemble and rebuilds every tube (about a
-// second at 200 paths), so applying while dragging would stall the drag. The label follows the drag.
-function SliderOnRelease({ value, min, max, step, label, onRelease }: {
-    value: number; min: number; max: number; step: number;
-    label: (value: number) => string; onRelease: (value: number) => void;
-}) {
-    const [dragValue, setDragValue] = useState<number | null>(null);
-    const shown = dragValue ?? value;
-    return (
-        <Box>
-            <Typography variant="caption" sx={{ display: "block", color: "text.secondary" }}>{label(shown)}</Typography>
-            <Slider size="small" min={min} max={max} step={step} value={shown}
-                    onChange={(_, next) => setDragValue(next as number)}
-                    onChangeCommitted={(_, next) => { setDragValue(null); onRelease(next as number); }} />
-        </Box>
-    );
-}
 
 export default observer(function ControlsPanel() {
     const context = useScenario().globalContext as LorenzEnsembleGlobalContext;

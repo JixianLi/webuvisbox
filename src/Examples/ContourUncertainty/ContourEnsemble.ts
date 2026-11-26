@@ -1,6 +1,8 @@
 // ABOUTME: Generates the contour uncertainty example's data: an ensemble of smooth 2D scalar fields, each a sum of
 // ABOUTME: Gaussian bumps whose positions, heights and widths vary from member to member. Pure math, no rendering.
 
+import { seededRandom, standardNormal } from "../../Helpers/Random";
+
 // Fields are sampled at GRID_SIZE × GRID_SIZE vertices covering the unit square; value index = row · GRID_SIZE + column,
 // with row 0 at the top. Each member is
 //     f(x, y) = Σ_k a_k · exp(−((x − x_k)² + (y − y_k)²) / (2 σ_k²))
@@ -26,17 +28,6 @@ const SIGMA_JITTER = 0.15;
 const EXTRA_BUMPS_PER_MEMBER = 2;
 const EXTRA_BUMP_AMPLITUDE = 0.25;
 
-// Seeded uniform random numbers in [0, 1) (mulberry32), so one seed always gives the same ensemble.
-function seededRandom(seed: number): () => number {
-    let value = seed >>> 0;
-    return () => {
-        value = (value + 0x6d2b79f5) >>> 0;
-        let mixed = Math.imul(value ^ (value >>> 15), value | 1);
-        mixed ^= mixed + Math.imul(mixed ^ (mixed >>> 7), mixed | 61);
-        return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
-    };
-}
-
 export interface ContourEnsemble {
     members: Float32Array[];   // GRID_SIZE² values each
     mean: Float32Array;
@@ -56,7 +47,7 @@ function addBump(field: Float32Array, bump: Bump) {
 
 export function generateEnsemble(memberCount: number, spread: number, seed: number): ContourEnsemble {
     const random = seededRandom(seed + 1);
-    const gaussian = () => Math.sqrt(-2 * Math.log(1 - random())) * Math.cos(2 * Math.PI * random());
+    const gaussian = standardNormal(random);
     const members = Array.from({ length: memberCount }, () => {
         const field = new Float32Array(GRID_SIZE * GRID_SIZE);
         for (const bump of BASE_BUMPS) {

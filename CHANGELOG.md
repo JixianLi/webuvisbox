@@ -5,6 +5,17 @@ has to change, if anything.
 
 ## Unreleased
 
+### New in the library (shared helpers, formerly copied between scenarios)
+
+- `Helpers/Random`: `seededRandom(seed)` (mulberry32) and `standardNormal(random)` (Box–Muller).
+- `Helpers/DoublePress`: `createDoublePressDetector(onDoublePress, intervalMs = 300)`, from pointer-down times, so it
+  works for touch as well as mouse.
+- `Renderers/Camera/FitCameraToAspect`: places the camera at `position`, backed off by `minimumAspect / aspect` on a
+  narrower canvas; saves the default controls' state, so their `reset()` returns to the fitted view.
+- `Renderers/Camera/DoublePressToReset`: a double press on the canvas resets the default controls.
+- `Panels/SliderOnRelease`: a slider that applies its value on release, for values expensive to apply.
+  Nothing to change in a host; scenarios that copied one of these can import it instead.
+
 ### Colormaps and color management (convention: sRGB colors, linear-light textures)
 
 - **TextureManager textures hold linear light** (`texture.colorSpace = LinearSRGBColorSpace`); before, they held the
