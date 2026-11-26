@@ -5,6 +5,21 @@ has to change, if anything.
 
 ## Unreleased
 
+### Colormaps and color management (convention: sRGB colors, linear-light textures)
+
+- **TextureManager textures hold linear light** (`texture.colorSpace = LinearSRGBColorSpace`); before, they held the
+  colormap's sRGB values unlabeled. Built-in three.js materials (`TexturedBufferedMesh`, `ScalarFieldMesh`, any
+  `meshPhongMaterial` sampling the texture) now show the colormap's colors; before they looked washed out.
+  **Host action:** render with R3F's default output (no `<Canvas linear flat>`; with it, colors now look too dark),
+  and end a custom shader that samples these textures with `linearToOutputTexel(color)` (or three's
+  `colorspace_fragment`). `VolumeRenderer` does so: its colors are unchanged, and semi-transparent samples now blend in
+  linear light.
+- `PresetLinearColormap.invert()` mirrors the map (the color at p moves to 1 - p); before, it reversed the colors but
+  kept the positions, so maps with uneven points inverted wrongly.
+- `VSUP` follows every edit (color points added, moved, removed, replaced, inverted; preset; fading color; depth); before,
+  its discrete colors stayed as built, and a color cached at one depth was served at another.
+- Subclasses of `PresetLinearColormap` can override `protected onColorsChanged()`, called after every edit.
+
 ### Scenario loading
 
 - A load builds and initializes the new scenario beside the running one and swaps it in only when ready; the running

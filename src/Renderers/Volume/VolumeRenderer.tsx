@@ -118,7 +118,8 @@ void main() {
         t += uStepSize;
     }
     if (accumulated.a < 0.002) discard;
-    fragmentColor = vec4(accumulated.rgb / accumulated.a, accumulated.a);
+    // The transfer function texture holds linear light (TextureManager); encode for the screen as three's materials do.
+    fragmentColor = linearToOutputTexel(vec4(accumulated.rgb / accumulated.a, accumulated.a));
 }`;
 
 // Float volumes go to the GPU as 16-bit floats: filterable in WebGL2 without extensions (32-bit floats need

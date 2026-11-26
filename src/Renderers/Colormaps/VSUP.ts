@@ -39,7 +39,7 @@ export class VSUP extends PresetLinearColormap {
                 console.warn('Invalid color format for setFadingColor.');
                 return;
             }
-            this._createTree();
+            this.onColorsChanged();
         });
     }
 
@@ -47,6 +47,15 @@ export class VSUP extends PresetLinearColormap {
         if (this.depth < 1 || this.depth > 10) {
             console.warn("Depth must be at least 1 and at most 10. Adjusting depth value.");
             this.depth = Math.max(1, Math.min(this.depth, 10));
+        }
+    }
+
+    // The cache and the tree both follow the colors, the fading color and the depth.
+    protected onColorsChanged(): void {
+        super.onColorsChanged();
+        // Also called by the base constructor (setPreset), before this class has set its depth.
+        if (this.depth !== undefined) {
+            this._createTree();
         }
     }
 
@@ -91,17 +100,7 @@ export class VSUP extends PresetLinearColormap {
             runInAction(() => {
                 this.depth = depth;
                 this._validateDepth();
-                this._createTree();
-            });
-        }
-    }
-
-    setPreset(presetName: string): void {
-        super.setPreset(presetName);
-        // Only rebuild tree if depth is set (not during parent constructor)
-        if (this.depth !== undefined) {
-            runInAction(() => {
-                this._createTree();
+                this.onColorsChanged();
             });
         }
     }

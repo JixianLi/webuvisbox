@@ -74,6 +74,10 @@ class TextureManager {
         const texture = new THREE.DataTexture(new Uint16Array(width * height * 4), width, height, THREE.RGBAFormat,
                                               THREE.HalfFloatType);
         texture.internalFormat = "RGBA16F";
+        // Colormaps are defined in sRGB; the texture holds them as linear light, three.js's working space, so built-in
+        // materials light and blend them correctly and the renderer encodes the result for the screen. A custom shader
+        // sampling it ends with linearToOutputTexel (or three's colorspace_fragment).
+        texture.colorSpace = THREE.LinearSRGBColorSpace;
         texture.minFilter = THREE.LinearFilter;
         texture.magFilter = THREE.LinearFilter;
         texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -87,18 +91,20 @@ class TextureManager {
             const opacityMap = opacityMapName ? this.opacityMaps.get(opacityMapName) : undefined;
             if (!colormap) return;
             const textureData = new Float32Array(width * height * 4);
+            const linear = new THREE.Color();
             for (let y = 0; y < height; y++) {
                 for (let x = 0; x < width; x++) {
-                    const x_norm = width === 1 ? 0 : x / (width - 1);
-                    const y_norm = height === 1 ? 0 : y / (height - 1);
+                    const xNormalized = width === 1 ? 0 : x / (width - 1);
+                    const yNormalized = height === 1 ? 0 : y / (height - 1);
 
-                    const color = colormap.getColorForTexture(x_norm, y_norm);
+                    const color = colormap.getColorForTexture(xNormalized, yNormalized);
 
                     const idx = (y * width + x) * 4;
-                    textureData[idx] = color.r / 255;
-                    textureData[idx + 1] = color.g / 255;
-                    textureData[idx + 2] = color.b / 255;
-                    textureData[idx + 3] = opacityMap ? opacityMap.getOpacityFromControlPoints(x_norm) : 1.0;
+                    linear.setRGB(color.r / 255, color.g / 255, color.b / 255, THREE.SRGBColorSpace);
+                    textureData[idx] = linear.r;
+                    textureData[idx + 1] = linear.g;
+                    textureData[idx + 2] = linear.b;
+                    textureData[idx + 3] = opacityMap ? opacityMap.getOpacityFromControlPoints(xNormalized) : 1.0;
                 }
             }
             texture.image.data = Uint16Array.from(textureData, THREE.DataUtils.toHalfFloat);

@@ -33,6 +33,11 @@ export class PresetLinearColormap {
             points[index] = Math.min(points[index + 1] - gap, Math.max(points[index - 1] + gap, position));
         }
         if (color) this.colorPoints[index] = [...color];
+        this.onColorsChanged();
+    }
+
+    // Every edit of the points ends here, so anything derived from them (a cache, VSUP's tree) is rebuilt.
+    protected onColorsChanged(): void {
         this._colorCache.clear();
     }
 
@@ -44,6 +49,7 @@ export class PresetLinearColormap {
         runInAction(() => {
             this.colorControlPoints.splice(index, 1);
             this.colorPoints.splice(index, 1);
+            this.onColorsChanged();
         });
     }
 
@@ -58,6 +64,7 @@ export class PresetLinearColormap {
         runInAction(() => {
             this.colorControlPoints.splice(idx, 0, value);
             this.colorPoints.splice(idx, 0, [newColor.r / 255, newColor.g / 255, newColor.b / 255]);
+            this.onColorsChanged();
         });
     }
 
@@ -69,9 +76,12 @@ export class PresetLinearColormap {
         return this.getColorByValue(value);
     }
 
+    // Mirrors the map: the color at position p moves to 1 - p.
     invert() {
         runInAction(() => {
-            this.colorPoints.reverse();
+            this.colorControlPoints = this.colorControlPoints.map(position => 1 - position).reverse();
+            this.colorPoints = [...this.colorPoints].reverse();
+            this.onColorsChanged();
         });
     }
 
@@ -103,9 +113,9 @@ export class PresetLinearColormap {
         runInAction(() => {
             this.presetName = presetName;
             this._validatePreset();
-            this._colorCache.clear();
             this.colorControlPoints = [...presets[this.presetName].control_points];
             this.colorPoints = presets[this.presetName].color_points.map(arr => [...arr]);
+            this.onColorsChanged();
         });
     }
 
@@ -117,7 +127,7 @@ export class PresetLinearColormap {
         runInAction(() => {
             this.colorControlPoints = controlPoints;
             this.colorPoints = colorPoints;
-            this._colorCache.clear();
+            this.onColorsChanged();
         });
     }
 
