@@ -31,12 +31,12 @@ function withShortcut(label: string, commandId: string): string {
     return shortcut ? `${label} (${shortcutLabel(shortcut)})` : label;
 }
 
+// The provider is always rendered, whatever the mode: a wrapper present in one mode only would change the element
+// tree, and React would remount the panel's content (losing its state) on every switch into or out of that mode.
 export function Panel(props: PanelProps) {
-    const controlPanelTheme = useTheme().controlPanelTheme;
-    if (props.scene || !controlPanelTheme) {
-        return <PanelFrame {...props} />;
-    }
-    return <ThemeProvider theme={controlPanelTheme}><PanelFrame {...props} /></ThemeProvider>;
+    const theme = useTheme();
+    const panelTheme = props.scene ? theme : theme.controlPanelTheme ?? theme;
+    return <ThemeProvider theme={panelTheme}><PanelFrame {...props} /></ThemeProvider>;
 }
 
 const PanelFrame = observer((props: PanelProps) => {

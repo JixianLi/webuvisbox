@@ -12,6 +12,8 @@ has to change, if anything.
   (`controlPanels` tokens, applied by a `ThemeProvider` inside the Panel). **Host action:** add `scene` to your 3D and
   image views (without it they show on dark gray in neutral); a view that reads `useTheme()` and renders a non-scene
   Panel should read it in a component inside the Panel, or it gets the scene tokens.
+- Fixed: switching into or out of neutral remounted every non-scene panel's content (losing its state, rerunning its
+  mount effects), as the Panel's `ThemeProvider` was present in neutral only. It is now always present. No host action.
 - Scrollbars follow the display mode (`scrollbarThumb` token, `color-scheme` per panel); neutral had white tracks.
 - The neutral display mode is redone: hue-free grays, mid gray (`#7C7C7C`) panels with dark gray (`#505050`) title
   rows and navbar on a darker (`#303030`) canvas, black text; borderless main views sit on the panel gray too. It is built on MUI's light palette now (it was dark), so
