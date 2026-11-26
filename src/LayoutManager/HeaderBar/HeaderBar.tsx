@@ -139,7 +139,7 @@ const BrandMark: React.FC<{ onAccent: boolean }> = ({ onAccent }) => {
     const theme = useTheme();
     const px = theme.tokens.px;
     return <Box sx={{ width: px(18), height: px(18), borderRadius: `${px(5)}px`, flexShrink: 0,
-                      backgroundColor: onAccent ? '#FFFFFF' : theme.tokens.accentFill,
+                      backgroundColor: onAccent ? '#FFFFFF' : theme.tokens.chrome?.text ?? theme.tokens.accentFill,
                       boxShadow: onAccent ? 'none' : 'inset 0 1px 0 rgba(255,255,255,0.25)' }} />;
 };
 
@@ -150,8 +150,8 @@ const HeaderBar: React.FC = observer(() => {
     const onAccent = tokens.navbar === 'accent';
     const compact = useMediaQuery(theme.breakpoints.down('sm'));
     const header = { height: tokens.px(SHAPE.navbarHeight), display: 'flex', alignItems: 'center', gap: 1.5, px: 1.75,
-                     backgroundColor: onAccent ? tokens.accent : tokens.surface,
-                     color: onAccent ? '#FFFFFF' : tokens.text,
+                     backgroundColor: onAccent ? tokens.accent : tokens.chrome?.fill ?? tokens.surface,
+                     color: onAccent ? '#FFFFFF' : tokens.chrome?.text ?? tokens.text,
                      borderBottom: onAccent ? 'none' : `1px solid ${tokens.border}` };
     const title = (
         <Typography component="h1" noWrap

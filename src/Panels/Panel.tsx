@@ -73,8 +73,9 @@ export const Panel = observer((props: PanelProps) => {
                    boxShadow: `inset 0 1px 0 ${tokens.glass.highlight}, ${tokens.shadowRaised}`,
                    borderRadius: `${tokens.px(12)}px` },
     };
-    const headerAction = { color: tokens.textSecondary, p: 0.5, opacity: 0.5, transition: 'opacity 120ms',
-                           '&:hover': { opacity: 1, backgroundColor: tokens.controlFill } };
+    const chrome = type !== 'borderless' ? tokens.chrome : undefined;
+    const headerAction = { color: chrome?.text ?? tokens.textSecondary, p: 0.5, opacity: 0.5, transition: 'opacity 120ms',
+                           '&:hover': { opacity: 1, backgroundColor: chrome ? 'rgba(255, 255, 255, 0.14)' : tokens.controlFill } };
     const icon = { size: tokens.px(15), strokeWidth: 1.75 };
     const showBody = !collapsed;
 
@@ -90,7 +91,7 @@ export const Panel = observer((props: PanelProps) => {
                       '&:hover .panel-header-action': { opacity: 0.85 }, ...props.sx }}>
         <Box ref={headerRef} className="drag-handle"
              sx={{ height: tokens.px(SHAPE.panelHeaderHeight), flexShrink: 0, display: 'flex', alignItems: 'center',
-                   gap: 0.25, pl: 1.5, pr: 0.75, color: tokens.text,
+                   gap: 0.25, pl: 1.5, pr: 0.75, color: chrome?.text ?? tokens.text, backgroundColor: chrome?.fill,
                    cursor: 'grab',
                    borderBottom: showBody && type !== 'borderless' ? `1px solid ${tokens.border}` : 'none',
                    '&:active': { cursor: 'grabbing' } }}>

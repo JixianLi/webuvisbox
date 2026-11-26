@@ -20,6 +20,9 @@ export interface ModeTokens {
     textMuted: string;
     // The navbar: 'surface' blends with the panels, 'accent' fills it with the accent (the brand bar).
     navbar: 'surface' | 'accent';
+    // Dark chrome on light content: when set, the navbar (unless 'accent') and the title rows of regular and overlay
+    // panels take this fill and text color.
+    chrome?: { fill: string; text: string };
     // Accent as a fill (switch, selection; white text on it) and as a line or text on the surface (focus ring,
     // links), where a dark surface needs a lighter tint to keep 3:1 contrast.
     accentFill: (accent: string) => string;
@@ -63,22 +66,25 @@ export const MODE_TOKENS: Record<DisplayMode, ModeTokens> = {
                  highlight: 'rgba(255, 255, 255, 0.10)' },
         shadowRaised: '0 12px 32px rgba(0, 0, 0, 0.40), 0 1px 3px rgba(0, 0, 0, 0.30)',
     },
-    // For judging color: every gray is hue-free (R = G = B), no accent near the content, glass without saturation.
+    // For judging color: warm mid grays, a dark gray navbar and panel title rows over a light gray canvas and panels,
+    // no accent near the content, glass without saturation. On the light gray (128, 124, 118) only black text reaches
+    // 4.5:1 (5.06:1), so text, secondary text and the accent as a line are black or nearly.
     neutral: {
-        base: 'dark',
-        canvas: '#4A4A4A',
-        surface: '#545454',
-        surfaceRaised: '#5E5E5E',
-        controlFill: '#5C5C5C',
-        border: 'rgba(255, 255, 255, 0.10)',
-        text: '#F2F2F2',
-        textSecondary: '#C8C8C8',
-        textMuted: '#A0A0A0',
+        base: 'light',
+        canvas: '#807C76',
+        surface: '#807C76',
+        surfaceRaised: '#8C8882',
+        controlFill: '#8A8680',
+        border: 'rgba(0, 0, 0, 0.22)',
+        text: '#000000',
+        textSecondary: '#0D0C0B',
+        textMuted: '#2A2724',
         navbar: 'surface',
-        accentFill: () => '#E0E0E0',
-        accentOnSurface: () => '#E0E0E0',
-        glass: { fill: 'rgba(84, 84, 84, 0.70)', blur: 24, saturate: 1.0, edge: 'rgba(255, 255, 255, 0.12)',
-                 highlight: 'rgba(255, 255, 255, 0.10)' },
+        chrome: { fill: '#544F4B', text: '#FFFFFF' },
+        accentFill: () => '#544F4B',
+        accentOnSurface: () => '#0D0C0B',
+        glass: { fill: 'rgba(128, 124, 118, 0.80)', blur: 24, saturate: 1.0, edge: 'rgba(255, 255, 255, 0.18)',
+                 highlight: 'rgba(255, 255, 255, 0.14)' },
         shadowRaised: '0 12px 32px rgba(0, 0, 0, 0.30), 0 1px 3px rgba(0, 0, 0, 0.25)',
     },
 };

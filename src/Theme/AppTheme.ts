@@ -35,7 +35,6 @@ export function createAppTheme(mode: DisplayMode, accent: string, uiScale: numbe
     };
     const SelectChevron = (props: { className?: string }) =>
         createElement(ChevronDown, { size: px(16), strokeWidth: 1.75, className: props.className, style: { right: px(8) } });
-    const accentText = mode === 'neutral' ? '#1A1A1A' : '#FFFFFF';
 
     return createTheme({
         tokens,
@@ -43,7 +42,7 @@ export function createAppTheme(mode: DisplayMode, accent: string, uiScale: numbe
             mode: modeTokens.base,
             // Lines and text (outlined and text buttons, sliders, focus, checkboxes) need the accent's on-surface tint
             // for contrast; fills (contained buttons, switch tracks) take accentFill through their overrides below.
-            primary: { main: tokens.accentOnSurface, contrastText: accentText },
+            primary: { main: tokens.accentOnSurface, contrastText: '#FFFFFF' },
             background: { default: modeTokens.canvas, paper: modeTokens.surface },
             text: { primary: modeTokens.text, secondary: modeTokens.textSecondary, disabled: modeTokens.textMuted },
             divider: modeTokens.border,
@@ -121,7 +120,7 @@ export function createAppTheme(mode: DisplayMode, accent: string, uiScale: numbe
                         '& .MuiSwitch-switchBase': {
                             padding: px(2),
                             color: '#FFFFFF',
-                            '&.Mui-checked': { transform: `translateX(${px(14)}px)`, color: accentText },
+                            '&.Mui-checked': { transform: `translateX(${px(14)}px)`, color: '#FFFFFF' },
                             '&.Mui-checked + .MuiSwitch-track': { opacity: 1, backgroundColor: tokens.accentFill },
                         },
                         '& .MuiSwitch-thumb': { width: px(16), height: px(16), boxShadow: '0 1px 2px rgba(0, 0, 0, 0.25)' },
