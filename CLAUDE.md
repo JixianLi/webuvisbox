@@ -30,7 +30,7 @@ src/                      # Library — no scenario-specific code, except the bu
 ├── ScenarioManager/      # Loads config, drives scenario lifecycle
 ├── LayoutManager/        # Navbar; the responsive panel grid, with overlay panels above it
 ├── Panels/               # Base Panel component (frame by panel type, fit, collapse) + grid container
-├── Examples/             # Built-in examples (ChatUI, Uncertain terrain, Tornado ensemble, Contour uncertainty, Volume rendering): config in a JSON file imported (bundled), registered by App, in every host's menu
+├── Examples/             # Built-in examples (Tornado ensemble, Uncertain terrain, Contour uncertainty, Volume rendering, ChatUI): config in a JSON file imported (bundled), registered by App, in every host's menu
 ├── Renderers/            # Reusable renderers: Chat, Trace (swim lanes), Graph (word-cloud force layout + SVG view), Mesh, Colormaps, Volume (ray marching), TransferFunction (editor)
 ├── Scenarios/
 │   ├── ScenarioRegistry.ts   # Registry singleton + ScenarioDefinition type
@@ -40,7 +40,7 @@ src/                      # Library — no scenario-specific code, except the bu
 
 examples/                 # Dev app + example scenarios (Vite root)
 ├── index.html            # Entry HTML, loads main.tsx
-├── main.tsx              # Imports each example to register, mounts <App> on the built-in ChatUI
+├── main.tsx              # Imports each example to register, mounts <App> on the built-in Tornado ensemble
 └── public/               # Static files served at URL root (a dev scenario's ScenarioConfigs/*.json)
 ```
 

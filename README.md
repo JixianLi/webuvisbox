@@ -100,8 +100,8 @@ webuvisbox/
 └── package.json
 ```
 
-The library contains the framework and its built-in examples (`src/Examples/`: ChatUI, Uncertain terrain, Tornado
-ensemble, Contour uncertainty, Volume rendering). They run entirely in the browser with generated data, and each imports
+The library contains the framework and its built-in examples (`src/Examples/`: Tornado ensemble, Uncertain terrain,
+Contour uncertainty, Volume rendering, ChatUI). They run entirely in the browser with generated data, and each imports
 its scenario config from a JSON file beside it, which bundles it, so every app built on the library offers them in the
 Scenario menu without serving a file or running a server. The dev app
 under `examples/` mounts the library and is where a dev-only scenario would go.
@@ -116,11 +116,11 @@ so the examples double as its demonstration and its integration test:
 
 | Example | What it shows |
 |---|---|
-| ChatUI (default) | A scripted tool-calling agent: chat, a swim-lane trace, and a word cloud of the conversation's topics |
+| Tornado ensemble (default) | Pathlines through an ensemble of tornado-like flows, after the paper's Uncertainty Tube case study: three linked 3D views (pathlines, uncertainty tube, mean path), data from an in-browser server speaking base64 binary |
 | Uncertain terrain | An ensemble of terrains, after the paper's Wildfire case study: VSUP or single-field coloring, wind glyphs where the members agree or not, a depth image |
-| Tornado ensemble | Pathlines through an ensemble of tornado-like flows, after the paper's Uncertainty Tube case study: three linked 3D views (pathlines, uncertainty tube, mean path), data from an in-browser server speaking base64 binary |
 | Contour uncertainty | Contour boxplots, crossing probability and critical points of a 2D ensemble |
 | Volume rendering | Ray-marched volumes with an editable transfer function |
+| ChatUI | A scripted tool-calling agent: chat, a swim-lane trace, and a word cloud of the conversation's topics |
 
 | Library component | Used by |
 |---|---|

@@ -52,6 +52,8 @@ has to change, if anything.
 
 ### Examples
 
+- The examples are listed in the Scenario menu as Tornado ensemble, Uncertain terrain, Contour uncertainty, Volume
+  rendering, ChatUI (`src/Examples/index.ts` registers them in that order), and the dev app opens on Tornado ensemble.
 - ChatUI adds a Topics panel (`WordCloud`, laid out in its worker): the conversation's words, linked when they share a
   message. Its seeded conversation uses a bundled cat image, so loading it waits on no network request; asking the
   scripted agent for a cat still fetches a live one (bundled one when offline). Its actions stay actions when called
