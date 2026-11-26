@@ -6,7 +6,7 @@ export interface BoxOutlineMeshProps {
     color: string;                 // Line color (required)
     opacity?: number;              // Line opacity (0-1)
     transparent?: boolean;         // Enable transparency
-    linewidth?: number;            // Line thickness (works on all platforms with tube mesh)
+    linewidth?: number;            // Line thickness in scene units: the tube's diameter (works on every platform)
     radialSegments?: number;       // Number of segments around tube circumference
     shininess?: number;            // Material shininess factor
 }
@@ -19,7 +19,7 @@ export interface BoxOutlineMeshProps {
  * @param props.color - Line color (required)
  * @param props.opacity - Line opacity, defaults to 1
  * @param props.transparent - Enable transparency, defaults to false
- * @param props.linewidth - Line thickness, defaults to 1
+ * @param props.linewidth - Line thickness in scene units (the tube's diameter), defaults to 1
  * @param props.radialSegments - Tube detail level, defaults to 8
  * @param props.shininess - Material shininess factor, defaults to 0
  * 
@@ -36,11 +36,12 @@ export function BoxOutlineMesh(props: BoxOutlineMeshProps) {
         shininess = 0
     } = props;
 
-    const meshRef = useRef<THREE.Group>(null);
+    const meshRef = useRef<THREE.Mesh>(null);
+    const [xMin, xMax, yMin, yMax, zMin, zMax] = boundingBox;
 
     // Create tube-based box outline geometry
+    // Keyed by the bounds' values, not the array: a caller passing a new array with the same bounds keeps the geometry.
     const geometry = useMemo(() => {
-        const [xMin, xMax, yMin, yMax, zMin, zMax] = boundingBox;
 
         // Define the 12 edges as line segments
         const edges = [
@@ -82,7 +83,7 @@ export function BoxOutlineMesh(props: BoxOutlineMeshProps) {
             const tubeGeometry = new THREE.TubeGeometry(
                 curve,
                 1,              // tubularSegments (1 for straight lines)
-                linewidth,      // radius
+                linewidth / 2,  // radius
                 radialSegments, // radialSegments
                 false          // closed
             );
@@ -130,7 +131,7 @@ export function BoxOutlineMesh(props: BoxOutlineMeshProps) {
         mergedGeometry.computeBoundingSphere();
 
         return mergedGeometry;
-    }, [boundingBox, linewidth, radialSegments]);
+    }, [xMin, xMax, yMin, yMax, zMin, zMax, linewidth, radialSegments]);
 
     // Clean up geometry on unmount or when geometry changes
     useEffect(() => {

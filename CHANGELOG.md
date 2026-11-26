@@ -5,6 +5,29 @@ has to change, if anything.
 
 ## Unreleased
 
+### Meshes and linked cameras
+
+- `InstancedSphereMesh` writes the instance matrices directly (one draw call, no React element per point). The
+  `keyPrefix` prop is removed (it keyed those elements); `color` and `specular` accept any three.js color. **Host
+  action:** drop `keyPrefix` where passed.
+- `BoxOutlineMesh`: `linewidth` is the line's thickness (the tube's diameter); it was used as the radius, so lines were
+  twice as thick as asked. **Host action:** double `linewidth` to keep the old look. The geometry is no longer rebuilt
+  when a new array with the same bounds is passed.
+- `TexturedBufferedMesh` and `SingleColorBufferedMesh` take `visibleIndexCount`: draw a prefix of the triangles (a tube
+  up to the current time) without rebuilding the geometry. `TexturedBufferedMesh` redraws a canvas drawing on demand
+  when its colormap texture is rewritten (edited in TextureManager).
+- `SharedTrackballControl`: views no longer take the shared pose over from each other every frame (a view applying the
+  shared pose republished it); views on canvases drawing on demand (`frameloop="demand"`) follow the others and can be
+  dragged (they had no frames for the trackball to move in); the first view to mount publishes its own camera as the
+  shared pose (it started at (0, 0, 5)). `SharedTrackballPerspectiveCamera` counts published poses (`version`).
+
+### Examples
+
+- Lorenz ensemble shows the paper's Uncertainty Tube setup on generated data: three views linked by one camera
+  (Trajectories, Uncertainty tube, Mean path), the attractor's bounding box, double press to reset. Its ensemble comes
+  from an in-browser data server answering like a Python one (JSON with base64 binary arrays), and its downloaded
+  config stores the seed.
+
 ### New in the library (shared helpers, formerly copied between scenarios)
 
 - `Helpers/Random`: `seededRandom(seed)` (mulberry32) and `standardNormal(random)` (Box–Muller).

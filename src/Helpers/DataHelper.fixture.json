@@ -1,0 +1,46 @@
+{
+  "float32": {
+    "base64": "AAAAAAAAwD8AABDAsA+hNMrySXEAAACA",
+    "values": [
+      0.0,
+      1.5,
+      -2.25,
+      3.000000106112566e-07,
+      1.0000000150474662e+30,
+      -0.0
+    ]
+  },
+  "float64": {
+    "base64": "mpmZmZmZuT9Z8/jCH26lgaH4MebWHMhA",
+    "values": [
+      0.1,
+      -1e-300,
+      12345.6789
+    ]
+  },
+  "int32": {
+    "base64": "AAAAAP////////9/AAAAgA==",
+    "values": [
+      0,
+      -1,
+      2147483647,
+      -2147483648
+    ]
+  },
+  "uint16": {
+    "base64": "AAABAP//",
+    "values": [
+      0,
+      1,
+      65535
+    ]
+  },
+  "uint8": {
+    "base64": "AH//",
+    "values": [
+      0,
+      127,
+      255
+    ]
+  }
+}

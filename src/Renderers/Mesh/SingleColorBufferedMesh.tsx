@@ -1,4 +1,5 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useEffect, useLayoutEffect } from 'react';
+import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 interface SingleColorBufferedGeometryProps {
@@ -49,6 +50,8 @@ export interface SingleColorBufferedMeshProps {
     depthTest?: boolean;           // Enable depth testing
     depthWrite?: boolean;          // Enable depth writing
     side?: THREE.Side;             // Which sides to render
+    // Draws only the first this-many indices (a prefix of the triangles) without rebuilding the geometry. Default: all.
+    visibleIndexCount?: number;
 }
 
 /**
@@ -67,7 +70,8 @@ export function SingleColorBufferedMesh(props: SingleColorBufferedMeshProps) {
         transparent = false,
         depthTest = true,
         depthWrite = true,
-        side = THREE.DoubleSide
+        side = THREE.DoubleSide,
+        visibleIndexCount,
     } = props;
 
     const meshRef = useRef<THREE.Mesh>(null);
@@ -83,6 +87,12 @@ export function SingleColorBufferedMesh(props: SingleColorBufferedMeshProps) {
             geometry?.dispose();
         };
     }, [geometry]);
+
+    const invalidate = useThree(state => state.invalidate);
+    useLayoutEffect(() => {
+        geometry.setDrawRange(0, visibleIndexCount ?? Infinity);
+        invalidate();
+    }, [geometry, visibleIndexCount, invalidate]);
 
     return (
         <mesh ref={meshRef} geometry={geometry}>

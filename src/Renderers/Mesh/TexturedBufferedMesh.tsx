@@ -1,5 +1,7 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useEffect, useLayoutEffect } from 'react';
+import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { onTextureUpdate } from '../Colormaps/TextureUpdates';
 
 interface TexturedBufferedGeometryProps {
     vertices: Float32Array;        // Vertex positions [x,y,z,x,y,z,...]
@@ -56,6 +58,9 @@ export interface TexturedBufferedMeshProps {
     depthTest?: boolean;           // Enable depth testing
     depthWrite?: boolean;          // Enable depth writing
     side?: THREE.Side;             // Which sides to render
+    // Draws only the first this-many indices (a prefix of the triangles), e.g. a tube up to the current time, without
+    // rebuilding the geometry. Default: all.
+    visibleIndexCount?: number;
 }
 
 /**
@@ -76,7 +81,8 @@ export function TexturedBufferedMesh(props: TexturedBufferedMeshProps) {
         transparent = false,
         depthTest = true,
         depthWrite = true,
-        side = THREE.DoubleSide
+        side = THREE.DoubleSide,
+        visibleIndexCount,
     } = props;
 
     const meshRef = useRef<THREE.Mesh>(null);
@@ -92,6 +98,14 @@ export function TexturedBufferedMesh(props: TexturedBufferedMeshProps) {
             geometry?.dispose();
         };
     }, [geometry]);
+
+    const invalidate = useThree(state => state.invalidate);
+    useLayoutEffect(() => {
+        geometry.setDrawRange(0, visibleIndexCount ?? Infinity);
+        invalidate();
+    }, [geometry, visibleIndexCount, invalidate]);
+    // A colormap edited in TextureManager is rewritten in place; redraw a canvas that draws on demand.
+    useEffect(() => onTextureUpdate(colormap, invalidate), [colormap, invalidate]);
 
     return (
         <mesh ref={meshRef} geometry={geometry}>

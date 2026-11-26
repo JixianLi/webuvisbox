@@ -8,6 +8,8 @@ export class SharedTrackballPerspectiveCamera {
     private _up: THREE.Vector3;
     private _quaternion: THREE.Quaternion;
     private _lastUsedId: string | null;
+    // Counts the poses published; 0 until the first. A control applies each version once.
+    private _version: number = 0;
 
     constructor() {
         this._position = new THREE.Vector3(0, 0, 5);
@@ -24,6 +26,7 @@ export class SharedTrackballPerspectiveCamera {
     get target(): THREE.Vector3 { return this._target; }
     get quaternion(): THREE.Quaternion { return this._quaternion; }
     get lastUsedId(): string | null { return this._lastUsedId; }
+    get version(): number { return this._version; }
 
 
     // Utility methods for updating camera state
@@ -34,6 +37,7 @@ export class SharedTrackballPerspectiveCamera {
             this._up.copy(up);
             this._quaternion.copy(quaternion);
             this._lastUsedId = id;
+            this._version += 1;
         });
     }
 }

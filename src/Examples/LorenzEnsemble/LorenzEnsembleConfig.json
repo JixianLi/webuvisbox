@@ -1,37 +1,37 @@
 {
     "name": "Lorenz ensemble",
     "description": "Chaos as uncertainty: paths of the Lorenz system from nearly the same start, colored as they diverge",
-    "views": ["Trajectories", "Controls", "Spread", "Colorbar"],
+    "views": ["Trajectories", "Uncertainty tube", "Mean path", "Controls", "Spread", "Colorbar"],
     "panel_layouts": {
         "default_layouts": {
             "xl": [
-                {"i": "Trajectories", "type": "borderless", "x": 0, "y": 0, "w": 18, "h": 16, "visible": true},
-                {"i": "Controls", "x": 18, "y": 0, "w": 6, "h": 9, "visible": true},
-                {"i": "Spread", "x": 18, "y": 9, "w": 6, "h": 7, "visible": true},
-                {"i": "Colorbar", "type": "overlay", "x": 0, "y": 13, "w": 5, "h": 3, "visible": true}
+                {"i": "Trajectories", "x": 0, "y": 0, "w": 8, "h": 9, "visible": true},
+                {"i": "Uncertainty tube", "x": 8, "y": 0, "w": 8, "h": 9, "visible": true},
+                {"i": "Mean path", "x": 16, "y": 0, "w": 8, "h": 9, "visible": true},
+                {"i": "Controls", "x": 0, "y": 9, "w": 8, "h": 7, "visible": true},
+                {"i": "Spread", "x": 8, "y": 9, "w": 16, "h": 7, "visible": true},
+                {"i": "Colorbar", "type": "overlay", "x": 0, "y": 6, "w": 5, "h": 3, "visible": true}
             ],
             "lg": [
-                {"i": "Trajectories", "type": "borderless", "x": 0, "y": 0, "w": 8, "h": 14, "visible": true},
-                {"i": "Controls", "x": 8, "y": 0, "w": 4, "h": 8, "visible": true},
-                {"i": "Spread", "x": 8, "y": 8, "w": 4, "h": 6, "visible": true},
-                {"i": "Colorbar", "type": "overlay", "x": 0, "y": 11, "w": 4, "h": 3, "visible": true}
+                {"i": "Trajectories", "x": 0, "y": 0, "w": 6, "h": 8, "visible": true},
+                {"i": "Uncertainty tube", "x": 6, "y": 0, "w": 6, "h": 8, "visible": true},
+                {"i": "Mean path", "x": 0, "y": 8, "w": 6, "h": 6, "visible": false},
+                {"i": "Controls", "x": 0, "y": 8, "w": 6, "h": 6, "visible": true},
+                {"i": "Spread", "x": 6, "y": 8, "w": 6, "h": 6, "visible": true},
+                {"i": "Colorbar", "type": "overlay", "x": 0, "y": 5, "w": 4, "h": 3, "visible": true}
             ],
             "sm": [
-                {"i": "Trajectories", "type": "borderless", "x": 0, "y": 0, "w": 4, "h": 9, "visible": true},
+                {"i": "Trajectories", "x": 0, "y": 0, "w": 4, "h": 9, "visible": true},
                 {"i": "Colorbar", "x": 0, "y": 9, "w": 4, "h": 2, "visible": true},
                 {"i": "Spread", "x": 0, "y": 11, "w": 4, "h": 5, "visible": true},
-                {"i": "Controls", "x": 0, "y": 16, "w": 4, "h": 10, "visible": true}
+                {"i": "Controls", "x": 0, "y": 16, "w": 4, "h": 10, "visible": true},
+                {"i": "Uncertainty tube", "x": 0, "y": 26, "w": 4, "h": 9, "visible": false},
+                {"i": "Mean path", "x": 0, "y": 35, "w": 4, "h": 9, "visible": false}
             ]
         },
         "breakpoints": {"xl": 1440, "lg": 800, "sm": 0},
         "cols": {"xl": 24, "lg": 12, "sm": 4},
         "fit_rows": {"sm": 13}
     },
-    "global_data": {
-        "member_count": 50,
-        "jitter_exponent": -5,
-        "speed": 1.5,
-        "color_mode": "spread",
-        "colormap_preset": "Plasma (matplotlib)"
-    }
+    "global_data": {"member_count": 50, "jitter_exponent": -5, "seed": 0, "speed": 1.5, "color_mode": "spread", "colormap_preset": "Plasma (matplotlib)"}
 }

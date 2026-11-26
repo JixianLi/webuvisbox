@@ -1,11 +1,8 @@
 // ABOUTME: The Lorenz ensemble example's main view: every member's trajectory as a tube, grown up to the current time
 // ABOUTME: and colored by the ensemble's spread (or by time), with a marker at each member's current position.
 
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { observer } from "mobx-react-lite";
-import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import * as THREE from "three";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import { Panel } from "../../../Panels/Panel";
@@ -13,43 +10,12 @@ import { useScenario } from "../../../ScenarioManager/ScenarioManager";
 import { LinearTubeMesh } from "../../../Renderers/Mesh/LinearTubeMesh";
 import type { LorenzEnsembleGlobalContext } from "../LorenzEnsembleGlobalContext";
 import { sampleColors } from "../LorenzColors";
-import { FitCameraToAspect } from "../../../Renderers/Camera/FitCameraToAspect";
-import { DoublePressToReset } from "../../../Renderers/Camera/DoublePressToReset";
+import { LinkedCanvas } from "./LinkedCanvas";
+import { MemberPositions } from "./MemberPositions";
 
-// Lorenz coordinates span about x, y ∈ [−20, 20], z ∈ [0, 50]. The group shows Lorenz z as up, scaled to about unit
-// size and centered: rotating −90° about x maps (x, y, z) to (x, z, −y).
-const SCENE_SCALE = 1 / 25;
+// In Lorenz units.
 const TUBE_RADIUS = 0.12;
 const MARKER_RADIUS = 0.45;
-const CAMERA_POSITION = new THREE.Vector3(0.4, 0.5, 3.1);
-
-
-const MemberMarkers = observer(function MemberMarkers() {
-    const context = useScenario().globalContext as LorenzEnsembleGlobalContext;
-    const markerColor = useTheme().tokens.text;
-    const invalidate = useThree(state => state.invalidate);
-    const meshRef = useRef<THREE.InstancedMesh>(null);
-    const { paths } = context.ensemble;
-    const sample = context.visibleSampleCount - 1;
-    useLayoutEffect(() => {
-        const mesh = meshRef.current;
-        if (!mesh) return;
-        const matrix = new THREE.Matrix4();
-        paths.forEach((path, member) => {
-            matrix.makeTranslation(path[sample * 3], path[sample * 3 + 1], path[sample * 3 + 2]);
-            mesh.setMatrixAt(member, matrix);
-        });
-        mesh.instanceMatrix.needsUpdate = true;
-        mesh.computeBoundingSphere();
-        invalidate();
-    }, [paths, sample, invalidate]);
-    return (
-        <instancedMesh key={paths.length} ref={meshRef} args={[undefined, undefined, paths.length]}>
-            <sphereGeometry args={[MARKER_RADIUS, 12, 12]} />
-            <meshBasicMaterial color={markerColor} />
-        </instancedMesh>
-    );
-});
 
 const EnsembleTubes = observer(function EnsembleTubes() {
     const context = useScenario().globalContext as LorenzEnsembleGlobalContext;
@@ -68,20 +34,14 @@ const EnsembleTubes = observer(function EnsembleTubes() {
 });
 
 export default function TrajectoriesPanel() {
+    const markerColor = useTheme().tokens.text;
     return (
         <Panel panelName="Trajectories">
             <Box sx={{ width: 1, height: 1, minHeight: 0 }}>
-                <Canvas frameloop="demand" camera={{ position: CAMERA_POSITION.toArray(), fov: 40 }}>
-                    <FitCameraToAspect position={CAMERA_POSITION.toArray()} />
-                    <DoublePressToReset />
-                    <hemisphereLight args={["#ffffff", "#808080", 1.4]} />
-                    <directionalLight position={[2, 3, 2]} intensity={1.2} />
-                    <group scale={SCENE_SCALE} rotation={[-Math.PI / 2, 0, 0]} position={[0, -25 * SCENE_SCALE, 0]}>
-                        <EnsembleTubes />
-                        <MemberMarkers />
-                    </group>
-                    <OrbitControls makeDefault minDistance={1.2} maxDistance={10} />
-                </Canvas>
+                <LinkedCanvas>
+                    <EnsembleTubes />
+                    <MemberPositions color={markerColor} radius={MARKER_RADIUS} />
+                </LinkedCanvas>
             </Box>
         </Panel>
     );

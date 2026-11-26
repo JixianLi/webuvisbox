@@ -47,7 +47,19 @@ const START: State = (() => {
 
 export interface LorenzEnsemble {
     paths: Float32Array[];   // one per member: SAMPLE_COUNT points, x y z each
+    mean: Float32Array;      // the ensemble mean path: SAMPLE_COUNT points, x y z each
     spread: Float32Array;    // per sample: RMS distance of the members from the ensemble mean
+}
+
+// The spread axis shared by the colors, the colorbar, the chart and the uncertainty tube: fixed rather than fitted to the
+// data, so a smaller starting jitter visibly starts cooler and lower.
+export const SPREAD_DOMAIN: [number, number] = [1e-6, 30];
+
+// A spread's place on SPREAD_DOMAIN in [0, 1], on a log scale (as d3.scaleLog().clamp(true) maps it).
+export function normalizedSpread(spread: number): number {
+    const [low, high] = SPREAD_DOMAIN;
+    const position = (Math.log(Math.max(spread, 1e-12)) - Math.log(low)) / (Math.log(high) - Math.log(low));
+    return Math.min(1, Math.max(0, position));
 }
 
 // Member m starts at START + jitter · (g_x, g_y, g_z) with g standard normal, so the starting spread is about
@@ -66,6 +78,7 @@ export function generateEnsemble(memberCount: number, jitter: number, seed: numb
     });
 
     const spread = new Float32Array(SAMPLE_COUNT);
+    const mean = new Float32Array(SAMPLE_COUNT * 3);
     for (let sample = 0; sample < SAMPLE_COUNT; sample++) {
         let meanX = 0, meanY = 0, meanZ = 0;
         for (const path of paths) {
@@ -74,6 +87,7 @@ export function generateEnsemble(memberCount: number, jitter: number, seed: numb
             meanZ += path[sample * 3 + 2];
         }
         meanX /= memberCount; meanY /= memberCount; meanZ /= memberCount;
+        mean.set([meanX, meanY, meanZ], sample * 3);
         let squaredDistance = 0;
         for (const path of paths) {
             squaredDistance += (path[sample * 3] - meanX) ** 2 + (path[sample * 3 + 1] - meanY) ** 2
@@ -81,5 +95,5 @@ export function generateEnsemble(memberCount: number, jitter: number, seed: numb
         }
         spread[sample] = Math.sqrt(squaredDistance / memberCount);
     }
-    return { paths, spread };
+    return { paths, mean, spread };
 }
