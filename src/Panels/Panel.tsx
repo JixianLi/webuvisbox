@@ -65,7 +65,7 @@ export const Panel = observer((props: PanelProps) => {
     const frames = {
         regular: { backgroundColor: tokens.surface, border: `1px solid ${tokens.border}`,
                    borderRadius: `${tokens.px(SHAPE.panelRadius)}px` },
-        borderless: { backgroundColor: tokens.canvas },
+        borderless: { backgroundColor: tokens.borderlessFill },
         overlay: { backgroundColor: tokens.glass.fill,
                    backdropFilter: `blur(${tokens.glass.blur}px) saturate(${tokens.glass.saturate})`,
                    WebkitBackdropFilter: `blur(${tokens.glass.blur}px) saturate(${tokens.glass.saturate})`,
@@ -73,7 +73,7 @@ export const Panel = observer((props: PanelProps) => {
                    boxShadow: `inset 0 1px 0 ${tokens.glass.highlight}, ${tokens.shadowRaised}`,
                    borderRadius: `${tokens.px(12)}px` },
     };
-    const chrome = type !== 'borderless' ? tokens.chrome : undefined;
+    const chrome = tokens.chrome;
     const headerAction = { color: chrome?.text ?? tokens.textSecondary, p: 0.5, opacity: 0.5, transition: 'opacity 120ms',
                            '&:hover': { opacity: 1, backgroundColor: chrome ? 'rgba(255, 255, 255, 0.14)' : tokens.controlFill } };
     const icon = { size: tokens.px(15), strokeWidth: 1.75 };

@@ -20,8 +20,8 @@ export interface ModeTokens {
     textMuted: string;
     // The navbar: 'surface' blends with the panels, 'accent' fills it with the accent (the brand bar).
     navbar: 'surface' | 'accent';
-    // Dark chrome on light content: when set, the navbar (unless 'accent') and the title rows of regular and overlay
-    // panels take this fill and text color.
+    // Dark chrome on light content: when set, the navbar (unless 'accent') and every panel's title row take this fill
+    // and text color, and borderless panels sit on the surface rather than the canvas (blocks on a darker ground).
     chrome?: { fill: string; text: string };
     // Accent as a fill (switch, selection; white text on it) and as a line or text on the surface (focus ring,
     // links), where a dark surface needs a lighter tint to keep 3:1 contrast.
@@ -66,13 +66,13 @@ export const MODE_TOKENS: Record<DisplayMode, ModeTokens> = {
                  highlight: 'rgba(255, 255, 255, 0.10)' },
         shadowRaised: '0 12px 32px rgba(0, 0, 0, 0.40), 0 1px 3px rgba(0, 0, 0, 0.30)',
     },
-    // For judging color: every gray is hue-free (R = G = B), no accent near the content, glass without saturation. The
-    // navbar and panel title rows are dark gray over a mid gray canvas and panels, so the panels read as blocks while the
-    // content's surround stays neutral. On the mid gray only black text reaches 4.5:1 (5.03:1), so text, secondary text
+    // For judging color: every gray is hue-free (R = G = B), no accent near the content, glass without saturation.
+    // Panels are mid gray blocks with dark gray title rows on a darker canvas, so they read as blocks, and every render
+    // (borderless main views included) sits on the same mid gray. On the mid gray only black text reaches 4.5:1 (5.03:1), so text, secondary text
     // and the accent as a line are black or nearly.
     neutral: {
         base: 'light',
-        canvas: '#7C7C7C',
+        canvas: '#303030',
         surface: '#7C7C7C',
         surfaceRaised: '#888888',
         controlFill: '#868686',

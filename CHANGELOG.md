@@ -7,10 +7,11 @@ has to change, if anything.
 
 ### Look and behavior
 
-- The neutral display mode is redone: hue-free grays, a dark gray (`#505050`) navbar and panel title rows over a mid
-  gray (`#7C7C7C`) canvas and panels, black text. It is built on MUI's light palette now (it was dark), so
+- The neutral display mode is redone: hue-free grays, mid gray (`#7C7C7C`) panels with dark gray (`#505050`) title
+  rows and navbar on a darker (`#303030`) canvas, black text; borderless main views sit on the panel gray too. It is built on MUI's light palette now (it was dark), so
   `palette.mode` is `light` in neutral. New optional token `chrome` (`{ fill, text }`): when a mode sets it, the navbar
-  and the title rows of regular and overlay panels use it. **Host action:** a component that picks colors from
+  and every panel's title row use it, and borderless panels sit on the surface. New resolved token `borderlessFill`:
+  what a borderless panel sits on. **Host action:** a component that picks colors from
   `palette.mode === 'dark'` (rather than the tokens) should check how it looks in neutral.
 - The theme's `primary.main` is the accent's on-surface tint (`tokens.accentOnSurface`), so lines and text drawn in
   the primary color (sliders, outlined and text buttons, focus rings, checkboxes) reach readable contrast in dark mode;

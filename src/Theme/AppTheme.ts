@@ -11,6 +11,8 @@ export interface ResolvedTokens extends Omit<ModeTokens, 'accentFill' | 'accentO
     accent: string;
     accentFill: string;
     accentOnSurface: string;
+    // What a borderless panel (a main view) sits on: the canvas, or the surface in a mode with dark chrome.
+    borderlessFill: string;
     uiScale: number;
     // A size in px at the current UI scale.
     px: (size: number) => number;
@@ -30,6 +32,7 @@ export function createAppTheme(mode: DisplayMode, accent: string, uiScale: numbe
         accent,
         accentFill: modeTokens.accentFill(accent),
         accentOnSurface: modeTokens.accentOnSurface(accent),
+        borderlessFill: modeTokens.chrome ? modeTokens.surface : modeTokens.canvas,
         uiScale,
         px,
     };

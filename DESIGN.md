@@ -39,10 +39,11 @@ panels 10px corners, controls 7px, navbar 44px, panel title row 34px.
 |---|---|---|---|---|
 | `bright` | MUI light | White panels on `#EEF0F0` | The navbar is the accent bar | Lit rooms, slides |
 | `dark` | MUI dark | `#2C2D32` panels on `#232428` (brighter than MUI's default near-black) | Fills only; lighter tint `#E5484D` for lines and focus | Everyday work |
-| `neutral` | MUI light | Hue-free grays: navbar and panel title rows `#505050`, canvas and panels `#7C7C7C` | None; dark gray fills, near-black lines | Judging color |
+| `neutral` | MUI light | Hue-free grays: `#7C7C7C` panels with `#505050` title rows and navbar, on a `#303030` canvas | None; dark gray fills, near-black lines | Judging color |
 
-The dark title rows against the mid gray panels (1.9:1) make the panels read as blocks; the content's surround stays a
-hue-free mid gray. A mid gray gives poor text contrast in both black and white: on `#7C7C7C` white reaches 4.1:1 and
+Panels read as blocks: mid gray on a darker canvas (3.2:1), each topped by a dark title row (1.9:1 to its panel; the
+canvas is darker still, 1.6:1, so the title rows stay apart from the gaps). Every render, borderless main views
+included, sits on the same hue-free mid gray. A mid gray gives poor text contrast in both black and white: on `#7C7C7C` white reaches 4.1:1 and
 black 5.0:1, so text there is black (secondary `#0D0D0D`, 4.7:1) and the dark title rows carry the white text (8.1:1).
 Fills are solid; a gradient background (as some renderers use behind 3D content) is not part of the tokens.
 
@@ -76,7 +77,7 @@ is drawn; it can differ per breakpoint like the position:
 | `type` | Drawn as | Takes grid space |
 |---|---|---|
 | `regular` (default) | A bordered tile | Yes; tiles push each other aside |
-| `borderless` | Unframed on the canvas, content edge to edge (for the main view); keeps a thin title row | Yes |
+| `borderless` | Unframed on the canvas (on the panel gray in neutral), content edge to edge (for the main view); keeps a thin title row | Yes |
 | `overlay` | Glass, above the grid at its `x`, `y`, `w`; as tall as its content up to `h` rows, then it scrolls | No; it floats over what is under it |
 
 Dragging a title row moves a panel: grid panels with the grid, overlays freely, snapping to the nearest cell on release.

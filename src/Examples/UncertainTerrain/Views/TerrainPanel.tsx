@@ -124,7 +124,7 @@ const WIND_GLYPH_LENGTH = 0.06;
 
 const WindGlyphs = observer(function WindGlyphs() {
     const context = useScenario().globalContext as UncertainTerrainGlobalContext;
-    const canvas = useTheme().tokens.canvas;
+    const surround = useTheme().tokens.borderlessFill;
     const glyphs = context.windGlyphs;
     const { mean } = context.ensemble;
     const heightScale = context.heightScale;
@@ -132,7 +132,7 @@ const WindGlyphs = observer(function WindGlyphs() {
     const glyphScale = context.windGlyphScale;
     const instances = useMemo(() => {
         const agreed = parseColor(windColor);
-        const fade = d3.interpolateRgb(agreed, canvas);
+        const fade = d3.interpolateRgb(agreed, surround);
         return glyphs.map((glyph): InstanceTransform => {
             const height = mean[nearestGridIndex(glyph.x, glyph.z)] * heightScale + WIND_LIFT;
             return {
@@ -143,7 +143,7 @@ const WindGlyphs = observer(function WindGlyphs() {
                 color: d3.rgb(fade(1 - glyph.agreement)),
             };
         });
-    }, [glyphs, mean, heightScale, windColor, glyphScale, canvas]);
+    }, [glyphs, mean, heightScale, windColor, glyphScale, surround]);
     return (
         <group rotation={[-Math.PI / 2, 0, 0]}>
             <InstancedConeMesh instances={instances} radius={0.01} lengthScale={WIND_GLYPH_LENGTH} radialSegments={8}
