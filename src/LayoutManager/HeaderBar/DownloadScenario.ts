@@ -1,9 +1,13 @@
-import type { Scenario } from '../../Types/Scenario';
+import type { Scenario, ScenarioLayoutChoice } from '../../Types/Scenario';
 
-export function downloadScenario(scenario: Scenario, handleClose: () => void) {
+export function downloadScenario(
+    scenario: Scenario,
+    handleClose: () => void,
+    layout: ScenarioLayoutChoice = 'default',
+) {
     try {
         // Get the scenario data as JSON
-        const jsonString = scenario.toJson();
+        const jsonString = scenario.toJson(layout);
 
         // Create a blob with the JSON data
         const blob = new Blob([jsonString], { type: 'application/json' });

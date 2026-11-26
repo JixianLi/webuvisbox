@@ -63,6 +63,8 @@ export interface PanelLayouts {
 
   saveDefaultLayouts(): void;
 
+  snapshotCurrentLayouts(): AppLayouts;
+
   resetToDefault(): void;
 
   setCurrentBreakpoint(breakpoint: string): void;

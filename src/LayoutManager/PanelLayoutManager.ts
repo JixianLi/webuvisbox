@@ -124,23 +124,29 @@ export class PanelLayoutManager implements PanelLayouts {
         });
     }
 
+    snapshotCurrentLayouts(): AppLayouts {
+        const snapshot = _.cloneDeep(this.currentLayouts);
+
+        // Iterate through all breakpoints
+        Object.keys(snapshot).forEach(breakpoint => {
+            snapshot[breakpoint].forEach((panel, index) => {
+                // If panel is not visible, use cached layout but keep visible as false
+                if (!panel.visible) {
+                    const cachedPanelIndex = _.findIndex(this.cacheLayouts[breakpoint], { i: panel.i });
+                    if (cachedPanelIndex !== -1) {
+                        snapshot[breakpoint][index] = _.cloneDeep(this.cacheLayouts[breakpoint][cachedPanelIndex]);
+                        snapshot[breakpoint][index].visible = false;
+                    }
+                }
+            });
+        });
+
+        return snapshot;
+    }
+
     saveDefaultLayouts() {
         runInAction(() => {
-            this.defaultLayouts = _.cloneDeep(this.currentLayouts);
-
-            // Iterate through all breakpoints
-            Object.keys(this.defaultLayouts).forEach(breakpoint => {
-                this.defaultLayouts[breakpoint].forEach((panel, index) => {
-                    // If panel is not visible, use cached layout but keep visible as false
-                    if (!panel.visible) {
-                        const cachedPanelIndex = _.findIndex(this.cacheLayouts[breakpoint], { i: panel.i });
-                        if (cachedPanelIndex !== -1) {
-                            this.defaultLayouts[breakpoint][index] = _.cloneDeep(this.cacheLayouts[breakpoint][cachedPanelIndex]);
-                            this.defaultLayouts[breakpoint][index].visible = false;
-                        }
-                    }
-                });
-            });
+            this.defaultLayouts = this.snapshotCurrentLayouts();
         });
     }
 

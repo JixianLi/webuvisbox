@@ -4,15 +4,18 @@ import { useState } from "react";
 import { downloadScenario } from "./DownloadScenario";
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import ScenarioDownloadDialog from "./ScenarioDownloadDialog";
 import ScenarioUploadDialog from "./ScenarioUploadDialog";
 import { Download, LayoutGrid, MessageSquare, Upload } from 'lucide-react';
 import Divider from '@mui/material/Divider';
 import { loadScenario, loadScenarioFromText, useScenario, type ScenarioSource } from "../../ScenarioManager/ScenarioManager";
 import { scenarioRegistry, type ScenarioDefinition } from "../../Scenarios";
+import type { ScenarioLayoutChoice } from "../../Types/Scenario";
 
 export const ScenarioMenuList: React.FC<{ handleClose: () => void }> = observer(({ handleClose }) => {
     const scenario = useScenario();
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+    const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
 
     const load = (source: ScenarioSource) => {
         handleClose();
@@ -23,6 +26,11 @@ export const ScenarioMenuList: React.FC<{ handleClose: () => void }> = observer(
         setUploadDialogOpen(false);
         handleClose();
         loadScenarioFromText(scenario, jsonString);
+    };
+
+    const handleDownloadScenario = (layout: ScenarioLayoutChoice) => {
+        setDownloadDialogOpen(false);
+        downloadScenario(scenario, handleClose, layout);
     };
 
     // Every registered scenario with a config: the library's built-in examples, then the host's own.
@@ -37,6 +45,7 @@ export const ScenarioMenuList: React.FC<{ handleClose: () => void }> = observer(
 
     const onClose = () => {
         setUploadDialogOpen(false);
+        setDownloadDialogOpen(false);
         handleClose();
     }
 
@@ -48,7 +57,7 @@ export const ScenarioMenuList: React.FC<{ handleClose: () => void }> = observer(
             <Divider>Scenarios</Divider>
             {menuItemsOf(loadable.filter(definition => !definition.isExample))}
             <Divider />
-            <MenuItem onClick={() => downloadScenario(scenario, handleClose)}>
+            <MenuItem onClick={() => setDownloadDialogOpen(true)}>
                 <ListItemIcon><Download size={16} strokeWidth={1.75} /></ListItemIcon>
                 <ListItemText>Download Scenario</ListItemText>
             </MenuItem>
@@ -56,7 +65,12 @@ export const ScenarioMenuList: React.FC<{ handleClose: () => void }> = observer(
                 <ListItemIcon><Upload size={16} strokeWidth={1.75} /></ListItemIcon>
                 <ListItemText>Upload Scenario</ListItemText>
             </MenuItem>
-            
+
+            <ScenarioDownloadDialog
+                open={downloadDialogOpen}
+                onClose={onClose}
+                onDownload={handleDownloadScenario}
+            />
 
             <ScenarioUploadDialog
                 open={uploadDialogOpen}

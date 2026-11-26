@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import type { GlobalContext} from "../Types/GlobalContext";
 import type { PanelLayouts } from "../Types/PanelLayouts";
-import type { Scenario } from "../Types/Scenario";
+import type { Scenario, ScenarioLayoutChoice } from "../Types/Scenario";
 import PanelLayoutManager from "../LayoutManager/PanelLayoutManager";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getGlobalContext, scenarioRegistry } from "../Scenarios";
@@ -66,13 +66,16 @@ class ScenarioManager implements Scenario {
         this.loadFromObject(config);
     }
 
-    toObject(): any {
+    toObject(layout: ScenarioLayoutChoice = 'default'): any {
+        const layouts = layout === 'current'
+            ? this.panelLayouts.snapshotCurrentLayouts()
+            : this.panelLayouts.defaultLayouts;
         return {
             name: this.name,
             description: this.description,
             views: this.views,
             panel_layouts: {
-                default_layouts: this.panelLayouts.defaultLayouts,
+                default_layouts: layouts,
                 breakpoints: this.panelLayouts.breakpoints,
                 cols: this.panelLayouts.cols,
                 fit_rows: this.panelLayouts.fitRows,
@@ -86,24 +89,8 @@ class ScenarioManager implements Scenario {
         };
     }
 
-    toJson(): string {
-        return JSON.stringify({
-            name: this.name,
-            description: this.description,
-            views: this.views,
-            panel_layouts: {
-                default_layouts: this.panelLayouts.defaultLayouts,
-                breakpoints: this.panelLayouts.breakpoints,
-                cols: this.panelLayouts.cols,
-                fit_rows: this.panelLayouts.fitRows,
-            },
-            appearance: {
-                accent: this.appearance.accent,
-                default_mode: this.appearance.defaultMode,
-                ui_scale: this.appearance.uiScale,
-            },
-            global_data: this.globalContext.toObject(),
-        }, null, 2);
+    toJson(layout: ScenarioLayoutChoice = 'default'): string {
+        return JSON.stringify(this.toObject(layout), null, 2);
     }
 
     setLoadError(message: string | null): void {

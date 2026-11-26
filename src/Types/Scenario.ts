@@ -1,6 +1,8 @@
 import type { GlobalContext } from "./GlobalContext";
 import type { PanelLayouts } from "./PanelLayouts";
 
+export type ScenarioLayoutChoice = 'current' | 'default';
+
 export interface Scenario {
     name: string;
     description?: string;
@@ -11,6 +13,6 @@ export interface Scenario {
     // Methods
     loadFromObject(config: any): void;
     loadFromJson(json: string): void;
-    toJson(): string;
+    toJson(layout?: ScenarioLayoutChoice): string;
     asyncInitialization(): Promise<void>;
 }

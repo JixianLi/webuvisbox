@@ -174,9 +174,8 @@ the others beside each example.
    `"resolveJsonModule": true` to import `.json`).
 3. **Upload it** at runtime: Scenario → Upload Scenario, then pick a `.json` file. The scenario it names must be
    registered in the app.
-4. **Write one from the running app**: Scenario → Download Scenario saves the open scenario's config, with its current
-   `global_data` and its default layout (to include a rearranged layout, first use Layout → Save as Default Layout).
-   Any of the ways above loads the file again.
+4. **Write one from the running app**: Scenario → Download Scenario prompts whether to save the current layout or the
+   default layout alongside the open scenario's `global_data`. Any of the ways above loads the file again.
 
 ## Key Features
 
