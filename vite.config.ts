@@ -4,6 +4,7 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: process.env.VITE_BASE ?? '/',
   plugins: [react()],
   root: path.resolve(__dirname, 'examples'),
   // Covers the production build; the optimizeDeps.rolldownOptions define below
