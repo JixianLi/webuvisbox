@@ -21,9 +21,14 @@ through the theme (`theme.tokens`), never as literal colors or sizes.
 | `surface`, `surfaceRaised` | Panels; menus and popovers |
 | `controlFill`, `border` | Text fields and selects; 1px hairlines (no shadows on panels) |
 | `text`, `textSecondary`, `textMuted` | Three levels of ink |
-| `accentFill`, `accentOnSurface` | The accent as a fill (white text on it) and as a line or text on the surface |
+| `accentFill`, `accentOnSurface` | The accent as a fill (white text on it) and as a line or text on the surface; MUI's `primary.main` is `accentOnSurface` (contained buttons and switch tracks use `accentFill`) |
 | `glass` | Fill, blur, saturation, edge and highlight of overlay panels |
 | `px(size)` | A size at the current UI scale |
+
+Color management: colors are written in sRGB (tokens, colormap presets, configs). Rendering follows three.js: the
+canvas encodes sRGB on output (R3F's default; no `linear flat`), materials work in linear light, and TextureManager's
+colormap textures hold linear values (`LinearSRGBColorSpace`). A custom shader sampling them ends with
+`linearToOutputTexel` (or `#include <colorspace_fragment>`), as `VolumeRenderer` does.
 
 Type: Inter (variable), with tabular figures so changing numbers do not jitter. Icons: Lucide, 1.75 stroke. Shapes:
 panels 10px corners, controls 7px, navbar 44px, panel title row 34px.

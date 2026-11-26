@@ -58,6 +58,15 @@ npm run build
 npm run preview
 ```
 
+### Check
+
+```bash
+npm run lint   # ESLint
+npm test       # Vitest: unit tests, and 3D components mounted without a GPU (@react-three/test-renderer)
+```
+
+CI (`.github/workflows/check.yml`) runs lint, tests and the build on pushes to main and on pull requests.
+
 ## Project Structure
 
 The repository is split into a reusable library and a dev app that exercises it:
@@ -100,12 +109,42 @@ under `examples/` mounts the library and is where a dev-only scenario would go.
 The earlier server-backed examples, Wildfire and Uncertainty Tube, are archived on the
 `archive/wildfire-and-uncertainty-tube` branch.
 
-## Scenarios
+## Examples
 
-### chatUI (no backend required) — **default**
-A sandbox that exercises the library's `Chat` and `Trace` renderers. A simulated tool-calling agent walks between User, Model, and two Tools — with retries, occasional failures, and base64-encoded image responses — animated through a swim-lane sequence diagram on the left and a chat window on the right.
+Every example runs in the browser on generated or bundled data, and each library component is used by at least one,
+so the examples double as its demonstration and its integration test:
 
-This is the scenario `npm run dev` boots into. It runs entirely client-side.
+| Example | What it shows |
+|---|---|
+| ChatUI (default) | A scripted tool-calling agent: chat, a swim-lane trace, and a word cloud of the conversation's topics |
+| Uncertain terrain | An ensemble of terrains, after the paper's Wildfire case study: VSUP or single-field coloring, wind glyphs where the members agree or not, a depth image |
+| Lorenz ensemble | Chaotic divergence, after the paper's Uncertainty Tube case study: three linked 3D views, an uncertainty tube, data from an in-browser server speaking base64 binary |
+| Contour uncertainty | Contour boxplots, crossing probability and critical points of a 2D ensemble |
+| Volume rendering | Ray-marched volumes with an editable transfer function |
+
+| Library component | Used by |
+|---|---|
+| `Renderers/Chat`, `Renderers/Trace` | ChatUI |
+| `Renderers/Graph` (`WordCloud`, `WordCloudLayoutRunner`) | ChatUI (Topics) |
+| `Renderers/Mesh/LinearTubeMesh` | Lorenz (Trajectories) |
+| `Renderers/Mesh/TexturedBufferedMesh` | Lorenz (Uncertainty tube) |
+| `Renderers/Mesh/SingleColorBufferedMesh` | Lorenz (Mean path) |
+| `Renderers/Mesh/InstancedSphereMesh` | Lorenz (member positions) |
+| `Renderers/Mesh/BoxOutlineMesh` | Lorenz (bounding box) |
+| `Renderers/Mesh/ScalarFieldMesh` | Uncertain terrain (single-field coloring) |
+| `Renderers/Mesh/InstancedConeMesh` | Uncertain terrain (wind glyphs) |
+| `Renderers/SharedCameraControl` | Lorenz (linked views) |
+| `Renderers/Camera` (`FitCameraToAspect`, `DoublePressToReset`) | Terrain, Volume, Lorenz |
+| `Renderers/DepthRenderer` | Uncertain terrain (Depth) |
+| `Renderers/Volume`, `Renderers/TransferFunction` | Volume rendering |
+| `Renderers/Colormaps` (`PresetLinearColormap`, `VSUP`, `OpacityMap`, `TextureManager`) | Terrain, Lorenz, Contour, Volume |
+| `Helpers/DataHelper` (`decode64`, `encode64`) | Lorenz (data server) |
+| `Helpers/Random`, `Helpers/DoublePress`, `Helpers/SaveGrayscalePng`, `Helpers/ColorParser`, `Helpers/InputChecks` | Lorenz, Contour, Terrain |
+| `Panels/SliderOnRelease`, `Panels/FormGrid`, `Panels/CheckMenuItem` | Lorenz, Contour, Terrain |
+| `Panels/Lazyfields` (`LazyTextField`) | Volume rendering, through the transfer function editor |
+
+The Lorenz example's `LorenzDataServer.ts` is a template for a scenario with a data server: it answers like a Python
+server (a `Response` with base64-encoded arrays), so moving to a real one means replacing its fetch with `fetch(url)`.
 
 ## Configuration
 

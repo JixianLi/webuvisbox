@@ -12,6 +12,7 @@ WebUVisBox (Web-based Uncertainty Visualization Toolbox) is a React/TypeScript a
 npm run dev      # Start development server (http://localhost:5173)
 npm run build    # TypeScript check + production build (tsc -b && vite build)
 npm run lint     # ESLint on all files
+npm test         # Vitest (unit tests; R3F components via @react-three/test-renderer, no GPU)
 npm run preview  # Preview production build
 ```
 
@@ -128,5 +129,6 @@ examples import theirs (`src/Examples/*/*Config.json`) so no file has to be serv
 ## Examples Are Standalone
 
 Every example runs entirely in the browser with generated or bundled data: no data server, no backend. Keep it that
-way for new examples. The earlier server-backed examples (Wildfire, Uncertainty Tube) and the Chart.js charts they used
+way for new examples. Each library component has an example that uses it (README.md lists which): a new component gets
+a user in an example and tests. A host-visible change goes in CHANGELOG.md with what a host must do. The earlier server-backed examples (Wildfire, Uncertainty Tube) and the Chart.js charts they used
 are archived on the `archive/wildfire-and-uncertainty-tube` branch; main has no Chart.js dependency.
